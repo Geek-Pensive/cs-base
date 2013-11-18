@@ -13,45 +13,23 @@ http://www.springframework.org/schema/aop http://www.springframework.org/schema/
 http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
 	default-lazy-init="false">
-
 	
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
 		<property name="maxActive" value="300" />
 		<property name="maxIdle" value="100" />
 		<property name="maxWait" value="50" />
-	</bean>
+	</bean> 
 
-	<bean id="jedisPoolMaster" class="redis.clients.jedis.JedisPool">
-		<constructor-arg name="poolConfig" ref="jedisPoolConfig" />
-		<constructor-arg name="host" value="172.19.108.117" />
-		<constructor-arg name="port" value="6380" />
-		<constructor-arg name="timeout" value="15000" />
-	</bean>
-
-	<bean id="jedisPoolSlaver" class="redis.clients.jedis.JedisPool">
-		<constructor-arg name="poolConfig" ref="jedisPoolConfig" />
-		<constructor-arg name="host" value="172.19.103.105" />
-		<constructor-arg name="port" value="6379" />
-		<constructor-arg name="timeout" value="15000" />
-		<constructor-arg name="password" value="fdfs123" />
-	</bean>
-
-	<bean id="jedisPoolManager" class="com.yy.cs.client.jedis.JedisPoolManager">
-		<property name="jedisPools">
+	<bean id="jedisPoolManager" class="com.yy.cs.redis.RedisPoolManager" init-method="init" destroy-method="destroy">
+		<property name="poolConfig" ref="jedisPoolConfig"></property><!-- optional -->
+		<property name="redisServers">
 			<list>
-				<ref bean="jedisPoolMaster" />
-				<ref bean="jedisPoolSlaver" />
-			</list>
-		</property>
-		<property name="jedisWritePools">
-			<list>
-				<ref bean="jedisPoolSlaver" />
-			</list>
-		</property>
-		<property name="jedisReadPools">
-			<list>
-				<ref bean="jedisPoolMaster" />
+				<!-- 格式是  ip:port:pw:timeout -->
+				<value>172.19.103.105:6331::</value>
+				<value>172.19.103.105:6330::</value>
+				<value>172.19.103.105:6379:fdfs123:</value>
 			</list>
 		</property>
 	</bean>
+	
 </beans>

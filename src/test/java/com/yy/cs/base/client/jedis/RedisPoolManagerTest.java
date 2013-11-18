@@ -17,7 +17,8 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import com.yy.cs.client.jedis.JedisPoolManager;
+import com.yy.cs.redis.RedisClient;
+import com.yy.cs.redis.RedisPoolManager;
 
 /**
  * 
@@ -25,15 +26,15 @@ import com.yy.cs.client.jedis.JedisPoolManager;
  * JedisPoolManager 的覆盖测试用例
  *
  */
-public class JedisPoolManagerTest {
+public class RedisPoolManagerTest {
 
-	JedisPoolManager jedisPoolManager;
+	RedisPoolManager jedisPoolManager;
 	
 	@Before
 	public void init(){
 		ApplicationContext context = new ClassPathXmlApplicationContext(
 				"jedis-application.xml");
-        jedisPoolManager = (JedisPoolManager) context.getBean("jedisPoolManager");
+        jedisPoolManager = (RedisPoolManager) context.getBean("jedisPoolManager");
 	}
 
 	/**
@@ -41,25 +42,17 @@ public class JedisPoolManagerTest {
 	 */
 	@Test
 	public void testRoundrobinGetJedis(){
+		System.out.println("测试轮询从 jedisPool中获取jedis实例  开始");
 		for(int i = 0; i < 100; i ++){
-			Jedis jedis = jedisPoolManager.getJedis();
-			String str = String.valueOf(System.currentTimeMillis());
-			jedis.set(str,str);
-			Jedis readJedis = jedisPoolManager.getReadJedis();
-			Jedis writeJedis = jedisPoolManager.getWriteJedis();
-			//如果i为偶数则命中jedisPools 中的第一个配置，如果为奇数，则命中jedisPools的第二个配置
-			if(i % 2 == 0){
-				Assert.assertEquals(str,readJedis.get(str));
-				Assert.assertFalse(str.equals(writeJedis.get(str)));
-			}else{
-				Assert.assertEquals(str,writeJedis.get(str));
-				Assert.assertFalse(str.equals(readJedis.get(str)));
-			}
-			//释放jedis
-			jedisPoolManager.returnJedis(jedis);
-			jedisPoolManager.returnReadJedis(readJedis);
-			jedisPoolManager.returnWriteJedis(writeJedis);
+			String currentTimestamp = String.valueOf(System.currentTimeMillis());
+			RedisClient redisClient = jedisPoolManager.getMasterJedis();
+			redisClient.setAndReturn(currentTimestamp,currentTimestamp);
+			RedisClient redisClient1 = jedisPoolManager.getSlaveJedis();
+			RedisClient redisClient2 = jedisPoolManager.getSlaveJedis();
+			Assert.assertTrue(redisClient1.getJedis().getClient().getHost().equals(redisClient2.getJedis().getClient().getHost()));
+			Assert.assertTrue(redisClient1.getJedis().getClient().getPort() != redisClient2.getJedis().getClient().getPort());
 		}
+		System.out.println("测试轮询从 jedisPool中获取jedis实例  通过");
 	}
 	
 	
@@ -69,19 +62,21 @@ public class JedisPoolManagerTest {
 	 */
 	@Test
 	public void testConectedClientsAndReturnJedis(){
-		Jedis jedis = jedisPoolManager.getReadJedis();
-		int clientNum1 = getConnectedClientNum(jedis.info());
-		Jedis jedis2 = jedisPoolManager.getReadJedis();
-		int clientNum2 = getConnectedClientNum(jedis2.info());
+		System.out.println("测试returnJedis 和 连接数 开始");
+		RedisClient redisClient = jedisPoolManager.getMasterJedis();
+		int clientNum1 = getConnectedClientNum(redisClient.getNativeJedis().info());
+		RedisClient redisClient2 = jedisPoolManager.getMasterJedis();
+		int clientNum2 = getConnectedClientNum(redisClient2.getNativeJedis().info());
 		Assert.assertEquals(1, clientNum2 - clientNum1);
-		List<Jedis> list = new ArrayList<Jedis>();
-		Jedis lastJedsi = jedis2;
-		for(int i = 0; i <= 100; i++){ //如果不能正常returnJedis的话，将导致抛出异常
-			Jedis j = jedisPoolManager.getReadJedis();
-			jedisPoolManager.returnReadJedis(lastJedsi);
-			lastJedsi = j;
+		List<RedisClient> list = new ArrayList<RedisClient>();
+		RedisClient lastJedis = redisClient2;
+		for(int i = 0; i <= 1000; i++){ //如果不能正常returnJedis的话，将导致抛出异常
+			RedisClient j = jedisPoolManager.getMasterJedis();
+			lastJedis.returnSelf();
+			lastJedis = j;
 			list.add(j);
 		}
+		System.out.println("测试returnJedis 和 连接数 通过");
 	}
 	
 	/**
@@ -98,13 +93,14 @@ public class JedisPoolManagerTest {
 	 */
 	@After
 	public void pressureTest(){
+		System.out.println("对比JedisPoolManager与Jedis的数据  开始");
 		//配置要与 JedisPoolManagerTest一致,连接同一台机器
 		JedisPoolConfig config = new JedisPoolConfig();
 		config.setMaxActive(300);
 		config.setMaxIdle(100);
 		config.setMaxWait(50);
 		JedisPool pool;
-		pool = new JedisPool(config, "172.19.108.117", 6380);
+		pool = new JedisPool(config, "172.19.103.105", 6379,2000, "fdfs123");
 		Jedis jedis = null;
 		long beginTime = System.currentTimeMillis();
 		for(int i = 0; i < 1000; i++){
@@ -128,13 +124,12 @@ public class JedisPoolManagerTest {
 		
 		beginTime = System.currentTimeMillis();
 		for(int i = 0; i < 1000; i++){
-			jedis = jedisPoolManager.getReadJedis();
-			jedis.set(String.valueOf(i), String.valueOf(i));
-			// do redis opt by instance
-			jedisPoolManager.returnReadJedis(jedis);
+			RedisClient r = jedisPoolManager.getMasterJedis();
+			r.setAndReturn(String.valueOf(i), String.valueOf(i));
 		}
 		endTime = System.currentTimeMillis();
 		System.out.println("test 1000 time cost "+ (endTime -  beginTime) + " in JedisPoolManagerTest");
+		System.out.println("对比JedisPoolManager与Jedis的数据  结束");
 	}
 	
 	/**
