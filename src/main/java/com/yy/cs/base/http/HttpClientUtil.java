@@ -30,7 +30,7 @@ public class HttpClientUtil {
 
         ArrayList<String> p = new ArrayList<String>();
         for (Entry<String, String> entry : params.entrySet()) {
-            p.add(URLDecoder.decode(entry.getKey(), "UTF-8")  + "=" + URLDecoder.decode(entry.getValue(), "utf-8"));
+            p.add(URLDecoder.decode(entry.getKey(), "UTF-8")  + "=" + URLDecoder.decode(entry.getValue(), "UTF-8"));
         }
 
         return StringUtils.join(p, '&');
