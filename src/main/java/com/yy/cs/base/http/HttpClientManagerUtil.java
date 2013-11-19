@@ -226,6 +226,7 @@ public class HttpClientManagerUtil {
 				.setProxyPreferredAuthSchemes(
 						config.getProxyPreferredAuthSchemes()).build();
     }
+    
     private boolean isInStatusArray(int status, int[] statusArray) {
         for (int i = 0; i < statusArray.length; i++) {
             if (status == statusArray[i]) {
