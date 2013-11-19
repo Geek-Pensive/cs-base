@@ -2,6 +2,7 @@ package com.yy.cs.base.http;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +31,31 @@ public class HttpClientUtil {
 
         ArrayList<String> p = new ArrayList<String>();
         for (Entry<String, String> entry : params.entrySet()) {
-            p.add(URLDecoder.decode(entry.getKey(), "UTF-8")  + "=" + URLDecoder.decode(entry.getValue(), "UTF-8"));
+            p.add(encode(entry.getKey())  + "=" + encode(entry.getValue()));
         }
 
         return StringUtils.join(p, '&');
+    }
+    
+    public static String encode(String value) {
+        if (value == null || value.length() == 0) { 
+            return "";
+        }
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+    
+    public static String decode(String value) {
+        if (value == null || value.length() == 0) { 
+            return "";
+        }
+        try {
+            return URLDecoder.decode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 }
