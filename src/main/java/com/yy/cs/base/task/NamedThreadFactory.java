@@ -1,4 +1,4 @@
-package com.yy.cs.base.task.poolthread;
+package com.yy.cs.base.task;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

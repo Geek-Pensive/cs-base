@@ -7,9 +7,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import com.yy.cs.base.task.poolthread.NamedThreadFactory;
 
-public class TimerManagerTaskScheduler {
+public class TimerTaskManagerScheduler {
 	
     private static final ScheduledExecutorService scheduledExecutorService = 
     		Executors.newScheduledThreadPool(2, new NamedThreadFactory("CS-Base-Timer", true));
@@ -26,7 +25,7 @@ public class TimerManagerTaskScheduler {
     			//log
     		};
     	};
-    	r.run();
+    	t.getExecuteTime().getTime();
     	ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(r, 0, 0, null);
     	scheduledFutures.putIfAbsent(scheduledFuture.hashCode()+"", scheduledFuture);
     	
