@@ -20,7 +20,7 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 		<property name="maxWait" value="50" />
 	</bean> 
 
-	<bean id="jedisPoolManager" class="com.yy.cs.redis.RedisPoolManager" init-method="init" destroy-method="destroy">
+	<bean id="jedisPoolManager" class="com.yy.cs.base.redis.RedisPoolManager" init-method="init" destroy-method="destroy">
 		<property name="poolConfig" ref="jedisPoolConfig"></property><!-- optional -->
 		<property name="redisServers">
 			<list>

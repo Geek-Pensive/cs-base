@@ -1,4 +1,4 @@
-package com.yy.cs.redis;
+package com.yy.cs.base.redis;
 
 /*
  * Copyright (c) 2012 duowan.com. 
@@ -171,9 +171,13 @@ public class RedisPoolManager {
 				//释放
 				pool.returnResource(jedis);
 			}
-			//如果没有master 则全部归为master
+			//如果没有master 避免用户直接获取master进行操作导致错误
 			if(redisMasterPool.size() == 0){
 				redisMasterPool = redisSlavePool;
+			}
+			//如果没有slave 避免用户直接获取slave进行操作导致错误
+			if(redisSlavePool.size() == 0){
+				redisSlavePool = redisMasterPool;
 			}
 		}catch(Exception e){
 			log.error("occur error in init, error = {}", e);

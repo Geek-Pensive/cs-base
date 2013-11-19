@@ -1,4 +1,4 @@
-package com.yy.cs.base.client.jedis;
+package com.yy.cs.base.redis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,8 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import com.yy.cs.redis.RedisClient;
-import com.yy.cs.redis.RedisPoolManager;
+import com.yy.cs.base.redis.RedisClient;
+import com.yy.cs.base.redis.RedisPoolManager;
 
 /**
  * 
@@ -38,7 +38,7 @@ public class RedisPoolManagerTest {
 	}
 
 	/**
-	 * 测试轮询从 jedisPool中获取jedis实例
+	 * 测试轮询从 redisPool中获取jedis实例
 	 */
 	@Test
 	public void testRoundrobinGetJedis(){
@@ -64,9 +64,9 @@ public class RedisPoolManagerTest {
 	public void testConectedClientsAndReturnJedis(){
 		System.out.println("测试returnJedis 和 连接数 开始");
 		RedisClient redisClient = jedisPoolManager.getMasterJedis();
-		int clientNum1 = getConnectedClientNum(redisClient.getNativeJedis().info());
+		int clientNum1 = RedisUtils.getConnectedClientNum(redisClient.getNativeJedis().info());
 		RedisClient redisClient2 = jedisPoolManager.getMasterJedis();
-		int clientNum2 = getConnectedClientNum(redisClient2.getNativeJedis().info());
+		int clientNum2 = RedisUtils.getConnectedClientNum(redisClient2.getNativeJedis().info());
 		Assert.assertEquals(1, clientNum2 - clientNum1);
 		List<RedisClient> list = new ArrayList<RedisClient>();
 		RedisClient lastJedis = redisClient2;
@@ -132,20 +132,7 @@ public class RedisPoolManagerTest {
 		System.out.println("对比JedisPoolManager与Jedis的数据  结束");
 	}
 	
-	/**
-	 * 从jedis返回的info信息中获取connected client 数量
-	 * @param info
-	 * @return
-	 */
-	public static int getConnectedClientNum(String info){
-		if(info == null || "".equals(info)){
-			return 0;
-		}
-		Pattern p = Pattern.compile("connected_clients:(\\d+)");
-		Matcher m = p.matcher(info);
-		if(m.find()){
-			return Integer.valueOf(m.group(1));
-		}
-		return 0;
-	}
+	
+	
+	
 }

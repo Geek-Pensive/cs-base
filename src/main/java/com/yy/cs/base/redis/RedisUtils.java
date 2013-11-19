@@ -1,4 +1,4 @@
-package com.yy.cs.redis;
+package com.yy.cs.base.redis;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

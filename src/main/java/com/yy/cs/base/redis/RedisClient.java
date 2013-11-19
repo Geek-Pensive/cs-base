@@ -1,4 +1,4 @@
-package com.yy.cs.redis;
+package com.yy.cs.base.redis;
 
 import com.yy.cs.base.nyy.exception.NyyRuntimeException;
 
