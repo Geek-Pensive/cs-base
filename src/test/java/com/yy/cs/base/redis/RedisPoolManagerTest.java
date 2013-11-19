@@ -23,7 +23,7 @@ import com.yy.cs.base.redis.RedisPoolManager;
 /**
  * 
  * @author haoqing
- * JedisPoolManager 的覆盖测试用例
+ * RedisPoolManager 的覆盖测试用例
  *
  */
 public class RedisPoolManagerTest {
@@ -33,7 +33,7 @@ public class RedisPoolManagerTest {
 	@Before
 	public void init(){
 		ApplicationContext context = new ClassPathXmlApplicationContext(
-				"jedis-application.xml");
+				"redis-master-slave-application.xml");
         jedisPoolManager = (RedisPoolManager) context.getBean("jedisPoolManager");
 	}
 
@@ -131,6 +131,7 @@ public class RedisPoolManagerTest {
 		System.out.println("test 1000 time cost "+ (endTime -  beginTime) + " in JedisPoolManagerTest");
 		System.out.println("对比JedisPoolManager与Jedis的数据  结束");
 	}
+	
 	
 	
 	

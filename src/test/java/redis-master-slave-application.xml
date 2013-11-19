@@ -25,6 +25,7 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 		<property name="redisServers">
 			<list>
 				<!-- 格式是  ip:port:pw:timeout -->
+				<!-- 目前这三个实例都放在同个机器上,6379的实例为主库,其他两个为从库 -->
 				<value>172.19.103.105:6331::</value>
 				<value>172.19.103.105:6330::</value>
 				<value>172.19.103.105:6379:fdfs123:</value>
