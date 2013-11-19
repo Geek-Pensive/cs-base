@@ -23,7 +23,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
+	
     	<dependencies>
+    		<dependency>
+				<groupId>org.apache.thrift</groupId>
+				<artifactId>libthrift</artifactId>
+				<version>0.6.1</version>
+			</dependency>
   			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
@@ -54,9 +60,9 @@
 				<optional>true</optional>
 			</dependency>
 			<dependency>
-			  <groupId>commons-httpclient</groupId>
-			  <artifactId>commons-httpclient</artifactId>
-			  <version>3.1</version>
+			  <groupId>org.apache.httpcomponents</groupId>
+			  <artifactId>httpclient</artifactId>
+			  <version>4.3.1</version>
 			</dependency>
 			    <!-- test -->
 		    <dependency>
