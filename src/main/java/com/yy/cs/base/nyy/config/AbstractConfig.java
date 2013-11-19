@@ -8,13 +8,29 @@ public abstract class AbstractConfig {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractConfig.class);
 
-    protected String address;
-	
-	//组成nyyHander的appid
-    protected String appId;
+    protected String address;//地址
+    
+    protected String timeout;//超时时间
+    
+    protected String appId;//nyy固定参数appid，可以不配置
 
-	//组成nyyHander的key
-    protected String key;
+    protected String key;//nyy固定参数key，可以不配置
+    
+    public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(String timeout) {
+		this.timeout = timeout;
+	}
 
 	public String getAppId() {
 		return appId;
@@ -32,31 +48,4 @@ public abstract class AbstractConfig {
 		this.key = key;
 	}
     
-    
-    //应用对key的组合，用户nyy解析端的校验 	<appId,key>
-  	//private ConcurrentMap<String,String> nyyHand = new ConcurrentHashMap<String, String>(); 
-    
-	//public Map<String, String> getNyyHand() {
-	//	return Collections.unmodifiableMap(nyyHand);
-	//}
-	//
-	//public void setNyyHand(Map<String, String> nyyHand) {
-	//	this.nyyHand.putAll(nyyHand);
-	//}
-	
-	//public String getAppId() {
-	//	return appId;
-	//}
-	//
-	//public void setAppId(String appId) {
-	//	this.appId = appId;
-	//}
-	//
-	//public String getKey() {
-	//	return key;
-	//}
-	//
-	//public void setKey(String key) {
-	//	this.key = key;
-	//}
 }

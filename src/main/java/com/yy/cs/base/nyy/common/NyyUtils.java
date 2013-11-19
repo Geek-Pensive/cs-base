@@ -14,11 +14,18 @@ public class NyyUtils {
 	private NyyUtils(){}
 	
 //	public static void main(String[] args) {
-//		System.out.println(toMD5HexString("wqe3wqe213123dsadasdasdasdasdasdasdasddasdasdasdasdsa"));
+//		System.out.println(getSign("key","data"));
 //	}
 	
 	public static String getSign(String key,String data){
-		return toMD5HexString(key+data);
+		String target = "";
+		if(key != null){
+			target += key;
+		}
+		if(data != null){
+			target += data;
+		}
+		return toMD5HexString(target);
 	} 
 	
 	public static String toMD5HexString(final String target) {
