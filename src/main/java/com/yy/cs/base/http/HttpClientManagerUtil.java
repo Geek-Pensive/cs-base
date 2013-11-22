@@ -51,16 +51,16 @@ public class HttpClientManagerUtil {
     	this(new HttpClientConfig());
     }
     /**
-     * @return 池化的httpClient
+     * @return 池化的原生httpClient
      */
     public HttpClient getHttpClient() {
         return httpClient;
     }
 
     /**
-     * 
-     * @param method HttpRequestBase
-     * @return the method's response content
+     * 执行一个http方法
+     * @param 执行方法的类型
+     * @return response正确返回后的字符串
      * @throws HttpClientException
      */
     public String executeMethod(HttpRequestBase httpRequestBase) throws HttpClientException {
@@ -97,12 +97,24 @@ public class HttpClientManagerUtil {
         return  result;
     }
     
-    
+    /**
+     * 执行一个HttpGet方法
+     * @param 请求地址
+     * @return response正确返回后的字符串
+     * @throws HttpClientException
+     */
     public String doGet(String url) throws HttpClientException  {
     	HttpGet get = new HttpGet(url);
         return this.executeMethod(get);
     }
-
+    
+    /**
+     * 执行一个HttpGet方法,返回response返回的流
+     * @param 请求地址
+     * @param 指点正确返回的状态码
+     * @return response正确返回后的流
+     * @throws HttpClientException
+     */
     public InputStream getResponseStream(String url, int[] statusArray) throws HttpClientException{
     	HttpGet httpRequestBase = new HttpGet(url);
         CloseableHttpResponse response = null;
@@ -134,7 +146,11 @@ public class HttpClientManagerUtil {
 			}
 		}
     }
-
+    /**
+     * 发送一个HttpGet请求，检查地址是否正常 
+     * @param url地址
+     * @return true 'response返回响应状态码200或304'
+     */
     public boolean isGetOK(String url)  {
     	HttpGet get = new HttpGet(url);
     	CloseableHttpResponse response = null;
@@ -165,7 +181,13 @@ public class HttpClientManagerUtil {
         return false;
     }
 
-
+    /**
+     * 执行一个HttPost请求
+     * @param url 请求地址
+     * @param parameters 自动参数按utf-8编码
+     * @return  response正确返回后的字符串
+     * @throws HttpClientException
+     */
     public String doPost(String url, Map<String, String> parameters) throws HttpClientException  { 
     	
     	HttpPost httpRequestBase = new HttpPost(url);

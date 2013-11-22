@@ -61,7 +61,7 @@ public class TimerTaskRegistrar {
 		return contexts;
 	}
 	
-	protected void scheduleTasks() {
+	private void scheduleTasks() {
 		if (this.cronTaskMap != null) {
 			for (Entry<String, TimerTask> entry : cronTaskMap.entrySet()) {
 				TimerTask task = entry.getValue();

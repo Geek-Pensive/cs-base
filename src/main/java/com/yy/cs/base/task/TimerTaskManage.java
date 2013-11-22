@@ -15,7 +15,7 @@ import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 
 public class TimerTaskManage {
 	
-	 private int poolSize = 2;
+	 private int poolSize = 1;
 	 
 	 private Map<String,TimerTask> timerTasks;
      
@@ -47,6 +47,7 @@ public class TimerTaskManage {
      public void destroy(){
     	 if(isStart){
     		 registrar.destroy();
+    		 isStart = false;
     	 }
      }
      public List<TaskStatus> getAllTaskStatus(){
@@ -87,6 +88,9 @@ public class TimerTaskManage {
 	}
 
 	public void setPoolSize(int poolSize) {
+		if(poolSize < 1){
+			throw new IllegalArgumentException("TimerTaskManage poolSize Not less than 1"); 
+		}
 		this.poolSize = poolSize;
 	}
 
