@@ -136,6 +136,6 @@ public class RedisClient {
 	 * @return 
 	 */
 	public void returnBrokenSelf(){
-		jedisPool.returnResource(jedis);
+		jedisPool.returnBrokenResource(jedis);
 	}
 }
