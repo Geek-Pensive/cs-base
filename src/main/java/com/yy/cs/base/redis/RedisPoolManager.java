@@ -154,7 +154,7 @@ public class RedisPoolManager {
 				String [] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
 				String ip = strArray[0];
 				int port = Integer.valueOf(strArray[1]);
-				String password = strArray.length >= 3 ? strArray[2] : null;
+				String password = (strArray.length > 2 && "".equals(strArray[2])) ? null :strArray[2];
 				int timeout = strArray.length == 4 ? Integer.valueOf(strArray[3]) : 2000;//默认是2秒
 				JedisPool pool = new JedisPool(this.poolConfig, ip, port,timeout, password);
 				//check master or slave
