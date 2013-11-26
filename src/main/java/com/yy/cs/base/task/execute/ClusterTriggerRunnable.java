@@ -8,24 +8,37 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
+import com.yy.cs.base.task.execute.lock.RedisTaskLock;
+import com.yy.cs.base.task.execute.lock.TaskLock;
 import com.yy.cs.base.task.trigger.Trigger;
 
  
  
-public class LocalTriggerRunnable extends HandlingRunnable {
+public class ClusterTriggerRunnable extends HandlingRunnable {
 
 	private final Trigger trigger;
 	
 	private final ScheduledExecutorService executor;
+	
+	private final TaskLock taskLock;
 
-	public LocalTriggerRunnable(Task task, Trigger trigger, ScheduledExecutorService executor) {
+	public ClusterTriggerRunnable(Task task, Trigger trigger, ScheduledExecutorService executor,ClusterConfig clusterConfig) {
 		super(task);
 		if(trigger == null){
 			throw new IllegalArgumentException("trigger must not be null");
 		}
+		if(clusterConfig == null || clusterConfig.getRedisClient() == null){
+			throw new IllegalArgumentException("clusterConfig must not be null");
+		}
 		this.trigger = trigger;
 		this.executor = executor;
+		if(clusterConfig.getExpireLockTime() > 0){
+			taskLock = new RedisTaskLock(clusterConfig.getRedisPoolManager(),clusterConfig.getExpireLockTime());
+		}else{
+			taskLock = new RedisTaskLock(clusterConfig.getRedisPoolManager());
+		}
 	}
 	
 	
@@ -45,8 +58,12 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 	@Override
 	public void run() {
 		Date startTime = new Date();
-		super.run();
+		//取task的锁
+		if(taskLock.lock(task.getId(), this.scheduledExecutionTime.getTime())){
+			super.run();
+		}
 		Date completionTime = new Date();
+		this.context.updateExecuteAddress(taskLock.getExecuteAddress(task.getId()));
 		synchronized (this.triggerContextMonitor) {
 			this.context.updateExecuteTime(startTime, completionTime);
 			if (!this.currentFuture.isCancelled()) {

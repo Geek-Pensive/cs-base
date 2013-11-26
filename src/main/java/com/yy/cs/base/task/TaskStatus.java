@@ -5,21 +5,34 @@ import java.util.Date;
 public class TaskStatus {
 	
 	private String id;
-	
 
-	private volatile Date nextScheduledExecutionTime;    //下次执行时间
+	private   Date nextScheduledExecutionTime;    //下次执行时间
 
-	private volatile Date lastStartTime;		//最近一次执行开始时间
+	private   Date lastStartTime;		//最近一次执行开始时间
 
-	private volatile Date lastCompletionTime;   //最近一次执行完成时间
+	private   Date lastCompletionTime;   //最近一次执行完成时间
 
-	private volatile Date lastExceptionTime;   //最近一次异常执行时间
+	private   String executeAddress;   //最近一次执行的地址
 	 
-	private volatile Throwable t;
+	private   Date lastExceptionTime;   //最近一次异常执行时间
+
+	private   Throwable t;
 	
 	public TaskStatus() {
 	}
-
+	
+	public TaskStatus(String id, Date nextScheduledExecutionTime,
+			Date lastStartTime, Date lastCompletionTime,
+			Date lastExceptionTime, String executeAddress, Throwable t) {
+		super();
+		this.id = id;
+		this.nextScheduledExecutionTime = nextScheduledExecutionTime;
+		this.lastStartTime = lastStartTime;
+		this.lastCompletionTime = lastCompletionTime;
+		this.lastExceptionTime = lastExceptionTime;
+		this.executeAddress = executeAddress;
+		this.t = t;
+	}
 	 
 	public TaskStatus(Date nextScheduledExecutionTime, Date lastStartTime, Date lastCompletionTime) {
 		this.nextScheduledExecutionTime = nextScheduledExecutionTime;
@@ -103,11 +116,24 @@ public class TaskStatus {
 		this.id = id;
 	}
 	
+	public String getExecuteAddress() {
+		return executeAddress;
+	}
+
+
+	public void setExecuteAddress(String executeAddress) {
+		this.executeAddress = executeAddress;
+	}
+
+
 	@Override
 	public String toString() {
 		return "TaskStatus [id=" + id + ", nextScheduledExecutionTime="
 				+ nextScheduledExecutionTime + ", lastStartTime="
 				+ lastStartTime + ", lastCompletionTime=" + lastCompletionTime
-				+ ", lastExceptionTime=" + lastExceptionTime + ", t=" + t + "]";
+				+ ", executeAddress=" + executeAddress
+				+ ", lastExceptionTime=" + lastExceptionTime
+				+ ", t=" + t + "]";
 	}
+	
 }

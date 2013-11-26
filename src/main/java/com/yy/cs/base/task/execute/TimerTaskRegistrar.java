@@ -69,6 +69,14 @@ public class TimerTaskRegistrar {
 				handlings.put(entry.getKey(), this.taskScheduler.localSchedule(task, trigger));
 			}
 		}
+		if (this.clusterTaskMap != null) {
+			for (Entry<String, TimerTask> entry : clusterTaskMap.entrySet()) {
+				TimerTask task = entry.getValue();
+				Trigger trigger = new CronTrigger(task.getCron());
+				handlings.put(entry.getKey(), this.taskScheduler.clusterSchedule(task, trigger,task.getCluster()));
+			}
+		}
+		
 	}
 
 	public void destroy() {

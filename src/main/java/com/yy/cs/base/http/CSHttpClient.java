@@ -27,29 +27,26 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-public class HttpClientManagerUtil {
+public class CSHttpClient {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpClientManagerUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(CSHttpClient.class);
     
-    private  final RequestConfig defaultRequestConfig;
+    private   RequestConfig defaultRequestConfig;
     
-    private  final CloseableHttpClient httpClient;
+    private   CloseableHttpClient httpClient;
     
-    public HttpClientManagerUtil(HttpClientConfig httpClientConfig) {
-    	 PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-         cm.setMaxTotal(httpClientConfig.getMaxTotal());
-         cm.setDefaultMaxPerRoute(httpClientConfig.getDefaultMaxPerRoute());
-         this.defaultRequestConfig = RequestConfig.custom()
-         .setConnectTimeout(httpClientConfig.getConnectionTimeout())				
-         .setConnectionRequestTimeout(httpClientConfig.getConnectionRequestTimeout())
-		 .setSocketTimeout(httpClientConfig.getSocketTimeOut())
-         .build();
-         this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
+    public CSHttpClient(CSHttpClientFactory factory) {
+    	PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+    	this.defaultRequestConfig = RequestConfig.custom()
+    	        .setConnectTimeout(factory.getConnectionTimeout())				
+    	        .setConnectionRequestTimeout(factory.getConnectionRequestTimeout())
+    			 .setSocketTimeout(factory.getSocketTimeOut())
+    	        .build();
+        cm.setMaxTotal(factory.getMaxTotal());
+        cm.setDefaultMaxPerRoute(factory.getDefaultMaxPerRoute());
+        this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
     }
 
-    public HttpClientManagerUtil() {
-    	this(new HttpClientConfig());
-    }
     /**
      * @return 池化的原生httpClient
      */

@@ -9,7 +9,7 @@ import com.yy.cs.base.task.context.TaskContext;
 
 public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Object>{
 
-	private final Task task;
+	protected final Task task;
 	
 	protected final TaskContext context = new TaskContext();
 
@@ -21,7 +21,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	
 	public HandlingRunnable(Task task) {
 		if(task == null){
-			new IllegalArgumentException("task must not be null");
+			throw new IllegalArgumentException("task must not be null");
 		}
 		this.task = task;
 	}

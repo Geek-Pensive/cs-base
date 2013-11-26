@@ -56,7 +56,7 @@ public class TimerTaskManage {
     		 TaskContext context = entry.getValue();
     		 status.add(new TaskStatus(entry.getKey(), context.nextScheduledExecutionTime(),context.lastStartTime(),
 					context.lastCompletionTime(),
-					context.getExceptionTime(),context.getT()));
+					context.getExceptionTime(),context.executeAddress(),context.getT()));
     	 }
     	 return status;
      }
@@ -68,7 +68,7 @@ public class TimerTaskManage {
     	 }
     	 return new TaskStatus(id, context.nextScheduledExecutionTime(),context.lastStartTime(),
 					context.lastCompletionTime(),
-					context.getExceptionTime(),context.getT());
+					context.getExceptionTime(),context.executeAddress(),context.getT());
      }
      
 

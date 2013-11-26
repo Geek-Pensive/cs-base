@@ -16,14 +16,21 @@ public class TaskContext{
 	
 	private volatile Date exceptionTime;
 	
+	private volatile String executeAddress;
+	
 	public TaskContext() {
 	}
- 
+	
 	public TaskContext(Date nextScheduledExecutionTime, Date lastStartTime, Date lastCompletionTime) {
 		this.nextScheduledExecutionTime = nextScheduledExecutionTime;
 		this.lastStartTime = lastStartTime;
 		this.lastCompletionTime = lastCompletionTime;
 	}
+	
+	public void updateExecuteAddress(String executeAddress) {
+		this.executeAddress = executeAddress;
+	}
+	
 	public void update(Date nextScheduledExecutionTime, Date lastStartTime, Date lastCompletionTime) {
 		this.nextScheduledExecutionTime = nextScheduledExecutionTime;
 		this.lastStartTime = lastStartTime;
@@ -69,4 +76,9 @@ public class TaskContext{
 	public void setT(Throwable t) {
 		this.t = t;
 	}
+
+	public String executeAddress() {
+		return executeAddress;
+	}
+	
 }

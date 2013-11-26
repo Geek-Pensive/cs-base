@@ -6,8 +6,7 @@ public class TimerTaskTest extends TimerTask {
 
 	@Override
 	public void execute() {
-		System.out.println(new Date() + "-----------execute()---TimerTaskTest--------");
-		throw new RuntimeException();
+		System.out.println(new Date() + "-----7777777777777777------execute()---TimerTaskTest--------");
 	}
 	
 }

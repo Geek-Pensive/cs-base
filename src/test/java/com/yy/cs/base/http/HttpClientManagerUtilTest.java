@@ -11,10 +11,11 @@ import org.junit.Test;
 public class HttpClientManagerUtilTest {
 	
 	
-	HttpClientManagerUtil http;
+	CSHttpClient  http;
 	@Before
     public void before() {
-		http = new HttpClientManagerUtil();
+		CSHttpClientFactory f = new CSHttpClientFactory();
+		http = new CSHttpClient(f);
     }
 	/**
 	 * 

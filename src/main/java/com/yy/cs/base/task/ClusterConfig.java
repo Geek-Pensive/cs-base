@@ -1,16 +1,38 @@
 package com.yy.cs.base.task;
 
-import javax.sql.DataSource;
+import com.yy.cs.base.redis.RedisClient;
+import com.yy.cs.base.redis.RedisPoolManager;
 
 public class ClusterConfig {
 
-	private DataSource dataSource;
-
-	public DataSource getDataSource() {
-		return dataSource;
+//	private RedisClient redisClient;
+	
+	private RedisPoolManager redisPoolManager;
+	
+	private int expireLockTime = -1;	//默认没有设置:-1
+	
+	public RedisClient getRedisClient() {
+		return redisPoolManager.getMasterJedis();
 	}
 
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
+//	public void setRedisClient(RedisClient redisClient) {
+//		this.redisClient = redisClient;
+//	}
+
+	public int getExpireLockTime() {
+		return expireLockTime;
 	}
+
+	public void setExpireLockTime(int expireLockTime) {
+		this.expireLockTime = expireLockTime;
+	}
+	
+	public RedisPoolManager getRedisPoolManager() {
+		return redisPoolManager;
+	}
+
+	public void setRedisPoolManager(RedisPoolManager redisPoolManager) {
+		this.redisPoolManager = redisPoolManager;
+	}
+
 }

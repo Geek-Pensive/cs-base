@@ -1,7 +1,5 @@
 package com.yy.cs.base.http;
 
-
-
 /**
  * 
  * http连接的配置对象
@@ -13,7 +11,8 @@ package com.yy.cs.base.http;
  * @param connectionRequestTimeout 从连接池获取连接的超时时间
  *
  */
-public class HttpClientConfig {
+public class CSHttpClientFactory {
+
 
 	private int maxTotal = 30;
     private int defaultMaxPerRoute = 4;
@@ -73,6 +72,5 @@ public class HttpClientConfig {
 	public void setConnectionRequestTimeout(int connectionRequestTimeout) {
 		this.connectionRequestTimeout = connectionRequestTimeout;
 	}
-
-    
+     
 }

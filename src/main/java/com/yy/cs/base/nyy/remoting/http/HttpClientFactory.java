@@ -4,7 +4,8 @@ package com.yy.cs.base.nyy.remoting.http;
 //import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 //import org.apache.commons.httpclient.params.HttpClientParams;
 
-import com.yy.cs.base.http.HttpClientManagerUtil;
+import com.yy.cs.base.http.CSHttpClient;
+import com.yy.cs.base.http.CSHttpClientFactory;
 import com.yy.cs.base.nyy.common.ConfigUtil;
 
 /**
@@ -12,14 +13,15 @@ import com.yy.cs.base.nyy.common.ConfigUtil;
  */
 public class HttpClientFactory {
 	
-	private final  HttpClientManagerUtil  httpClientManager; 
+	private final  CSHttpClient  httpClient; 
 	
 	private static HttpClientFactory httpClientFactory;
 	private HttpClientFactory(ConfigUtil params){
-	    httpClientManager = new HttpClientManagerUtil();
+		CSHttpClientFactory factory = new CSHttpClientFactory();
+		httpClient = new CSHttpClient(factory);
 	}
 	
-	public static HttpClientManagerUtil getHttpClient(ConfigUtil params){
+	public static CSHttpClient getHttpClient(ConfigUtil params){
 		if(httpClientFactory == null){
 			synchronized (HttpClientFactory.class) {
 				if(httpClientFactory == null){
@@ -27,6 +29,6 @@ public class HttpClientFactory {
 				}
 			}
 		}
-		return httpClientFactory.httpClientManager;
+		return httpClientFactory.httpClient;
 	}
 }

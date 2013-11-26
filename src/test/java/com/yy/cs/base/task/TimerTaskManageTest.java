@@ -26,7 +26,7 @@ public class TimerTaskManageTest {
     
     @Test
     public void testSpringTimerTaskManag() {
-	    for(int i=0; i<20;i++){
+	    for(; ;){
 			try {
 				Thread.sleep(8000);
 				for(TaskStatus t : timerTaskManage.getAllTaskStatus()){

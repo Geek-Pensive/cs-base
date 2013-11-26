@@ -5,9 +5,9 @@ public abstract class TimerTask implements Task{
 	
 	private String id;
 	
-	private long fixedDelay;
-	
-	private long initialDelay;
+//	private long fixedDelay;
+//	
+//	private long initialDelay;
 	
 	private String cron;
 	
@@ -23,24 +23,24 @@ public abstract class TimerTask implements Task{
 	}
 
 
-	public long getFixedDelay() {
-		return fixedDelay;
-	}
+//	public long getFixedDelay() {
+//		return fixedDelay;
+//	}
+//
+//
+//	public void setFixedDelay(long fixedDelay) {
+//		this.fixedDelay = fixedDelay;
+//	}
 
 
-	public void setFixedDelay(long fixedDelay) {
-		this.fixedDelay = fixedDelay;
-	}
-
-
-	public long getInitialDelay() {
-		return initialDelay;
-	}
-
-
-	public void setInitialDelay(long initialDelay) {
-		this.initialDelay = initialDelay;
-	}
+//	public long getInitialDelay() {
+//		return initialDelay;
+//	}
+//
+//
+//	public void setInitialDelay(long initialDelay) {
+//		this.initialDelay = initialDelay;
+//	}
 
 
 	public String getCron() {

@@ -3,8 +3,8 @@ package com.yy.cs.base.nyy.remoting.http;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
-import com.yy.cs.base.http.HttpClientManagerUtil;
 import com.yy.cs.base.nyy.common.ConfigUtil;
 import com.yy.cs.base.nyy.common.Constants;
 import com.yy.cs.base.nyy.exception.NyyException;
@@ -25,7 +25,7 @@ public class HttpInvoker implements Invoker{
 	
 	private final ConfigUtil config;
 	
-	private final HttpClientManagerUtil  httpClient;
+	private final CSHttpClient  httpClient;
 //	
 //	
 	public HttpInvoker(ConfigUtil config){

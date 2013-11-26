@@ -5,4 +5,5 @@ public interface Task {
 	
 	 void execute();
 	
+	 String getId();
 }
