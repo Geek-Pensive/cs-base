@@ -58,7 +58,17 @@ public class RedisUtils {
 		if(str.length < 2){
 			throw new NyyRuntimeException("invalid param, param should like ip:port:password:timeout, if not exists password, you can use ip:port::");
 		}
-		return str;
+		String [] result = new String[4];
+		result[0] = str[0];
+		result[1] = str[1];
+		if(str.length == 3){
+			result[2] = str[2];
+		}
+		if(str.length == 4){
+			result[2] = str[2];
+			result[3] = str[3];
+		}
+		return result;
 	}
 	
 	public static void main(String []args){

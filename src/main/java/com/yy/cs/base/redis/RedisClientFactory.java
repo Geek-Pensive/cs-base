@@ -19,21 +19,18 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.yy.cs.base.nyy.exception.NyyRuntimeException;
 
 /**
  * @author hongyuan
- * @author haoqing </br> redis client线程池管理类
+ * @author haoqing </br> redis client线程池工厂类
  */
-public class RedisPoolManager {
+public class RedisClientFactory extends JedisPoolConfig{
 
 	private static final Logger log = LoggerFactory
-			.getLogger(RedisPoolManager.class);
+			.getLogger(RedisClientFactory.class);
 
-	private JedisPoolConfig poolConfig;
-	
 	private List<JedisPool> redisMasterPool = new ArrayList<JedisPool>();
 	
 	private List<JedisPool> redisSlavePool = new ArrayList<JedisPool>();
@@ -47,89 +44,30 @@ public class RedisPoolManager {
 	private AtomicInteger atomitMasterCount = new AtomicInteger(0);
 	private AtomicInteger atomitSlaveCount = new AtomicInteger(0);
 	
-	public final static JedisPoolConfig DEFAULT_CONFIG = new JedisPoolConfig(){
-		{
-		setMaxActive(300);
-		setMaxIdle(100);
-		setMaxWait(50);
-		}
-	};
 	
 	private List<String> redisServers;
 	
 	/**
-	 * 从redisMasterPool中随机获取jedis连接
-	 * @return   如果出现异常，则返回null
+	 * 从redisMasterPool中随机获取pool
+	 * @return  
 	 */
-	public RedisClient getMasterJedis() {
+	public JedisPool getMasterPool() {
 		int currentIndex = atomitMasterCount.getAndIncrement();
 		currentIndex = currentIndex % masterServerSize;
 		JedisPool jedisPool = redisMasterPool.get(currentIndex);
-		Jedis jedis = null;
-		try {
-			jedis = jedisPool.getResource();
-			if (jedis.isConnected()) {
-				RedisClient redisClient = new RedisClient();
-				redisClient.setJedis(jedis);
-				redisClient.setJedisPool(jedisPool);
-				return redisClient;
-			} else {
-				jedisPool.returnBrokenResource(jedis);
-				log.error("Get jedis connection from pool but not connected.");
-			}
-		} catch (JedisConnectionException e) {
-			log.error("Get jedis connection from redisMasterPool list index:{}",
-					currentIndex, e);
-			if (jedis != null) {
-				log.warn("Return broken resource:" + jedis);
-				jedisPool.returnBrokenResource(jedis);
-			}
-		}
-		return null;
+		return jedisPool;
 	}
 
 	
 	/**
-	 * 从redisSlavePool中随机获取jedis连接
-	 * @return  如果出现异常，则返回null
+	 * 从redisSlavePool中随机获取pool
+	 * @return 
 	 */
-	public RedisClient getSlaveJedis() {
+	public JedisPool getSlavePool() {
 		int currentIndex = atomitSlaveCount.getAndIncrement();
 		currentIndex = currentIndex % slaveServerSize;
 		JedisPool jedisPool = redisSlavePool.get(currentIndex);
-		Jedis jedis = null;
-		try {
-			jedis = jedisPool.getResource();
-			if (jedis.isConnected()) {
-				RedisClient redisClient = new RedisClient();
-				redisClient.setJedis(jedis);
-				redisClient.setJedisPool(jedisPool);
-				return redisClient;
-			} else {
-				jedisPool.returnBrokenResource(jedis);
-				log.error("Get jedis connection from pool but not connected.");
-			}
-		} catch (JedisConnectionException e) {
-			log.error("Get jedis connection from redisMasterPool list index:{}",
-					currentIndex, e);
-			if (jedis != null) {
-				log.warn("Return broken resource:" + jedis);
-				jedisPool.returnBrokenResource(jedis);
-			}
-		}
-		return null;
-	}
-
-	
-
-	/**
-	 * 设置poolConfig, 如果没有poolConfig，将使用默认的poolConfig
-	 * @param poolConfig
-	 */
-	public void setPoolConfig(JedisPoolConfig poolConfig) {
-		if(poolConfig != null){
-			this.poolConfig = poolConfig;
-		}
+		return jedisPool;
 	}
 
 
@@ -146,17 +84,14 @@ public class RedisPoolManager {
 	 * 初始化
 	 */
 	public void init(){
-		if(this.poolConfig == null){
-			poolConfig = DEFAULT_CONFIG;
-		}
 		try{
 			for(int i = 0; i < totalServersSize; i++){
 				String [] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
 				String ip = strArray[0];
 				int port = Integer.valueOf(strArray[1]);
-				String password = (strArray.length > 2 && "".equals(strArray[2])) ? null :strArray[2];
-				int timeout = strArray.length == 4 ? Integer.valueOf(strArray[3]) : 2000;//默认是2秒
-				JedisPool pool = new JedisPool(this.poolConfig, ip, port,timeout, password);
+				String password = strArray[2];
+				int timeout = strArray[3] != null? Integer.valueOf(strArray[3]) : 10000;//默认是10秒
+				JedisPool pool = new JedisPool(this, ip, port,timeout, password);
 				//check master or slave
 				Jedis jedis = pool.getResource();
 				String info = jedis.info();

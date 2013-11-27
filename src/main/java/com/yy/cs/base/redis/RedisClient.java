@@ -12,40 +12,33 @@ import redis.clients.jedis.JedisPool;
  */
 public class RedisClient {
 	
-	private Jedis jedis;
-	private JedisPool jedisPool;
+	private RedisClientFactory factory;
 	
-	public Jedis getJedis() {
-		return jedis;
+	public JedisPool getJedisMasterPool() {
+		return factory.getMasterPool();
 	}
-
-	public void setJedis(Jedis jedis) {
-		this.jedis = jedis;
-	}
-
-	public JedisPool getJedisPool() {
-		return jedisPool;
-	}
-
-	public void setJedisPool(JedisPool jedisPool) {
-		this.jedisPool = jedisPool;
+	
+	public JedisPool getJedisSlavePool() {
+		return factory.getSlavePool();
 	}
 
 	/**
 	 * 执行set操作，然后释放client连接
-	 * </br>注意如果client连接释放后，不能再使用该client
-	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getNativeJedis 方法
-	 * </br>并在多次调用后，释放该连接可调用 returnSelf 方法 
-	 * @see #getNativeJedis()
-	 * @see #returnSelf() 
+	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+	 * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
 	 * @param key
 	 * @param value
 	 * @return
 	 */
-	public String setAndReturn(final String key, String value){
+	public synchronized String setAndReturn(final String key, String value){
+		Jedis jedis = null;
+		JedisPool jedisPool = null;
 		try{
+			jedisPool = getJedisMasterPool();
+			jedis = getJedisMasterPool().getResource();
 			return jedis.set(key, value);
 		}catch(Exception e){
+			jedisPool.returnBrokenResource(jedis);
 			throw new NyyRuntimeException("jedis set fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
@@ -53,20 +46,89 @@ public class RedisClient {
 	}
 	
 	/**
+	 * 执行set操作，然后释放client连接
+	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+	 * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
+	 * @param key
+	 * @param value
+	 * @param seconds  有效时间
+	 * @return
+	 */
+	public synchronized String setAndReturn(final String key, String value, int seconds){
+		Jedis jedis = null;
+		JedisPool jedisPool = null;
+		try{
+			jedisPool = getJedisMasterPool();
+			jedis = getJedisMasterPool().getResource();
+			return jedis.setex(key, seconds, value);
+		}catch(Exception e){
+			jedisPool.returnBrokenResource(jedis);
+			throw new NyyRuntimeException("jedis set fail", e);
+		}finally{
+			jedisPool.returnResource(jedis);
+		}
+	}
+	
+	/**
+	 * 执行set操作，然后释放client连接
+	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+	 * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
+	 * @param key
+	 * @param value
+	 * @param seconds  有效时间
+	 * @return
+	 */
+	public synchronized String setAndReturn(final byte[] key, byte[] value, int seconds){
+		Jedis jedis = null;
+		JedisPool jedisPool = null;
+		try{
+			jedisPool = getJedisMasterPool();
+			jedis = getJedisMasterPool().getResource();
+			return jedis.setex(key, seconds, value);
+		}catch(Exception e){
+			jedisPool.returnBrokenResource(jedis);
+			throw new NyyRuntimeException("jedis set fail", e);
+		}finally{
+			jedisPool.returnResource(jedis);
+		}
+	}
+	
+	/**
+	 * 获取info信息
+	 * @return
+	 */
+	public synchronized String infoAndReturn(){
+		Jedis jedis = null;
+		JedisPool jedisPool = null;
+		try{
+			jedisPool = getJedisMasterPool();
+			jedis = getJedisMasterPool().getResource();
+			return jedis.info();
+		}catch(Exception e){
+			jedisPool.returnBrokenResource(jedis);
+			throw new NyyRuntimeException("jedis info fail", e);
+		}finally{
+			jedisPool.returnResource(jedis);
+		}
+	}
+	
+	/**
 	 * 执行get操作，然后释放client连接
-	 * </br>注意如果client连接释放后，不能再使用该client
-	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getNativeJedis 方法
-	 * </br>并在多次调用后，释放该连接可调用 returnSelf 方法 
-	 * @see #getNativeJedis()
-	 * @see #returnSelf() 
+	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+	 * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
 	 * @param key
 	 * @param value
 	 * @return
 	 */
-	public String getAndReturn(final String key){
+	public synchronized String getAndReturn(final String key){
+		Jedis jedis = null;
+		JedisPool jedisPool = null;
 		try{
+			jedisPool = getJedisSlavePool();
+			jedis = getJedisSlavePool().getResource();
 			return jedis.get(key);
 		}catch(Exception e){
+			jedisPool.returnBrokenResource(jedis);
 			throw new NyyRuntimeException("jedis get fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
@@ -75,9 +137,8 @@ public class RedisClient {
 	
 	/**
 	 * 执行set操作，然后释放client连接
-	 * </br>注意如果client连接释放后，不能再使用该client
-	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getNativeJedis 方法
-	 * </br>并在多次调用后，释放该连接可调用 returnSelf 方法 
+	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+	 * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
 	 * @see #getNativeJedis()
 	 * @see #returnSelf() 
 	 * @param key
@@ -85,9 +146,14 @@ public class RedisClient {
 	 * @return
 	 */
 	public String setAndReturn(final byte[] key, byte[] value){
+		Jedis jedis = null;
+		JedisPool jedisPool = null;
 		try{
+			jedisPool = getJedisMasterPool();
+			jedis = getJedisMasterPool().getResource();
 			return jedis.set(key, value);
 		}catch(Exception e){
+			jedisPool.returnBrokenResource(jedis);
 			throw new NyyRuntimeException("jedis set fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
@@ -96,46 +162,33 @@ public class RedisClient {
 	
 	/**
 	 * 执行get操作，然后释放client连接
-	 * </br>注意如果client连接释放后，不能再使用该client
-	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getNativeJedis 方法
-	 * </br>并在多次调用后，释放该连接可调用 returnSelf 方法 
-	 * @see #getNativeJedis()
-	 * @see #returnSelf() 
+	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+	 * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
 	 * @param key
 	 * @param value
 	 * @return
 	 */
 	public byte[] getAndReturn(final byte[] key){
+		Jedis jedis = null;
+		JedisPool jedisPool = null;
 		try{
+			jedisPool = getJedisSlavePool();
+			jedis = getJedisSlavePool().getResource();
 			return jedis.get(key);
 		}catch(Exception e){
+			jedisPool.returnBrokenResource(jedis);
 			throw new NyyRuntimeException("jedis get fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}
 	}
-	
-	/**
-	 * 获取原生的Jedis 连接
-	 * @return 
-	 */
-	public Jedis getNativeJedis(){
-		return this.jedis;
+
+	public RedisClientFactory getFactory() {
+		return factory;
+	}
+
+	public void setFactory(RedisClientFactory factory) {
+		this.factory = factory;
 	}
 	
-	/**
-	 * 释放Jedis 连接
-	 * @return 
-	 */
-	public void returnSelf(){
-		jedisPool.returnResource(jedis);
-	}
-	
-	/**
-	 * 释放Jedis broken连接
-	 * @return 
-	 */
-	public void returnBrokenSelf(){
-		jedisPool.returnBrokenResource(jedis);
-	}
 }
