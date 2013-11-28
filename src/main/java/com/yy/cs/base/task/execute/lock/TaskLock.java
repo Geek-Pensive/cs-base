@@ -16,7 +16,7 @@ public interface TaskLock {
 
     
      
-    String getExecuteAddress(String id);
+    String getExecuteAddress(String id,long value);
 //    /**
 //     * 
 //     * @param key

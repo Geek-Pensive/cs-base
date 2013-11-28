@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.task.TimerTask;
+import com.yy.cs.base.task.context.Constants;
 import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.trigger.CronTrigger;
@@ -48,17 +50,33 @@ public class TimerTaskRegistrar {
 		scheduleTasks();
 	}
 
-	public TaskContext getTaskContext(String id) {
-		HandlingRunnable handlingRunnable = handlings.get(id);
-		return handlingRunnable.getContext();
-	}
+//	public TaskContext getTaskContext(String id) {
+//		HandlingRunnable handlingRunnable = handlings.get(id);
+//		return handlingRunnable.getContext();
+//	}
 	
-	public Map<String,TaskContext> getAllTaskContext() {
-		Map<String , TaskContext> contexts= new HashMap<String,TaskContext>();
+	public CsStatus getCsStatus() {
+		CsStatus csStatus = new CsStatus();
 		for (Entry<String, HandlingRunnable> entry : this.handlings.entrySet()) {
-			contexts.put(entry.getKey(), entry.getValue().getContext());
+			
+			CsStatus subStatus = entry.getValue().task.getCsStatus();
+			if(subStatus == null){
+				subStatus = new CsStatus();
+			}
+			if(subStatus.getName() == null || "".equals(subStatus.getName())){
+				subStatus.setName(entry.getKey());
+			}
+			TaskContext context = entry.getValue().getContext();
+			subStatus.additionInfo(Constants.TASK_ID, entry.getKey());
+			subStatus.additionInfo(Constants.NEXT_EXECUTE_TIME, context.nextScheduledExecutionTime());
+			subStatus.additionInfo(Constants.LAST_START_TIME, context.lastStartTime());
+			subStatus.additionInfo(Constants.LAST_COMPLETION_TIME, context.lastCompletionTime());
+			subStatus.additionInfo(Constants.EXECUTE_ADDRESS, context.executeAddress());
+			subStatus.additionInfo(Constants.LAST_EXCEPTION_TIME, context.lastCompletionTime());
+			subStatus.additionInfo(Constants.THROWABLE, context.getT());
+			csStatus.addSubCsStatus(subStatus);
 		}
-		return contexts;
+		return csStatus;
 	}
 	
 	private void scheduleTasks() {

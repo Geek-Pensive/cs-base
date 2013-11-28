@@ -1,19 +1,16 @@
 package com.yy.cs.base.task;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import com.yy.cs.base.task.context.TaskContext;
+import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 
 
 
-public class TimerTaskManage {
+public class TimerTaskManager {
 	
 	 private int poolSize = 1;
 	 
@@ -50,26 +47,19 @@ public class TimerTaskManage {
     		 isStart = false;
     	 }
      }
-     public List<TaskStatus> getAllTaskStatus(){
-    	 List<TaskStatus> status = new ArrayList<TaskStatus>(); 
-    	 for(Entry<String,TaskContext> entry : registrar.getAllTaskContext().entrySet()){
-    		 TaskContext context = entry.getValue();
-    		 status.add(new TaskStatus(entry.getKey(), context.nextScheduledExecutionTime(),context.lastStartTime(),
-					context.lastCompletionTime(),
-					context.getExceptionTime(),context.executeAddress(),context.getT()));
-    	 }
-    	 return status;
+     public CsStatus getCsStatus(){
+    	 return registrar.getCsStatus();
      }
      
-     public TaskStatus getTaskStatus(String id){
-    	 TaskContext context = registrar.getTaskContext(id);
-    	 if(context ==  null){
-    		 return null;
-    	 }
-    	 return new TaskStatus(id, context.nextScheduledExecutionTime(),context.lastStartTime(),
-					context.lastCompletionTime(),
-					context.getExceptionTime(),context.executeAddress(),context.getT());
-     }
+//     public TaskStatus getTaskStatus(String id){
+//    	 TaskContext context = registrar.getTaskContext(id);
+//    	 if(context ==  null){
+//    		 return null;
+//    	 }
+//    	 return new TaskStatus(id, context.nextScheduledExecutionTime(),context.lastStartTime(),
+//					context.lastCompletionTime(),
+//					context.getExceptionTime(),context.executeAddress(),context.getT());
+//     }
      
 
 	public Map<String, TimerTask> getTimerTasks() {

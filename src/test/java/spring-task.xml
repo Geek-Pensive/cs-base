@@ -4,14 +4,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-<!-- 	 <task:scheduled-tasks scheduler="myScheduler"> -->
-<!--    		 <task:scheduled ref="myJob" method="execute" fixed-delay="5000"/> -->
-<!-- 	 </task:scheduled-tasks> -->
-<!-- 	<bean id="myJob" class="com.yy.cs.base.task.ScanDirectoryJob" /> -->
-<!-- 	<task:scheduler id="myScheduler" pool-size="10"/> -->
-
-		<bean name="taskManage" class="com.yy.cs.base.task.TimerTaskManage" init-method="start" >
-			<property name="poolSize"  value="2" />
+		<bean name="taskManage" class="com.yy.cs.base.task.TimerTaskManager" init-method="start" >
+			<property name="poolSize"  value="1" />
 		  	<property name="timerTasks">
 			    <map>
 			      	<entry key="com.yy.cs.base.task.TimerTaskTest"   value-ref="timerTaskTest" />
@@ -20,27 +14,5 @@
 		</bean>
 		<bean id="timerTaskTest" class="com.yy.cs.base.task.TimerTaskTest" >
 			<property name="cron" value="*/5 * * * * *" />
-			<property name="cluster"  ref="cluster" />
-		</bean>
-		<bean id="cluster" class="com.yy.cs.base.task.ClusterConfig" >
-			<property name="expireLockTime" value="1" /> 
-			<property name="redisPoolManager" ref="jedisPoolManager"  /> 
-		</bean>
-		<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-			<property name="maxActive" value="300" />
-			<property name="maxIdle" value="100" />
-			<property name="maxWait" value="50" />
-		</bean> 
-		<bean id="jedisPoolManager" class="com.yy.cs.base.redis.RedisPoolManager" init-method="init" destroy-method="destroy">
-			<property name="poolConfig" ref="jedisPoolConfig"></property><!-- optional -->
-			<property name="redisServers">
-				<list>
-					<!-- 格式是  ip:port:pw:timeout -->
-					<!-- 目前这三个实例都放在同个机器上,6379的实例为主库,其他两个为从库 -->
-					<value>172.19.103.105:6331::</value>
-					<value>172.19.103.105:6330::</value>
-					<value>172.19.103.105:6379:fdfs123:</value>
-				</list>
-			</property>
 		</bean>
 </beans>

@@ -1,13 +1,13 @@
 package com.yy.cs.base.task;
 
+import com.yy.cs.base.status.CsStatus;
+
 
 public abstract class TimerTask implements Task{
 	
 	private String id;
 	
-//	private long fixedDelay;
-//	
-//	private long initialDelay;
+	private CsStatus   csStatus;
 	
 	private String cron;
 	
@@ -21,26 +21,16 @@ public abstract class TimerTask implements Task{
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	
+	public CsStatus getCsStatus() {
+		return csStatus;
+	}
 
 
-//	public long getFixedDelay() {
-//		return fixedDelay;
-//	}
-//
-//
-//	public void setFixedDelay(long fixedDelay) {
-//		this.fixedDelay = fixedDelay;
-//	}
-
-
-//	public long getInitialDelay() {
-//		return initialDelay;
-//	}
-//
-//
-//	public void setInitialDelay(long initialDelay) {
-//		this.initialDelay = initialDelay;
-//	}
+	public void setCsStatus(CsStatus csStatus) {
+		this.csStatus = csStatus;
+	}
 
 
 	public String getCron() {

@@ -3,26 +3,33 @@ package com.yy.cs.base.task.execute.lock;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+
 import com.yy.cs.base.redis.RedisClient;
-import com.yy.cs.base.redis.RedisPoolManager;
 
 public class RedisTaskLock implements TaskLock {
 	
-	private final RedisPoolManager redisClient; 
+	private static final Logger logger = LoggerFactory.getLogger(RedisTaskLock.class);
 	
-	private static final int defaultExpire = 3 * 60;   //默认锁3 * 60秒
+	private final RedisClient redisClient; 
+	
+	private static final int defaultExpire = 7 * 24 * 60 * 60;   //失效时间7天
 	
 	private static final String defaultPrefix = "cs-base-task-";   //默认锁5 * 60秒
 	
 	private static final String defaultSplit = "&";
 	
-	private final int expire;   //默认锁3 * 60秒
+	private final int expire;   //失效时间3 * 60秒
 	
-	public RedisTaskLock(RedisPoolManager redisClient) {
+	public RedisTaskLock(RedisClient redisClient) {
 		this(redisClient,defaultExpire);
 	}
 	
-	public RedisTaskLock(RedisPoolManager redisClient, int expire) {
+	public RedisTaskLock(RedisClient redisClient, int expire) {
 		super();
 		this.redisClient = redisClient;
 		this.expire = expire;
@@ -30,54 +37,64 @@ public class RedisTaskLock implements TaskLock {
 	
 	@Override
 	public boolean lock(String id, long value) {
-		RedisClient client = redisClient.getMasterJedis();
-		boolean result;
-		String key = defaultPrefix+id;
-		String v = getLocalAddress()+defaultSplit+value;  
-		long setnx = client.getNativeJedis().setnx(key, v);
-		//如果等于1 加锁成功
-		result = setnx == 1 ? true : false;
-        if(result) {
-        	//设置超时时间
-        	client.getNativeJedis().expire(key, expire);
-        	return result;
-        } else {
-            //如果没有加锁成功，检查是否是死锁，如果是死锁，则释放
-        	String s = client.getNativeJedis().get(key);
-        	Long old = Long.valueOf(s.substring(s.lastIndexOf(defaultSplit)+1));
-        	//如果当前执行点大于被锁时间点，释放该锁
-        	if(value > old.longValue()){
-        		String oldValue = client.getNativeJedis().getSet(key, v);
-        		if(oldValue == null || !oldValue.equals(v)){
-        			client.getNativeJedis().expire(key, expire);
-        			result = true;
-        		}
-        	}
-        }
-        client.returnSelf();
+		JedisPool pool = null;
+		Jedis	jedis  = null;
+		boolean result = false;
+		try{
+			pool = redisClient.getJedisMasterPool();
+			jedis =	pool.getResource();
+			String key = defaultPrefix + id + defaultSplit + value;
+			String v = getLocalAddress() + defaultSplit + value;  
+			long setnx = jedis.setnx(key, v);
+			//如果等于1 加锁成功
+			result = setnx == 1 ? true : false;
+	        if(result) {
+	        	//设置超时时间
+	        	jedis.expire(key, expire);
+	        	return result;
+	        }
+		}catch(Throwable t){
+			//防御性容错，如果异常直接返回false
+			logger.error(" task id:" + id + " value:" +value , t);
+		}
+		finally{
+			if(pool != null && jedis != null){
+				pool.returnResource(jedis);
+			}
+		}
 		return result;
 	}
 
 	 
-	public boolean unLock(String id, long value) {
-	//	redisClient.getNativeJedis().del(id);
-		return false;
-	}
-
 	@Override
-	public String getExecuteAddress(String id) {
-		RedisClient client = redisClient.getMasterJedis();
-		String key = defaultPrefix+id;
-		String s = client.getNativeJedis().get(key);
-		client.returnSelf();
-		return s.substring(0,s.lastIndexOf(defaultSplit));
+	public String getExecuteAddress(String id,long value) {
+		
+		JedisPool pool = null;
+		Jedis	jedis  = null;
+		String result = null;
+		try{
+			pool = redisClient.getJedisMasterPool();
+			jedis =	pool.getResource();
+			String key = defaultPrefix + id + defaultSplit + value;
+			String s = jedis.get(key);
+			result = s.substring(0,s.lastIndexOf(defaultSplit));
+		}catch(Throwable t){
+			//防御性容错，如果异常直接返回false
+			logger.error(" task id:" + id + " value:" +value , t);
+		}
+		finally{
+			if(pool != null && jedis != null){
+				pool.returnResource(jedis);
+			}
+		}
+		return result;
 	}
 
 	public static String getLocalAddress() {
     	try {
 			return InetAddress.getLocalHost().toString();
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			logger.error("",e);
 		}
 		return "127.0.0.1";
     }

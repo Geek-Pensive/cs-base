@@ -34,11 +34,11 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 		}
 		this.trigger = trigger;
 		this.executor = executor;
-		if(clusterConfig.getExpireLockTime() > 0){
-			taskLock = new RedisTaskLock(clusterConfig.getRedisPoolManager(),clusterConfig.getExpireLockTime());
-		}else{
-			taskLock = new RedisTaskLock(clusterConfig.getRedisPoolManager());
-		}
+//		if(clusterConfig.getExpireLockTime() > 0){
+//			taskLock = new RedisTaskLock(clusterConfig.getRedisPoolManager(),clusterConfig.getExpireLockTime());
+//		}else{
+		taskLock = new RedisTaskLock(clusterConfig.getRedisClient());
+//		}
 	}
 	
 	
@@ -63,7 +63,7 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 			super.run();
 		}
 		Date completionTime = new Date();
-		this.context.updateExecuteAddress(taskLock.getExecuteAddress(task.getId()));
+		this.context.updateExecuteAddress(taskLock.getExecuteAddress(task.getId(),this.scheduledExecutionTime.getTime()));
 		synchronized (this.triggerContextMonitor) {
 			this.context.updateExecuteTime(startTime, completionTime);
 			if (!this.currentFuture.isCancelled()) {
