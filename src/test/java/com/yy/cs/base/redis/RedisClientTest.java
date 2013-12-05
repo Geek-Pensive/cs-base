@@ -1,5 +1,8 @@
 package com.yy.cs.base.redis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -157,7 +160,19 @@ public class RedisClientTest {
 	}
 	
 	
-	
+	public static void main(String []args){
+		
+		
+		RedisClientFactory redisClientFactory = new RedisClientFactory();
+		List<String> list = new ArrayList<String>();
+		//这里是业务要连接的redis
+		list.add("172.19.103.105:6379:fdfs123:");
+		redisClientFactory.setRedisServers(list);
+		redisClientFactory.init();
+		RedisClient redisClient = new RedisClient();
+		redisClient.setFactory(redisClientFactory);
+		System.out.println(redisClient.setAndReturn("test", "test"));
+	}
 	
 	
 	
