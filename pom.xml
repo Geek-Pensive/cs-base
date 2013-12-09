@@ -26,6 +26,11 @@
 	
     	<dependencies>
     		<dependency>
+			 	 <groupId>com.duowan.pooling</groupId>
+				 <artifactId>libpooling</artifactId>
+				 <version>1.0.0.5</version>
+			  </dependency>
+    		<dependency>
 				<groupId>org.apache.thrift</groupId>
 				<artifactId>libthrift</artifactId>
 				<version>0.6.1</version>
