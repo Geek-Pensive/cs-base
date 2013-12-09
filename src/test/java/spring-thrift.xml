@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	
+		<bean id="clientFactory" class="com.yy.cs.base.thrift.ThriftClientFactory" destroy-method="destroy"  >
+			<property name="interfaceName"   value="com.yy.cs.base.nyy.remoting.thrift.nyyService.NyyService$Iface" />
+		  	<property name="thriftConfig">
+		  		<list>
+		  			<ref bean="thriftConfig"/>
+		  			<ref bean="thriftConfig1"/>
+		  		</list>
+		  	</property>
+		</bean>
+		<bean id="thriftConfig" class="com.yy.cs.base.thrift.ThriftConfig" >
+			<property  name="host" value="127.0.0.1"/>
+			<property  name="port" value="8181" />
+			<property  name="weight" value="5" />
+		</bean>
+		<bean id="thriftConfig1" class="com.yy.cs.base.thrift.ThriftConfig" >
+			<property  name="host" value="127.0.0.1"/>
+			<property  name="port" value="8181" />
+			<property  name="weight" value="10" />
+		</bean>
+</beans>

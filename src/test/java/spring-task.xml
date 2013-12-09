@@ -14,5 +14,26 @@
 		</bean>
 		<bean id="timerTaskTest" class="com.yy.cs.base.task.TimerTaskTest" >
 			<property name="cron" value="*/5 * * * * *" />
+			<property name="cluster" ref="cluster"></property>
+		</bean>
+		<bean id="cluster" class="com.yy.cs.base.task.ClusterConfig" >
+			 <property name="redisClient" ref="redisClient" />
+		</bean>
+		<bean id="redisClientFactory" class="com.yy.cs.base.redis.RedisClientFactory" init-method="init" destroy-method="destroy">
+			<property name="maxActive" value="300" /><!-- 可选 -->
+			<property name="maxIdle" value="100" /><!-- 可选 -->
+			<property name="maxWait" value="50" /><!-- 可选 -->
+			<property name="redisServers">
+				<list>
+					<!-- 格式是  ip:port:pw:timeout -->
+					<!-- 目前这三个实例都放在同个机器上,6379的实例为主库,其他两个为从库 -->
+					<value>172.19.103.105:6331::</value>
+					<value>172.19.103.105:6330::</value>
+					<value>172.19.103.105:6379:fdfs123:</value>
+				</list>
+			</property>
+		</bean>
+		<bean id="redisClient" class="com.yy.cs.base.redis.RedisClient">
+			<property name="factory" ref="redisClientFactory"></property>
 		</bean>
 </beans>
