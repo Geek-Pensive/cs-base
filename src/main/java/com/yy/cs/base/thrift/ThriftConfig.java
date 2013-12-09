@@ -1,8 +1,11 @@
 package com.yy.cs.base.thrift;
+
+import com.duowan.pooling.PoolConfig;
+
  
 
 
-public class ThriftConfig {
+public class ThriftConfig extends PoolConfig{
     
 	private String host;
     
@@ -10,9 +13,7 @@ public class ThriftConfig {
     
     private int timeout = 5000;
     
-    private int poolSize = 5;
-    
-    private int weight = 5;
+    private int weight = 0;
     
 
 	public ThriftConfig(){
@@ -52,14 +53,6 @@ public class ThriftConfig {
 
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
-	}
-
-	public int getPoolSize() {
-		return poolSize;
-	}
-
-	public void setPoolSize(int poolSize) {
-		this.poolSize = poolSize;
 	}
 
 	public int getWeight() {
