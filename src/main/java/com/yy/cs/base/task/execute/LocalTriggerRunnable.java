@@ -8,13 +8,18 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.trigger.Trigger;
 
  
  
 public class LocalTriggerRunnable extends HandlingRunnable {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(LocalTriggerRunnable.class);
+	
 	private final Trigger trigger;
 	
 	private final ScheduledExecutorService executor;
@@ -45,6 +50,7 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 	@Override
 	public void run() {
 		Date startTime = new Date();
+		logger.info(startTime + ", start run local task id:" + task.getId());
 		super.run();
 		Date completionTime = new Date();
 		synchronized (this.triggerContextMonitor) {
@@ -53,6 +59,7 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 				schedule();
 			}
 		}
+		logger.info("completion run local task id:" + task.getId());
 	}
 	
 	@Override

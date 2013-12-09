@@ -1,7 +1,9 @@
 package com.yy.cs.base.task.thread;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
@@ -17,10 +19,13 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 	private final ScheduledExecutorService scheduledExecutor;
 	
 	public  ThreadPoolTaskScheduler() {
-		this(1);
+		this(2);
 	}
 	
 	public  ThreadPoolTaskScheduler(int poolSize) {
+		if(poolSize < 2){
+			poolSize = 2;
+		}
 		this.scheduledExecutor =  new ScheduledThreadPoolExecutor(poolSize, new NamedThreadFactory("cs-taks-pool"));
 	}
 
@@ -37,6 +42,11 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 			scheduledExecutor.shutdown();
 		}
 		
+	}
+
+	public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
+			long initialDelay, long delay, TimeUnit unit) {
+		return scheduledExecutor.scheduleWithFixedDelay(command, initialDelay, delay, unit);
 	}
 
 }

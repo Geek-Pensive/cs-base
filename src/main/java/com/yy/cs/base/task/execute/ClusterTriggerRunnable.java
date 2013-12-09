@@ -8,6 +8,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.execute.lock.RedisTaskLock;
@@ -18,6 +21,8 @@ import com.yy.cs.base.task.trigger.Trigger;
  
 public class ClusterTriggerRunnable extends HandlingRunnable {
 
+	private static final Logger logger = LoggerFactory.getLogger(ClusterTriggerRunnable.class);
+	
 	private final Trigger trigger;
 	
 	private final ScheduledExecutorService executor;
@@ -58,6 +63,7 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 	@Override
 	public void run() {
 		Date startTime = new Date();
+		logger.info(startTime + ", start run cluster task id:" + task.getId());
 		//取task的锁
 		if(taskLock.lock(task.getId(), this.scheduledExecutionTime.getTime())){
 			super.run();
@@ -70,6 +76,7 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 				schedule();
 			}
 		}
+		logger.info("completion run cluster task id:" + task.getId());
 	}
 	
 	@Override

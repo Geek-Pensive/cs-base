@@ -12,7 +12,7 @@ import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 
 public class TimerTaskManager {
 	
-	 private int poolSize = 1;
+	 private int poolSize = 2;
 	 
 	 private Map<String,TimerTask> timerTasks;
      

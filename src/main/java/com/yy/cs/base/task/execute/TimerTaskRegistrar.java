@@ -4,10 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.task.TimerTask;
 import com.yy.cs.base.task.context.Constants;
+import com.yy.cs.base.task.context.MonitorTask;
 import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.trigger.CronTrigger;
@@ -15,6 +20,7 @@ import com.yy.cs.base.task.trigger.Trigger;
 
 public class TimerTaskRegistrar {
 	
+	private static final Logger logger = LoggerFactory.getLogger(TimerTaskRegistrar.class);
 	
 	private TaskScheduler taskScheduler;
 
@@ -31,6 +37,9 @@ public class TimerTaskRegistrar {
 			String id =  e.getKey();
 			if (task == null) {
 				continue;
+			}
+			if(task.getId() == null || "".equals(task.getId())){
+				task.setId(id);
 			}
 			if(task.getCluster() != null){
 				clusterTaskMap.put(id, task);
@@ -72,10 +81,11 @@ public class TimerTaskRegistrar {
 			subStatus.additionInfo(Constants.LAST_START_TIME, context.lastStartTime());
 			subStatus.additionInfo(Constants.LAST_COMPLETION_TIME, context.lastCompletionTime());
 			subStatus.additionInfo(Constants.EXECUTE_ADDRESS, context.executeAddress());
-			subStatus.additionInfo(Constants.LAST_EXCEPTION_TIME, context.lastCompletionTime());
+			subStatus.additionInfo(Constants.LAST_EXCEPTION_TIME, context.getExceptionTime());
 			subStatus.additionInfo(Constants.THROWABLE, context.getT());
 			csStatus.addSubCsStatus(subStatus);
 		}
+		csStatus.setName("TimerTaskManager");
 		return csStatus;
 	}
 	
@@ -95,6 +105,16 @@ public class TimerTaskRegistrar {
 			}
 		}
 		
+		this.taskScheduler.scheduleWithFixedDelay(new Runnable() {
+			MonitorTask monitor = new MonitorTask();
+			public void run() {
+                try {
+                	monitor.writeTaskFile(getCsStatus());
+                } catch (Throwable t) { // 防御性容错
+                	logger.error("monitorTask  expection: " + t.getMessage(), t);
+                }
+			}
+		}, 5* 1000, 5* 1000, TimeUnit.MILLISECONDS);
 	}
 
 	public void destroy() {
