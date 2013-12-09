@@ -1,6 +1,6 @@
 package com.yy.cs.base.thrift.proxy;
 
-import com.yy.cs.base.thrift.protocol.Invoker;
+import com.yy.cs.base.thrift.invoker.Invoker;
 
 
 public class JDKProxy{

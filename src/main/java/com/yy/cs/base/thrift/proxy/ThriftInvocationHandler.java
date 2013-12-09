@@ -3,7 +3,7 @@ package com.yy.cs.base.thrift.proxy;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import com.yy.cs.base.thrift.protocol.Invoker;
+import com.yy.cs.base.thrift.invoker.Invoker;
 
 
 public class ThriftInvocationHandler  implements InvocationHandler {
