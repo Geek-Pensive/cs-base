@@ -31,7 +31,9 @@ public class TimerTaskManageTest {
 			try {
 				Thread.sleep(8000);
 				CsStatus t = timerTaskManage.getCsStatus();
-				System.out.println(t.toString());
+//				System.out.println(t.toString());
+//				WebServiceFileUtil w = new WebServiceFileUtil();
+//				w.writeTaskFile(t);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
