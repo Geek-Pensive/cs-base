@@ -1,115 +1,121 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.yy.cs</groupId>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.yy.cs</groupId>
 	<artifactId>cs-base</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>cs-base</name>
 	<url>http://maven.apache.org</url>
 	<distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>http://jrepo.yypm.com:8181/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>release-server-deploy</id>
-            <url>http://jrepo.yypm.com:8181/nexus/content/repositories/releases/</url>
-        </repository>
-    </distributionManagement>
-   <properties>
-	    <!-- 日志工具 -->
-	    <codehaus.janino>2.6.1</codehaus.janino>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>http://jrepo.yypm.com/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>release-server-deploy</id>
+			<url>http://jrepo.yypm.com/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
+
+	<properties>
+		<!-- 日志工具 -->
+		<codehaus.janino>2.6.1</codehaus.janino>
 		<logback.version>1.0.7</logback.version>
 		<slf4j.version>1.6.4</slf4j.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 	
-    	<dependencies>
-    		<dependency>
-			 	 <groupId>com.duowan.pooling</groupId>
-				 <artifactId>libpooling</artifactId>
-				 <version>1.0.0.5</version>
-			  </dependency>
-    		<dependency>
-				<groupId>org.apache.thrift</groupId>
-				<artifactId>libthrift</artifactId>
-				<version>0.6.1</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>slf4j-log4j12</artifactId>
-						<groupId>org.slf4j</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>log4j</artifactId>
-						<groupId>log4j</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-  			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>${logback.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-core</artifactId>
-				<version>${logback.version}</version>
-			</dependency>
-		    <dependency>
-				<groupId>org.codehaus.jackson</groupId>
-				<artifactId>jackson-core-asl</artifactId>
-				<version>1.9.6</version>
-				<scope>provided</scope>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>org.codehaus.jackson</groupId>
-				<artifactId>jackson-mapper-asl</artifactId>
-				<version>1.9.6</version>
-				<scope>provided</scope>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-			  <groupId>org.apache.httpcomponents</groupId>
-			  <artifactId>httpclient</artifactId>
-			  <version>4.3.1</version>
-			</dependency>
-			    <!-- test -->
-		    <dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.8.2</version>
-				<scope>test</scope>
-			</dependency>
-			<!-- client -->
-			<dependency>
-			    <groupId>redis.clients</groupId>
-			    <artifactId>jedis</artifactId>
-			    <version>2.0.0</version>
-			</dependency>
-			<!-- Spring framework -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring</artifactId>
-				<version>2.5.6</version>
-				<scope>test</scope>
-			</dependency>
-	     </dependencies>
-    <build>
+	<dependencies>
+		<dependency>
+			<groupId>com.duowan.pooling</groupId>
+			<artifactId>libpooling</artifactId>
+			<version>1.0.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.thrift</groupId>
+			<artifactId>libthrift</artifactId>
+			<version>0.6.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.9.6</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.6</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- client -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+		<!-- Spring framework -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring</artifactId>
+			<version>3.2.5</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<encoding>utf-8</encoding>
-					<source>1.6</source>
-					<target>1.6</target>
-					<meminitial>128m</meminitial>
-					<maxmem>512m</maxmem>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>
