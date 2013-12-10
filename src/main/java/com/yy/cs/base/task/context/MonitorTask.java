@@ -113,6 +113,7 @@ public class MonitorTask {
 			return;
 		} 
     	for(CsStatus c : cs){
+    		strBuffer.append("\n");
     		strBuffer.append(tr);
         	addTD(strBuffer, c.getAdditionInfo(Constants.TASK_ID));
         	addTD(strBuffer, c.getCode());

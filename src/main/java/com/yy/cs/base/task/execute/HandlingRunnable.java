@@ -36,6 +36,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	public void run(){
 		try {
 			this.task.execute();
+			this.context.updateException(null,null);
 		}catch (Throwable ex) {
 			this.context.updateException(new Date(),ex);
 		}

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.status.StatusCode;
 import com.yy.cs.base.task.TimerTask;
 import com.yy.cs.base.task.context.Constants;
 import com.yy.cs.base.task.context.MonitorTask;
@@ -83,6 +84,9 @@ public class TimerTaskRegistrar {
 			subStatus.additionInfo(Constants.EXECUTE_ADDRESS, context.executeAddress());
 			subStatus.additionInfo(Constants.LAST_EXCEPTION_TIME, context.getExceptionTime());
 			subStatus.additionInfo(Constants.THROWABLE, context.getT());
+			if(context.getT() != null){
+				subStatus.setCode(StatusCode.FAIL);
+			}
 			csStatus.addSubCsStatus(subStatus);
 		}
 		csStatus.setName("TimerTaskManager");
