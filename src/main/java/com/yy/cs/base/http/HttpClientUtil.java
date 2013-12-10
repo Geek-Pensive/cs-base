@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -33,8 +32,14 @@ public class HttpClientUtil {
         for (Entry<String, String> entry : params.entrySet()) {
             p.add(encode(entry.getKey())  + "=" + encode(entry.getValue()));
         }
-
-        return StringUtils.join(p, '&');
+        StringBuffer sb = new StringBuffer(); 
+        for(int i = 0; i<p.size(); i++){
+        	sb.append(p.get(i));
+        	if(i != p.size()-1){
+        		sb.append('&');
+        	}
+        }
+        return sb.toString();
     }
     
     public static String encode(String value) {
