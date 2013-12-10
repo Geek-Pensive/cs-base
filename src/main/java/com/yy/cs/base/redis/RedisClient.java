@@ -1,9 +1,9 @@
 package com.yy.cs.base.redis;
 
-import com.yy.cs.base.nyy.exception.NyyRuntimeException;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+
+import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
 
 /**
  * redis client 的封装类
@@ -39,7 +39,7 @@ public class RedisClient {
 			return jedis.set(key, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
-			throw new NyyRuntimeException("jedis set fail", e);
+			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}
@@ -63,7 +63,7 @@ public class RedisClient {
 			return jedis.setex(key, seconds, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
-			throw new NyyRuntimeException("jedis set fail", e);
+			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}
@@ -87,7 +87,7 @@ public class RedisClient {
 			return jedis.setex(key, seconds, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
-			throw new NyyRuntimeException("jedis set fail", e);
+			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}
@@ -106,7 +106,7 @@ public class RedisClient {
 			return jedis.info();
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
-			throw new NyyRuntimeException("jedis info fail", e);
+			throw new CsRedisRuntimeException("jedis info fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}
@@ -129,7 +129,7 @@ public class RedisClient {
 			return jedis.get(key);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
-			throw new NyyRuntimeException("jedis get fail", e);
+			throw new CsRedisRuntimeException("jedis get fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}
@@ -154,7 +154,7 @@ public class RedisClient {
 			return jedis.set(key, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
-			throw new NyyRuntimeException("jedis set fail", e);
+			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}
@@ -177,7 +177,7 @@ public class RedisClient {
 			return jedis.get(key);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
-			throw new NyyRuntimeException("jedis get fail", e);
+			throw new CsRedisRuntimeException("jedis get fail", e);
 		}finally{
 			jedisPool.returnResource(jedis);
 		}

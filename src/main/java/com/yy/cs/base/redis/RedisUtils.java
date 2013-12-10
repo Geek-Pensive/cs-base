@@ -72,8 +72,9 @@ public class RedisUtils {
 	}
 	
 	public static void main(String []args){
-		String [] strArray = parseServerInfo("172.19.103.105:6331::");
+		String [] strArray = parseServerInfo("172.19.103.105:6331::1000");
 		for(int i = 0; i < strArray.length; i++){
+			System.out.println(strArray[2] == null);
 			System.out.println(i + " " + strArray[i]);
 		}
 	}

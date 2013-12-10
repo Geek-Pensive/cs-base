@@ -20,7 +20,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import com.yy.cs.base.nyy.exception.NyyRuntimeException;
+import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
 
 /**
  * @author hongyuan
@@ -74,7 +74,7 @@ public class RedisClientFactory extends JedisPoolConfig{
 
 	public void setRedisServers(List<String> redisServers) {
 		if(redisServers == null || redisServers.size() ==0){
-			throw new NyyRuntimeException("redisServers couldn't be null");
+			throw new CsRedisRuntimeException("redisServers couldn't be null");
 		}
 		this.redisServers = redisServers;
 		this.totalServersSize = redisServers.size();
