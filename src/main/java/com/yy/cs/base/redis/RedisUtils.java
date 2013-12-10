@@ -3,7 +3,8 @@ package com.yy.cs.base.redis;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.yy.cs.base.nyy.exception.NyyRuntimeException;
+import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
+
 
 public class RedisUtils {
 	
@@ -52,11 +53,11 @@ public class RedisUtils {
 	 */
 	public static String[] parseServerInfo(String serverInfo){
 		if(serverInfo == null || "".equals(serverInfo)){
-			throw new NyyRuntimeException("invalid param, param couldn't be blank");
+			throw new CsRedisRuntimeException("invalid param, param couldn't be blank");
 		}
 		String [] str = serverInfo.split(":");
 		if(str.length < 2){
-			throw new NyyRuntimeException("invalid param, param should like ip:port:password:timeout, if not exists password, you can use ip:port::");
+			throw new CsRedisRuntimeException("invalid param, param should like ip:port:password:timeout, if not exists password, you can use ip:port::");
 		}
 		String [] result = new String[4];
 		result[0] = str[0];
