@@ -36,9 +36,7 @@ public class ClientFactory extends BasePoolableObjectFactory {
 		return client;
 	}
 
-	/**
-	 * Destroy a TScoket.
-	 */
+	 
 	public void destroyObject(Object obj) throws Exception {
 		Client client = (Client) obj;
 		client.close();

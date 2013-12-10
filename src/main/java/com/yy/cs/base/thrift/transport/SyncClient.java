@@ -64,7 +64,6 @@ public class SyncClient implements Client{
 		protocol = new TBinaryProtocol(transport);
 		transport.open();
 		thriftClinet = ctor.newInstance(protocol);
-		
 	}
 	
 	
