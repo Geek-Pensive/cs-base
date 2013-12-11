@@ -47,34 +47,30 @@ public class MonitorTask {
     private static final String lastException = "上次异常信息";
 //    private static final String lastAddress = "上次集群task执行地址";
     
-    private static String dir = null;
+    private  String monitorfile;
     
     public static void main(String[] args) {
 //		System.out.println(getWebPath());
 	}
-    
+    public MonitorTask(String monitorfile){
+    	this.monitorfile = monitorfile;
+    }
     
     /**
-     * 取classloader加载的文件夹（classes）路径的上两层，一般就是项目的根目录appname-->WEB-INF-->classes
      * @return
      */
     private  String getWebPath(){
-    	if(dir != null && !"".equals(dir)){
-    		return dir;
+    	if(monitorfile != null && !"".equals(monitorfile)){
+    		return monitorfile;
     	}
-    	String dir = MonitorTask.class.getResource("/").getFile();
-    	if(dir.startsWith("/")){
-    		dir = dir.substring(1, dir.length()-1);
-    	}
-    	dir = dir.substring(0, dir.lastIndexOf("/"));
-    	dir = dir.substring(0, dir.lastIndexOf("/"));
-    	return dir;
+    	this.monitorfile = System.getProperty("user.dir") + File.separatorChar + "monitortask.html";
+    	return monitorfile;
     } 
     
     
     public void writeTaskFile(CsStatus csStatus) {
         
-        String path = getWebPath() +File.separatorChar + "monitortask.html";
+        String path = getWebPath();
 //        log.info("file path is {}", new Object[] { path });
         try {
             File f = new File(path);
@@ -124,6 +120,7 @@ public class MonitorTask {
         	addTD(strBuffer, dateToString(c.getAdditionInfo(Constants.LAST_EXCEPTION_TIME)));
         	addTD(strBuffer, throwableToString(c.getAdditionInfo(Constants.THROWABLE)));
             strBuffer.append(trEnd);
+            strBuffer.append("\n");
 		 }
 	}
 

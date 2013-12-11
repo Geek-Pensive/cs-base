@@ -158,7 +158,7 @@
 
 			<bean name="taskManage" class="com.yy.cs.base.task.TimerTaskManager" init-method="start" >
 					<!-- 线程池大小配置启动线程池  -->
-					<property name="pooSize" value="2" />
+					<property name="poolSize" value="2" />
 			    <!-- 在任务管理器中添加任务  -->
 				 <property name="timerTasks">
 					    <map>
@@ -171,11 +171,9 @@
 			CsStatus t = timerTaskManage.getCsStatus();
 	 	 
 ### 状态监控说明
-*	 任务状态的监控数据，会间隔5秒输出到monitortask.html文件中。
-*	 monitortask.html文件的路径会默认放在jvm加载的class的上两集目录。
-		如果是在容器中一般则是项目的根路径下，这样可以通过容器直接访问到页面。
-		如果没有通过容器发布，则也会在当前的classess上两级目录输出。
-		运维监控只需要monitortask.html文件里面是否FAIL的任务。
+*	 任务状态的监控数据，默认会间隔5秒输出到当前系统的user.dir目录下monitortask.html文件中。
+*	 此目录也支持配置，可以设置taskManage的monitorfile属性，输出到制定目录的指点文件中。
+*	 运维只需要监控此文件里面是否FAIL的任务。
 
 
 *	 任务状态监控数据monitortask.html内容</br>

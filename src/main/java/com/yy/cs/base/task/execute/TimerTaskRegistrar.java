@@ -55,9 +55,9 @@ public class TimerTaskRegistrar {
 	}
 
 	 
-	public void start(TaskScheduler taskScheduler ) {
+	public void start(TaskScheduler taskScheduler,String monitorfile) {
 		this.taskScheduler = taskScheduler;
-		scheduleTasks();
+		scheduleTasks(monitorfile);
 	}
 
 //	public TaskContext getTaskContext(String id) {
@@ -93,7 +93,7 @@ public class TimerTaskRegistrar {
 		return csStatus;
 	}
 	
-	private void scheduleTasks() {
+	private void scheduleTasks(final String monitorfile) {
 		if (this.cronTaskMap != null) {
 			for (Entry<String, TimerTask> entry : cronTaskMap.entrySet()) {
 				TimerTask task = entry.getValue();
@@ -110,7 +110,7 @@ public class TimerTaskRegistrar {
 		}
 		
 		this.taskScheduler.scheduleWithFixedDelay(new Runnable() {
-			MonitorTask monitor = new MonitorTask();
+			MonitorTask monitor = new MonitorTask(monitorfile);
 			public void run() {
                 try {
                 	monitor.writeTaskFile(getCsStatus());

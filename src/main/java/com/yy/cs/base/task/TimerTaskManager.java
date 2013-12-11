@@ -20,7 +20,17 @@ public class TimerTaskManager {
      
      private volatile boolean  isStart = false;
      
-     public void addTimerTask(String id,TimerTask task){
+     private String monitorfile;
+     
+     public String getMonitorfile() {
+		return monitorfile;
+	}
+
+	public void setMonitorfile(String monitorfile) {
+		this.monitorfile = monitorfile;
+	}
+
+	public void addTimerTask(String id,TimerTask task){
     	 if(timerTasks ==  null){
     		 timerTasks = new HashMap<String,TimerTask>();
     	 }
@@ -37,7 +47,7 @@ public class TimerTaskManager {
     		 TaskScheduler taskScheduler = new ThreadPoolTaskScheduler(poolSize);
     		 registrar = new TimerTaskRegistrar();
     		 registrar.parse(timerTasks);
-    		 registrar.start(taskScheduler);
+    		 registrar.start(taskScheduler,monitorfile);
     	 }
      }
      
