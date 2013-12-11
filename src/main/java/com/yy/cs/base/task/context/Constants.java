@@ -18,4 +18,6 @@ public class Constants {
 	public final static String LAST_EXCEPTION_TIME = "lastExceptionTime";   //最近一次异常执行时间
 
 	public final static String  THROWABLE = "throwable";
+	
+	public final static String  TIMEOUT = "timeout";
 }

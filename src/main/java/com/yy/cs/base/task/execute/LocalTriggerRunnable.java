@@ -1,12 +1,7 @@
 package com.yy.cs.base.task.execute;
 
-import java.util.Date;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +15,15 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 	
 	private static final Logger logger = LoggerFactory.getLogger(LocalTriggerRunnable.class);
 	
-	private final Trigger trigger;
+//	private final Trigger trigger;
 	
 	private final ScheduledExecutorService executor;
 
 	public LocalTriggerRunnable(Task task, Trigger trigger, ScheduledExecutorService executor) {
-		super(task);
+		super(task,trigger);
 		if(trigger == null){
 			throw new IllegalArgumentException("trigger must not be null");
 		}
-		this.trigger = trigger;
 		this.executor = executor;
 	}
 	
@@ -49,12 +43,8 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 	
 	@Override
 	public void run() {
-		Date startTime = new Date();
-		logger.info(startTime + ", start run local task id:" + task.getId());
 		super.run();
-		Date completionTime = new Date();
 		synchronized (this.triggerContextMonitor) {
-			this.context.updateExecuteTime(startTime, completionTime);
 			if (!this.currentFuture.isCancelled()) {
 				schedule();
 			}
@@ -62,61 +52,5 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 		logger.info("completion run local task id:" + task.getId());
 	}
 	
-	@Override
-	public boolean cancel(boolean mayInterruptIfRunning) {
-		synchronized (this.triggerContextMonitor) {
-			return this.currentFuture.cancel(mayInterruptIfRunning);
-		}
-	}
-
-	@Override
-	public boolean isCancelled() {
-		synchronized (this.triggerContextMonitor) {
-			return this.currentFuture.isCancelled();
-		}
-	}
-
-	@Override
-	public boolean isDone() {
-		synchronized (this.triggerContextMonitor) {
-			return this.currentFuture.isDone();
-		}
-	}
-
-	@Override
-	public Object get() throws InterruptedException, ExecutionException {
-		ScheduledFuture<?> curr;
-		synchronized (this.triggerContextMonitor) {
-			curr = this.currentFuture;
-		}
-		return curr.get();
-	}
-
-	@Override
-	public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-		ScheduledFuture<?> curr;
-		synchronized (this.triggerContextMonitor) {
-			curr = this.currentFuture;
-		}
-		return curr.get(timeout, unit);
-	}
-
-	@Override
-	public long getDelay(TimeUnit unit) {
-		ScheduledFuture<?> curr;
-		synchronized (this.triggerContextMonitor) {
-			curr = this.currentFuture;
-		}
-		return curr.getDelay(unit);
-	}
-
-	@Override
-	public int compareTo(Delayed other) {
-		if (this == other) {
-			return 0;
-		}
-		long diff = getDelay(TimeUnit.MILLISECONDS) - other.getDelay(TimeUnit.MILLISECONDS);
-		return (diff == 0 ? 0 : ((diff < 0)? -1 : 1));
-	}
 
 }

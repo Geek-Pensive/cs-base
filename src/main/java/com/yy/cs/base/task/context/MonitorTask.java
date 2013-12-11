@@ -45,6 +45,7 @@ public class MonitorTask {
     private static final String lastCompletionDate = "上次执行完成时间点";
     private static final String lastExceptionDate = "上次异常执行时间点";
     private static final String lastException = "上次异常信息";
+    private static final String timeout = "执行是否超时";
 //    private static final String lastAddress = "上次集群task执行地址";
     
     private  String monitorfile;
@@ -119,6 +120,7 @@ public class MonitorTask {
         	addTD(strBuffer, dateToString(c.getAdditionInfo(Constants.LAST_COMPLETION_TIME)));
         	addTD(strBuffer, dateToString(c.getAdditionInfo(Constants.LAST_EXCEPTION_TIME)));
         	addTD(strBuffer, throwableToString(c.getAdditionInfo(Constants.THROWABLE)));
+        	addTD(strBuffer, c.getAdditionInfo(Constants.TIMEOUT));
             strBuffer.append(trEnd);
             strBuffer.append("\n");
 		 }
@@ -165,6 +167,7 @@ public class MonitorTask {
     	addTH(strBuffer, lastCompletionDate);
     	addTH(strBuffer, lastExceptionDate);
     	addTH(strBuffer, lastException);
+    	addTH(strBuffer, timeout);
         strBuffer.append(trEnd);
 	}
 

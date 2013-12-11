@@ -84,6 +84,11 @@ public class TimerTaskRegistrar {
 			subStatus.additionInfo(Constants.EXECUTE_ADDRESS, context.executeAddress());
 			subStatus.additionInfo(Constants.LAST_EXCEPTION_TIME, context.getExceptionTime());
 			subStatus.additionInfo(Constants.THROWABLE, context.getT());
+			boolean istimeout = entry.getValue().isTimeout();
+			subStatus.additionInfo(Constants.TIMEOUT, istimeout);
+			if(istimeout){
+				subStatus.setCode(StatusCode.WRONG);
+			}
 			if(context.getT() != null){
 				subStatus.setCode(StatusCode.FAIL);
 			}
@@ -118,7 +123,7 @@ public class TimerTaskRegistrar {
                 	logger.error("monitorTask  expection: " + t.getMessage(), t);
                 }
 			}
-		}, 5* 1000, 5* 1000, TimeUnit.MILLISECONDS);
+		}, 5 * 1000, 3 * 1000, TimeUnit.MILLISECONDS);
 	}
 
 	public void destroy() {
