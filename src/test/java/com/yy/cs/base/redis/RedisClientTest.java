@@ -3,12 +3,9 @@ package com.yy.cs.base.redis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -27,9 +24,17 @@ public class RedisClientTest {
 	
 	@Before
 	public void init(){
-		ApplicationContext context = new ClassPathXmlApplicationContext(
-				"redis-master-slave-application.xml");
-		redisClient = (RedisClient) context.getBean("redisClient");
+		
+		RedisClientFactory redisClientFactory = new RedisClientFactory();
+		List<String> list = new ArrayList<String>();
+		//这里是业务要连接的redis
+		list.add("172.19.103.105:6331::");
+		list.add("172.19.103.105:6330::");
+		list.add("172.19.103.105:6379:fdfs123:");
+		redisClientFactory.setRedisServers(list);
+		redisClientFactory.init();
+		redisClient = new RedisClient();
+		redisClient.setFactory(redisClientFactory);
 	}
 
 	/**
