@@ -3,8 +3,6 @@ package com.yy.cs.base.task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.yy.cs.base.status.CsStatus;
 
@@ -13,8 +11,8 @@ public class TimerTaskManageTest {
 	TimerTaskManager timerTaskManage;
 	@Before
     public void before() {
-		ApplicationContext context = new ClassPathXmlApplicationContext("spring-task.xml");
-		timerTaskManage =  (TimerTaskManager) context.getBean("taskManage");
+//		ApplicationContext context = new ClassPathXmlApplicationContext("spring-task.xml");
+//		timerTaskManage =  (TimerTaskManager) context.getBean("taskManage");
     }
 	/**
 	 * 

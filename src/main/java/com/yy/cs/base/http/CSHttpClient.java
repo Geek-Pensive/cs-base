@@ -47,6 +47,10 @@ public class CSHttpClient {
         this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
     }
 
+    
+    public CSHttpClient() {
+    	this(new CSHttpClientFactory());
+    }
     /**
      * @return 池化的原生httpClient
      */
