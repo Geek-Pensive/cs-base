@@ -174,7 +174,7 @@
 *	 任务状态的监控数据，默认会间隔5秒输出到当前系统的user.dir目录下monitortask.html文件中。
 *	 此目录也支持配置，可以设置taskManage的monitorfile属性，输出到制定目录的指点文件中。
 *	 执行是否超时是指，本次执行的时间，超出了下次执行的时间；也就是本次执行时间超过了一个时间间隔。
-*	 运维只需要监控此文件里面是否FAIL的任务。
+*	 如果如果执行超时任务状态为WRONG,任务执行异常则状态FAIL。
 
 *	 任务状态监控数据monitortask.html内容</br>
 	 		<table cellpadding='0' cellspacing='0' align='center' border='1' >
