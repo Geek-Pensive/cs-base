@@ -241,16 +241,15 @@
 #### 初始化配置
    
    
-			   com.yy.cs.base.http.HttpClientConfig config = new com.yy.cs.base.http.HttpClientConfig();
-			   config.setMaxTotal(30);           			//池中的最大连接数
-			   config.setDefaultMaxPerRoute(4);  			//HttpClient中每个远程host最大连接数,一个host可能有多个连接
-			   config.setConnectionTimeout(5000);   			// 建立http连接的超时时间
-			   config.setSocketTimeOut(5000); 					  // socket读取的超时时间（0为无限）
-			   config.setConnectionRequestTimeout(5000);  // 从连接池获取连接的超时时间
-	  			
-	  		 com.yy.cs.base.http.HttpClientManagerUtil 	httpClientManager = new com.yy.cs.base.http.HttpClientManagerUtil(config);
+			   com.yy.cs.base.http.CSHttpClientFactory factory = new com.yy.cs.base.http.CSHttpClientFactory();
+			   factory.setMaxTotal(30);           			//池中的最大连接数
+			   factory.setDefaultMaxPerRoute(4);  			//HttpClient中每个远程host最大连接数,一个host可能有多个连接
+			   factory.setConnectionTimeout(5000);   			// 建立http连接的超时时间
+			   factory.setSocketTimeOut(5000); 					  // socket读取的超时时间
+			   factory.setConnectionRequestTimeout(5000);  // 从连接池获取连接的超时时间
+	  		 com.yy.cs.base.http.CSHttpClient 	csHttpClient = new com.yy.cs.base.http.CSHttpClient(factory);
 	
-####	AIP说明
+####	AIP说明(CSHttpClient)
 	
 	      /**
 		     * @return 池化的原生httpClient
