@@ -16,7 +16,7 @@
     <dependency>
       <groupId>com.yy.cs</groupId>
       <artifactId>cs-base</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.2-SNAPSHOT</version>
     </dependency>
 
 ---
@@ -173,8 +173,8 @@
 ### 状态监控说明
 *	 任务状态的监控数据，默认会间隔5秒输出到当前系统的user.dir目录下monitortask.html文件中。
 *	 此目录也支持配置，可以设置taskManage的monitorfile属性，输出到制定目录的指点文件中。
+*	 执行是否超时是指，本次执行的时间，超出了下次执行的时间；也就是本次执行时间超过了一个时间间隔。
 *	 运维只需要监控此文件里面是否FAIL的任务。
-
 
 *	 任务状态监控数据monitortask.html内容</br>
 	 		<table cellpadding='0' cellspacing='0' align='center' border='1' >
@@ -208,6 +208,7 @@
 				 		<th  align='center' >上次执行完成时间点</th>
 				 		<th  align='center' >上次异常执行时间点</th>
 				 		<th  align='center' >上次异常信息</th>
+				 		<th  align='center' >执行是否超时</th>
 		 		</tr>
 		 		<tr>
 				 		<td align='center' style='padding:10px 10px 10px 10px;'>com.yy.cs.base.task.TimerTaskTest</td>
@@ -218,6 +219,7 @@
 				 		<td align='center' style='padding:10px 10px 10px 10px;'>2013-12-03 16:47:31</td>
 				 		<td align='center' style='padding:10px 10px 10px 10px;'></td>
 				 		<td align='center' style='padding:10px 10px 10px 10px;'></td>
+				 		<td align='center' style='padding:10px 10px 10px 10px;'>false</td>
 		 		</tr>
 	 		</table>
 	 	 
