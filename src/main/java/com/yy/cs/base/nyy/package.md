@@ -16,8 +16,9 @@
 ----
 ## 思路
 
-1. 统一编码
+1. 统一编码与算法
 	- 说明：对于ASCII以外的编码，使用UTF-8。对于一些需要使用客串表示二进制字节的地方，都使用BASE64。
+	- 说明：哈希选用SHA256，对称加密使用AES（AES/ECB/PKCS5PADDING，key长度选用128bit）
 	<br>
 
 1. 扁平的数据结构
@@ -64,9 +65,8 @@
    后续的基础库可能会添加这方面的安全校验。
 
 2. data字段中均为业务字段，可以自由定义，这里尝试建议如下一些常用的key，以期减小沟通成本：
-   - statusCode：响应中的状态码，String，业务自行定义内容，如：123, APP_NOT_EXIST
-   - statusMsg：响应中的状态信息，String，针对statusCode给出的详细信息
-
+   - statusCode：响应中的状态/结果码，String，业务自定义内容，如：123, APP_NOT_EXIST
+   - statusMsg：响应中的状态/结果信息，String，针对statusCode给出的详细信息
 
 ----
 ## 安全机制
