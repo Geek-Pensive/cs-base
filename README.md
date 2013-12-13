@@ -233,7 +233,7 @@
 ---
 ## HTTP
 ### 简要说明
-*	基于apache的httpclient-4.X版本封装，提供了常用的方法的调用，并且采用httpclient池。
+*	基于apache的httpclient-4.3以上版本封装，提供了常用的方法的调用，并且采用httpclient池。
 *	池大小设置 | 超时时间设置
 *	接口简易
 
