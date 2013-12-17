@@ -5,7 +5,7 @@ import com.yy.cs.base.status.CsStatus;
 public interface Task {
 	
 	
-	 void execute();
+	 void execute() throws Exception;
 	
 	 String getId();
 	 

@@ -1,9 +1,7 @@
 package com.yy.cs.base.task.context;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +18,7 @@ public class MonitorTask {
     private static final String html = "<html>";
     private static final String htmlEnd = "</html>";
     private static final String mete  = "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
-    private static final String table = "<table cellpadding='0' cellspacing='0' align='center' border='1' >";
+    private static final String table = "<table style='word-break: keep-all;' cellpadding='0' cellspacing='0' align='center' border='1' >";
     private static final String tableEnd = "</table>";
     private static final String tr = "<tr>";
     private static final String trEnd = "</tr>";
@@ -134,18 +132,21 @@ public class MonitorTask {
     }
     /**
      * 获得堆栈信息
-     * 
      */
     private String getStackTrace(Throwable e) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintWriter pw = new PrintWriter(out);
-        e.printStackTrace(pw);
-        pw.close();
+        StackTraceElement[] traces = e.getStackTrace(); 
+        if(traces == null ){
+        	return "";
+        }
+        StringBuffer str = new StringBuffer();
+        for(StackTraceElement t : traces){
+        	str.append(t.toString());
+        }
         try {
-            return new String(out.toByteArray(), "utf-8");
+            return str.toString();//;new String(out.toByteArray(), "utf-8");
         } catch (Exception e1) {
         	log.warn("", e1);
-            return new String(out.toByteArray());
+            return "";
         }
     }
     
