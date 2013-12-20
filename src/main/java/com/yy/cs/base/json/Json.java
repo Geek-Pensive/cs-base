@@ -19,42 +19,39 @@ public class Json {
 	 * 通过JSON字符串生成对象
 	 * 
 	 * @param jsonStr
-	 *            s * JSON字符串
+	 *            JSON字符串
 	 * @param type
 	 *            返回值的类型
-	 * @return 如果能够封装为指定对象，则返回该值，否则返回null
+	 * @exception e
+	 *                对象为空时，底层抛出异常时，均会封装成RuntimeException抛出
+	 * @return T 指定对象
 	 */
 	public static <T> T strToObj(String jsonStr, Class<T> type) {
-		if (jsonStr == null || jsonStr.isEmpty()) {
-			return null;
-		}
-
 		try {
 			return mapper.readValue(jsonStr, type);
 		} catch (Exception e) {
 			String msg = String.format("Failed to parse json %s", jsonStr);
-			LOG.warn(msg, e);
 			throw new RuntimeException(msg, e);
 		}
 	}
 
 	/**
-	 * 生成JSON字符串.
+	 * 生成对象对应的JSON字符串.
 	 * 
 	 * @param obj
 	 *            对象实例
+	 * @exception e
+	 *                对象为空时，底层抛出异常时，均会封装成RuntimeException抛出
 	 * @return 返回生成的字符串
 	 */
 	public static String ObjToStr(Object obj) {
 		if (obj == null) {
-			return null;
+			throw new RuntimeException("Failed to map object, which is null");
 		}
-
 		try {
 			return mapper.writeValueAsString(obj);
 		} catch (Exception e) {
 			String msg = String.format("Failed to map object {}", obj);
-			LOG.warn(msg, e);
 			throw new RuntimeException(msg, e);
 		}
 	}

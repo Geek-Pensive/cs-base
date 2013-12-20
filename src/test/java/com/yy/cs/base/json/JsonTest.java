@@ -14,6 +14,13 @@ public class JsonTest {
 		tObj.setKey(key);
 		tObj.setValue(value);
 
+		try {
+			System.out.println(Json.ObjToStr(null));
+			fail("should fail for null object");
+		} catch (Exception e) {
+			// expect exception here
+		}
+
 		String jsonStr = Json.ObjToStr(tObj);
 
 		assertTrue(jsonStr.contains(key));
@@ -22,43 +29,32 @@ public class JsonTest {
 
 	@Test
 	public void testStrToObj() {
+		try {
+			Json.strToObj(null, TObj.class);
+			fail("should fail for null string");
+		} catch (Exception e) {
+			// expect exception here
+		}
+
+		try {
+			Json.strToObj(" ", TObj.class);
+			fail("should fail for empty string");
+		} catch (Exception e) {
+			// expect exception here
+		}
+
+		// normal parse
 		String jsonStr = "{\"key\":\"" + key + "\",\"value\":" + value + "}";
-
 		TObj result = Json.strToObj(jsonStr, TObj.class);
-
 		assertEquals(key, result.getKey());
 		assertEquals(value, result.getValue());
-	}
 
-	@Test
-	public void testStrToObjPerformance() {
-		long start = System.currentTimeMillis();
-
-		long i;
-		for (i = 0; i < 1000 * 1000 * 10; i++) {
-			String jsonStr = "{\"key\":\"" + key + i + "\",\"value\":" + value
-					+ i + "}";
-			Json.strToObj(jsonStr, TObj.class);
-		}
-		long time = System.currentTimeMillis() - start;
-		System.out.println("StrToObjPerformance. Time cost (ms): " + time
-				+ ", count: " + i + ", tps: " + i * 1000 / time);
-	}
-
-	@Test
-	public void testObjToStrPerformance() {
-		long start = System.currentTimeMillis();
-		TObj tObj = new TObj();
-
-		long i;
-		for (i = 0; i < 1000 * 1000 * 10; i++) {
-			tObj.setKey(key + i);
-			tObj.setValue(value + i);
-			Json.ObjToStr(tObj);
-		}
-		long time = System.currentTimeMillis() - start;
-		System.out.println("ObjToStrPerformance. Time cost (ms): " + time
-				+ ", count: " + i + ", tps: " + i * 1000 / time);
+		// compatible with extra no exist properties
+		String jsonStrWithExtras = "{\"key\":\"" + key + "\",\"value\":"
+				+ value + ",\"notExistValue\":" + value + "}";
+		result = Json.strToObj(jsonStrWithExtras, TObj.class);
+		assertEquals(key, result.getKey());
+		assertEquals(value, result.getValue());
 	}
 
 	public static class TObj {

@@ -3,6 +3,7 @@ package integration.com.yy.cs.base.json;
 import org.junit.Test;
 
 import com.yy.cs.base.json.Json;
+import com.yy.cs.base.json.JsonTest.TObj;
 
 public class JsonTest {
 	public static String key = "kkkey";
@@ -36,26 +37,5 @@ public class JsonTest {
 		long time = System.currentTimeMillis() - start;
 		System.out.println("ObjToStrPerformance. Time cost (ms): " + time
 				+ ", count: " + count + ", tps: " + count * 1000 / time);
-	}
-
-	public static class TObj {
-		private String key;
-		private Long value;
-
-		public String getKey() {
-			return key;
-		}
-
-		public void setKey(String key) {
-			this.key = key;
-		}
-
-		public Long getValue() {
-			return value;
-		}
-
-		public void setValue(Long value) {
-			this.value = value;
-		}
 	}
 }
