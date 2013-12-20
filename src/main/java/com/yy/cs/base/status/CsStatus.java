@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.yy.cs.base.json.Json;
+
 
 public class CsStatus{
 	
@@ -188,7 +190,7 @@ public class CsStatus{
 			}
 		}
 		str.append("]");*/
-		return JacksonUtils.toJson(this);
+		return Json.ObjToStr(this);
 	}
 	
 }

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.yy.cs</groupId>
 	<artifactId>cs-base</artifactId>
@@ -18,23 +19,20 @@
 
 	<properties>
 		<!-- 日志工具 -->
-		<slf4j.version>1.6.4</slf4j.version>
+		<jdk.version>1.7</jdk.version>
+		<slf4j.version>1.7.2</slf4j.version>
 		<redis.version>2.0.0</redis.version>
 		<thrift.version>0.6.1</thrift.version>
 		<jackson.version>2.3.0</jackson.version>
+		<logback.version>1.0.9</logback.version>
+		<surefire.version>2.16</surefire.version>
 		<httpclient.version>4.3.1</httpclient.version>
 		<libpooling.version>1.0.0.5</libpooling.version>
-		<!--
-		<cglib.version>3.0</cglib.version>
-		<codehaus.janino>2.6.1</codehaus.janino>
-		<logback.version>1.0.7</logback.version>
-		<spring.versioin>3.2.5.RELEASE</spring.versioin>
-		-->
-		
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-	
+
 	<dependencies>
 		<!-- duowan -->
 		<dependency>
@@ -55,18 +53,18 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-		<!--
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
 			<version>${logback.version}</version>
+			<scope>test</scope>
 		</dependency>
-		-->
 
 		<!-- Jackson libs -->
 		<dependency>
@@ -132,9 +130,9 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<encoding>utf-8</encoding>
-					<source>1.7</source>
-					<target>1.7</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -148,6 +146,16 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${surefire.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>**/integration/**</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
