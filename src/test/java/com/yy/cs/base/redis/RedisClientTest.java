@@ -165,18 +165,33 @@ public class RedisClientTest {
 	}
 	
 	
+	
 	public static void main(String []args){
-		
 		
 		RedisClientFactory redisClientFactory = new RedisClientFactory();
 		List<String> list = new ArrayList<String>();
 		//这里是业务要连接的redis
+		list.add("172.19.103.105:6331::");
+		list.add("172.19.103.105:6330::");
 		list.add("172.19.103.105:6379:fdfs123:");
 		redisClientFactory.setRedisServers(list);
 		redisClientFactory.init();
 		RedisClient redisClient = new RedisClient();
 		redisClient.setFactory(redisClientFactory);
-		System.out.println(redisClient.setAndReturn("test", "test"));
+		String str = redisClient.msetAndReturn("hello","hello1","world","world1");
+		System.out.println(str);
+		System.out.println(redisClient.mgetAndReturn("hello","hello1","world","world1"));
+		
+		/*JedisPool pool = redisClientFactory.getMasterPool();
+		Jedis jedis = pool.getResource();
+		System.out.println(RedisUtils.isMaster(jedis.info()));
+		pool.returnResource(jedis);
+		
+		pool = redisClientFactory.getSlavePool();
+		jedis = pool.getResource();
+		System.out.println(RedisUtils.isMaster(jedis.info()));
+		pool.returnResource(jedis);*/
+		
 	}
 	
 	

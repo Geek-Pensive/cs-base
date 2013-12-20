@@ -20,4 +20,23 @@ public class Constants {
 	public final static String  THROWABLE = "throwable";
 	
 	public final static String  TIMEOUT = "timeout";
+	
+	public interface Param {
+		public static String APPID = "appId";
+		public static String DATA = "data";
+		public static String SIGN = "sign";
+	}
+
+	public interface Symbol {
+		public static String SLASH = "/";
+		public static String QUESTION_MARK = "?";
+		public static String AND = "&";
+		public static String EQUAL = "=";
+	}
+	
+	public interface Enc {
+		public static String UTF_8 = "utf-8";
+	}
+	
+	
 }
