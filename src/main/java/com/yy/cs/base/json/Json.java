@@ -32,9 +32,10 @@ public class Json {
 		try {
 			return mapper.readValue(jsonStr, type);
 		} catch (Exception e) {
-			LOG.warn("Failed to parse json {}", jsonStr, e);
+			String msg = String.format("Failed to parse json %s", jsonStr);
+			LOG.warn(msg, e);
+			throw new RuntimeException(msg, e);
 		}
-		return null;
 	}
 
 	/**
@@ -52,8 +53,9 @@ public class Json {
 		try {
 			return mapper.writeValueAsString(obj);
 		} catch (Exception e) {
-			LOG.warn("Failed to map object {}", obj, e);
+			String msg = String.format("Failed to map object {}", obj);
+			LOG.warn(msg, e);
+			throw new RuntimeException(msg, e);
 		}
-		return null;
 	}
 }
