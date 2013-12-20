@@ -38,11 +38,11 @@ public class RedisUtils {
 		if(info == null || "".equals(info)){
 			return false;
 		}
-		Pattern p = Pattern.compile("connected_slaves:(\\d+)");
+		Pattern p = Pattern.compile("role:(\\w+)");
 		Matcher m = p.matcher(info);
 		if(m.find()){
-			int num = Integer.valueOf(m.group(1));
-			return num != 0? true : false;
+			String isMaster = (m.group(1));
+			return "master".equals(isMaster) ? true : false;
 		}
 		return false;
 	}

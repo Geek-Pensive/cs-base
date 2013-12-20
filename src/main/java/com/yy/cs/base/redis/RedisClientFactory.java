@@ -84,6 +84,8 @@ public class RedisClientFactory extends JedisPoolConfig{
 	 * 初始化
 	 */
 	public void init(){
+		JedisPool pool = null;
+		Jedis jedis = null;
 		try{
 			for(int i = 0; i < totalServersSize; i++){
 				String [] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
@@ -91,9 +93,9 @@ public class RedisClientFactory extends JedisPoolConfig{
 				int port = Integer.valueOf(strArray[1]);
 				String password = strArray[2];
 				int timeout = strArray[3] != null? Integer.valueOf(strArray[3]) : 10000;//默认是10秒
-				JedisPool pool = new JedisPool(this, ip, port,timeout, password);
+				pool = new JedisPool(this, ip, port,timeout, password);
 				//check master or slave
-				Jedis jedis = pool.getResource();
+				jedis = pool.getResource();
 				String info = jedis.info();
 				boolean isMaster = RedisUtils.isMaster(info);
 				//主实例
@@ -106,16 +108,17 @@ public class RedisClientFactory extends JedisPoolConfig{
 				//释放
 				pool.returnResource(jedis);
 			}
-			//如果没有master 避免用户直接获取master进行操作导致错误
-			if(redisMasterPool.size() == 0){
-				redisMasterPool = redisSlavePool;
-			}
-			//如果没有slave 避免用户直接获取slave进行操作导致错误
-			if(redisSlavePool.size() == 0){
-				redisSlavePool = redisMasterPool;
-			}
 		}catch(Exception e){
 			log.error("occur error in init, error = {}", e);
+			pool.returnBrokenResource(jedis);
+		}
+		//如果没有master 避免用户直接获取master进行操作导致错误
+		if(redisMasterPool.size() == 0){
+			redisMasterPool = redisSlavePool;
+		}
+		//如果没有slave 避免用户直接获取slave进行操作导致错误
+		if(redisSlavePool.size() == 0){
+			redisSlavePool = redisMasterPool;
 		}
 		this.masterServerSize = redisMasterPool.size();
 		this.slaveServerSize = redisSlavePool.size();
