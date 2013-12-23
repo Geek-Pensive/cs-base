@@ -6,7 +6,11 @@ import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+
 import com.yy.cs.base.json.Json;
+import com.yy.cs.base.nyy.context.Constants;
 import com.yy.cs.base.nyy.context.Constants.Enc;
 import com.yy.cs.base.nyy.context.Constants.NyyObject;
 import com.yy.cs.base.nyy.context.Constants.Param;
@@ -58,7 +62,7 @@ public class NyyProtocolHelper {
 	 * @param request
 	 * @return
 	 */
-	public static String getNyyPostContent(HttpServletRequest request){
+	protected static String getNyyPostMethodContent(HttpServletRequest request){
 		if(request == null){
 			throw new CsNyySecurityException("request can't be null");
 		}
@@ -75,6 +79,54 @@ public class NyyProtocolHelper {
 		return sb.toString();
 	}
 
+	
+	/**
+	 * 从request中获取get的数据</br>
+	 * 兼容携带nyy参数或者不带nyy参数
+	 * 最终返回类似 {"appId":1,"sign":"x","data":{"k1":"v1"}}
+	 * @param request
+	 * @return
+	 */
+	protected static String getNyyGetMethodContent(HttpServletRequest request){
+		if(request == null){
+			throw new CsNyySecurityException("request can't be null");
+		}
+		String nyyValue = request.getParameter(Constants.Param.NYY);
+		// if not contains nyy
+		if(nyyValue != null && !nyyValue.isEmpty()){
+			return nyyValue;
+		//if contains nyy
+		}else{
+			String appId = request.getParameter(Constants.Param.APPID);
+			String sign = request.getParameter(Constants.Param.SIGN);
+			String data = request.getParameter(Constants.Param.DATA);
+			Constants c = new Constants();
+			c.setAppId(appId);
+			c.setSign(sign);
+			c.setData(data);
+			return Json.ObjToStr(c);
+		}
+	}
+	
+	/**
+	 * 获取nyy内容 </br>
+	 * @param request
+	 * @return  最终返回类似 {"appId":1,"sign":"x","data":{"k1":"v1"}}
+	 * </br>如果method不是post或者get,则返回null
+	 */
+	public static String getNyyContent(HttpServletRequest request){
+		//post
+		if(HttpPost.METHOD_NAME.equals(request.getMethod())){
+			return getNyyPostMethodContent(request);
+		//get	
+		}else if(HttpGet.METHOD_NAME.equals(request.getMethod())){
+			return getNyyGetMethodContent(request);
+		}
+		return null;
+	}
+	
+	
+	
 	public static <T> T parseDataFromRespJson(String key, String respJson, Class<T> cls, boolean securityCheck){
 		if(securityCheck){
 			NyyObject nyyObject = Json.strToObj(respJson, NyyObject.class);
