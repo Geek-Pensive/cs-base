@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.yy.cs</groupId>
 	<artifactId>cs-base</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>cs-base</name>
 	<url>http://maven.apache.org</url>
 	<distributionManagement>
@@ -22,7 +22,7 @@
 		<jdk.version>1.7</jdk.version>
 		<slf4j.version>1.7.2</slf4j.version>
 		<redis.version>2.0.0</redis.version>
-		<thrift.version>0.6.1</thrift.version>
+		<thrift.version>0.9.1</thrift.version>
 		<jackson.version>2.3.0</jackson.version>
 		<logback.version>1.0.9</logback.version>
 		<surefire.version>2.16</surefire.version>
