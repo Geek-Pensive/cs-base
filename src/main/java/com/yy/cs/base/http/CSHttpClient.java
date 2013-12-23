@@ -18,6 +18,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -202,6 +203,27 @@ public class CSHttpClient {
 		}
         return this.executeMethod(httpRequestBase);
     }
+    
+    /**
+     * 执行一个HttPost请求
+     * @param url 请求地址
+     * @param jsonStr  json字符串, 按utf-8编码
+     * @return   response正确返回后的字符串
+     * @throws HttpClientException
+     */
+    public String doPost(String url, String jsonStr) throws HttpClientException  { 
+    	HttpPost httpRequestBase = new HttpPost(url);
+		if (jsonStr != null && !jsonStr.isEmpty()) {
+			try {
+				httpRequestBase.setHeader("Content-Type","application/json");
+				httpRequestBase.setEntity(new StringEntity(jsonStr, "UTF-8"));
+			} catch (UnsupportedEncodingException e1) {
+				throw new HttpClientException(e1);
+			}
+		}
+        return this.executeMethod(httpRequestBase);
+    }
+    
  
     
     private String inputStream2String(InputStream in) throws IOException{

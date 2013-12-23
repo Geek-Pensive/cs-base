@@ -1,11 +1,18 @@
 package com.yy.cs.base.nyy.helper;
 
+import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.servlet.http.HttpServletRequest;
+
+import com.yy.cs.base.json.Json;
 import com.yy.cs.base.nyy.context.Constants.Enc;
+import com.yy.cs.base.nyy.context.Constants.NyyObject;
 import com.yy.cs.base.nyy.context.Constants.Param;
 import com.yy.cs.base.nyy.context.Constants.Symbol;
+import com.yy.cs.base.thrift.exception.CsNyyRuntimeException;
+import com.yy.cs.base.thrift.exception.CsNyySecurityException;
 
 /**
  * nyy协议解析帮忙类
@@ -44,6 +51,38 @@ public class NyyProtocolHelper {
 		}
 		return result;
 	}
+	
+	/**
+	 * 从request中获取post的数据</br>
+	 * 比如 {"appId":1,"sign":"x","data":{"k1":"v1"}}
+	 * @param request
+	 * @return
+	 */
+	public static String getNyyPostContent(HttpServletRequest request){
+		if(request == null){
+			throw new CsNyySecurityException("request can't be null");
+		}
+		StringBuilder  sb = new StringBuilder();
+		String line = null;
+		try{
+			BufferedReader br = request.getReader();
+			while((line = br.readLine()) != null){
+				sb.append(line);
+			}
+		}catch(Exception e){
+			throw new CsNyyRuntimeException("request can't get a bufferedReader or readLine");
+		}
+		return sb.toString();
+	}
 
-
+	public static <T> T parseDataFromRespJson(String key, String respJson, Class<T> cls, boolean securityCheck){
+		if(securityCheck){
+			NyyObject nyyObject = Json.strToObj(respJson, NyyObject.class);
+			NyySecureHelper.verifySha256Sign(key, nyyObject.getSign(), nyyObject.getData());
+			return Json.strToObj(respJson, cls);
+		}else{
+			return Json.strToObj(respJson, cls);
+		}
+	}
+	
 }
