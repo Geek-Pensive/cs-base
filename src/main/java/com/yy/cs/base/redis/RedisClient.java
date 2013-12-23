@@ -219,7 +219,7 @@ public class RedisClient {
 	 * @param value
 	 * @return
 	 */
-	public String setAndReturn(int dbIndex, final byte[] key, byte[] value){
+	public synchronized String setAndReturn(int dbIndex, final byte[] key, byte[] value){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
@@ -245,7 +245,7 @@ public class RedisClient {
 	 * @param value
 	 * @return
 	 */
-	public String setAndReturn(final byte[] key, byte[] value){
+	public synchronized String setAndReturn(final byte[] key, byte[] value){
 		return setAndReturn(0, key, value);
 	}
 	
@@ -257,7 +257,7 @@ public class RedisClient {
 	 * @param key
 	 * @return
 	 */
-	public byte[] getAndReturn(int dbIndex, final byte[] key){
+	public synchronized byte[] getAndReturn(int dbIndex, final byte[] key){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
@@ -282,7 +282,7 @@ public class RedisClient {
 	 * @param key
 	 * @return
 	 */
-	public byte[] getAndReturn(final byte[] key){
+	public synchronized byte[] getAndReturn(final byte[] key){
 		return getAndReturn(0,key);
 	}
 	
@@ -298,7 +298,7 @@ public class RedisClient {
 	 * @param value
 	 * @return  Status code reply Basically +OK as MSET can't fail
 	 */
-	public String msetAndReturn(int dbIndex, String... keysvalues){
+	public synchronized String msetAndReturn(int dbIndex, String... keysvalues){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
@@ -324,7 +324,7 @@ public class RedisClient {
 	 * @param value
 	 * @return  Status code reply Basically +OK as MSET can't fail
 	 */
-	public String msetAndReturn(String... keysvalues){
+	public synchronized String msetAndReturn(String... keysvalues){
 		return msetAndReturn(0, keysvalues);
 	}
 	
@@ -337,7 +337,7 @@ public class RedisClient {
 	 * @param value
 	 * @return  
 	 */
-	public List<String> mgetAndReturn(int dbIndex, String... keys){
+	public synchronized List<String> mgetAndReturn(int dbIndex, String... keys){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
@@ -363,7 +363,7 @@ public class RedisClient {
 	 * @param value
 	 * @return  
 	 */
-	public List<String> mgetAndReturn(String... keys){
+	public synchronized List<String> mgetAndReturn(String... keys){
 		return mgetAndReturn(0, keys);
 	}
 	
