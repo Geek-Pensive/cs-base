@@ -366,7 +366,7 @@
 ## thrift
 ### 简要说明
 *	为了简化用户thrift接口初始化和池化的过程，封装了一套以简单方式来引用thrift接口的方式。
-*	默认采用libthrift-0.6.1版本的thrift，也是可以支持0.6.1以上版本的，所依赖的版本取决于gen thrift接口所以的thrift.exe版本。
+*	默认采用libthrift-0.9.1版本的thrift，所依赖的版本取决于gen thrift接口所以的thrift.exe版本。
 *	0.1版本采用的是TSocket + TBinaryProtocol的同步的方式进行调用。后续版本传输和序列化的方式会支持配置可选方式。
 *	简单，高效使用
 
