@@ -20,6 +20,14 @@ public class NyyClient {
 	 */
 	private String key;
 	
+	public NyyClient(){
+	}
+	
+	public NyyClient(String appId, String key){
+		this.key = key;
+		this.appId = appId;
+	}
+	
 	public String getAppId() {
 		return appId;
 	}
