@@ -1,4 +1,4 @@
-package com.yy.cs.base.nyy.helper;
+package com.yy.cs.base.nyy;
 
 import java.nio.charset.Charset;
 

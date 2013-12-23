@@ -1,4 +1,4 @@
-package com.yy.cs.base.nyy.context;
+package com.yy.cs.base.nyy;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -17,6 +17,15 @@ public class Constants {
 	
 	@JsonView({NyyObject.class})
 	private String sign;
+	
+	public Constants(){
+	}
+	
+	public Constants(String appId, String sign, String data){
+		this.appId = appId;
+		this.sign = sign;
+		this.data = data;
+	}
 	
 	public interface Param {
 		public static String APPID = "appId";

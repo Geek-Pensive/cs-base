@@ -5,9 +5,6 @@ import java.io.UnsupportedEncodingException;
 import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.json.Json;
-import com.yy.cs.base.nyy.context.Constants;
-import com.yy.cs.base.nyy.helper.NyyProtocolHelper;
-import com.yy.cs.base.nyy.helper.NyySecureHelper;
 
 public class NyyClient {
 	

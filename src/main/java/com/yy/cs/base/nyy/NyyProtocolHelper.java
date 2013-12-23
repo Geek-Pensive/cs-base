@@ -1,4 +1,4 @@
-package com.yy.cs.base.nyy.helper;
+package com.yy.cs.base.nyy;
 
 import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
@@ -10,11 +10,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
 import com.yy.cs.base.json.Json;
-import com.yy.cs.base.nyy.context.Constants;
-import com.yy.cs.base.nyy.context.Constants.Enc;
-import com.yy.cs.base.nyy.context.Constants.NyyObject;
-import com.yy.cs.base.nyy.context.Constants.Param;
-import com.yy.cs.base.nyy.context.Constants.Symbol;
+import com.yy.cs.base.nyy.Constants.Enc;
+import com.yy.cs.base.nyy.Constants.NyyObject;
+import com.yy.cs.base.nyy.Constants.Param;
+import com.yy.cs.base.nyy.Constants.Symbol;
 import com.yy.cs.base.thrift.exception.CsNyyRuntimeException;
 import com.yy.cs.base.thrift.exception.CsNyySecurityException;
 
@@ -42,7 +41,7 @@ public class NyyProtocolHelper {
 	 * @return
 	 * @throws UnsupportedEncodingException 
 	 */
-	public static String assembleNyyGetUrl(String uri, String appId, String sign, String data, boolean withNyyKey) throws UnsupportedEncodingException {
+	protected static String assembleNyyGetUrl(String uri, String appId, String sign, String data, boolean withNyyKey) throws UnsupportedEncodingException {
 		String result = null;
 		if(withNyyKey){
 			String nyyJsonToEncode = String.format(NYY_JSON_FORMAT, appId, sign, data);
@@ -100,10 +99,7 @@ public class NyyProtocolHelper {
 			String appId = request.getParameter(Constants.Param.APPID);
 			String sign = request.getParameter(Constants.Param.SIGN);
 			String data = request.getParameter(Constants.Param.DATA);
-			Constants c = new Constants();
-			c.setAppId(appId);
-			c.setSign(sign);
-			c.setData(data);
+			Constants c = new Constants(appId, sign, data);
 			return Json.ObjToStr(c);
 		}
 	}
@@ -126,8 +122,15 @@ public class NyyProtocolHelper {
 	}
 	
 	
-	
-	public static <T> T parseDataFromRespJson(String key, String respJson, Class<T> cls, boolean securityCheck){
+	/**
+	 * 从返回的json字符串中获取data字段
+	 * @param key
+	 * @param respJson
+	 * @param cls
+	 * @param securityCheck
+	 * @return
+	 */
+	protected static <T> T parseDataFromRespJson(String key, String respJson, Class<T> cls, boolean securityCheck){
 		if(securityCheck){
 			NyyObject nyyObject = Json.strToObj(respJson, NyyObject.class);
 			NyySecureHelper.verifySha256Sign(key, nyyObject.getSign(), nyyObject.getData());
@@ -135,6 +138,18 @@ public class NyyProtocolHelper {
 		}else{
 			return Json.strToObj(respJson, cls);
 		}
+	}
+	/**
+	 * 生成类似  {"appId":1,"sign":"x","data":{"k1":"v1"}} 返回给client 
+	 * @param appId
+	 * @param key
+	 * @param data
+	 * @return
+	 */
+	public static String genRespJson(String appId, String key, String data){
+		String sign = NyySecureHelper.genSha256(key, data);
+		Constants c = new Constants(appId, sign, data);
+		return Json.ObjToStr(c);
 	}
 	
 }
