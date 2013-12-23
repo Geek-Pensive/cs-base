@@ -6,6 +6,11 @@ import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.json.Json;
 
+/**
+ * 
+ * @author haoqing
+ *
+ */
 public class NyyClient {
 	
 	private static CSHttpClient csHttpClient = new CSHttpClient();
@@ -68,10 +73,7 @@ public class NyyClient {
 	 */
 	public String doPost(String uri, String dataJson) throws HttpClientException{
 		String sign = NyySecureHelper.genSha256(key, dataJson);
-		Constants c = new Constants();
-		c.setAppId(appId);
-		c.setSign(sign);
-		c.setData(dataJson);
+		Constants c = new Constants(appId, sign, dataJson);
 		String strToPost = Json.ObjToStr(c);
 		return csHttpClient.doPost(uri, strToPost);
 	}

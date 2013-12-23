@@ -28,7 +28,7 @@
 		<surefire.version>2.16</surefire.version>
 		<httpclient.version>4.3.1</httpclient.version>
 		<libpooling.version>1.0.0.5</libpooling.version>
-
+		<servlet.version>3.0.1</servlet.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -118,10 +118,19 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- redis -->
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 			<version>${redis.version}</version>
+		</dependency>
+		
+		<!-- servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
