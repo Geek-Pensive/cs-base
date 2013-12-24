@@ -180,7 +180,7 @@ public class NyyProtocolHelper {
 	 *            要匹配的字段，比如appId sign data
 	 * @return
 	 */
-	protected static String parseNyyJsonStr(String nyyJsonStr, String param) {
+	public static String parseNyyJsonStr(String nyyJsonStr, String param) {
 		String paramValue = null;
 		if (Constants.Param.APPID.equals(param)) {
 			Matcher m = appIdPattern.matcher(nyyJsonStr);
