@@ -48,11 +48,12 @@ public class Constants {
 	/**
 	 * 包含 appId key sign 三个字段
 	 * @author haoqing
+	 * @param <T>
 	 *
 	 */
-	public static class NyyObject{
+	public static class NyyObject<T>{
 		private String appId;
-		private String data;
+		private T data;
 		private String sign;
 		public String getAppId() {
 			return appId;
@@ -60,10 +61,10 @@ public class Constants {
 		public void setAppId(String appId) {
 			this.appId = appId;
 		}
-		public String getData() {
+		public T getData() {
 			return data;
 		}
-		public void setData(String data) {
+		public void setData(T data) {
 			this.data = data;
 		}
 		public String getSign() {

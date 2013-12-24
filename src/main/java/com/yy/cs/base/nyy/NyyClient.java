@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 
 import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
-import com.yy.cs.base.json.Json;
 
 /**
  * 
@@ -73,8 +72,7 @@ public class NyyClient {
 	 */
 	public String doPost(String uri, String dataJson) throws HttpClientException{
 		String sign = NyySecureHelper.genSha256(key, dataJson);
-		Constants c = new Constants(appId, sign, dataJson);
-		String strToPost = Json.ObjToStr(c);
+		String strToPost = NyyProtocolHelper.formatNyyJson(appId, sign, dataJson);
 		return csHttpClient.doPost(uri, strToPost);
 	}
 
@@ -82,12 +80,12 @@ public class NyyClient {
 	 * 从返回的字符串中获取json格式的data,以pojo的方式返回 
 	 * @param respJson  返回的字符串
 	 * @param cls   对应pojo类
-	 * @param securityCheck  是否要进行算法为sha256的哈希校验
+	 * @param sha256HashSecurityCheck  是否要进行算法为sha256的哈希校验
 	 * </br>此方法会抛出runtimeException 
 	 * @return
 	 */
-	public <T> T parseDataFromRespJson(String respJson, Class<T> cls, boolean securityCheck){
-		return NyyProtocolHelper.parseDataFromRespJson(key, respJson, cls, securityCheck);
+	public <T> T parseDataFromRespJson(String respJson, Class<T> cls, boolean sha256HashSecurityCheck){
+		return NyyProtocolHelper.parseDataFromRespJson(key, respJson, cls, sha256HashSecurityCheck);
 	}
 
 }
