@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -61,7 +62,8 @@ public class SyncClient implements Client{
 		 */
 		transport = config.getTimeout() > 0 ? new TSocket(config.getHost(), config.getPort(),
 				config.getTimeout()) : new TSocket(config.getHost(), config.getPort());
-		protocol = new TBinaryProtocol(transport);
+		
+		protocol = new TBinaryProtocol(new TFramedTransport(transport));
 		transport.open();
 		thriftClinet = ctor.newInstance(protocol);
 	}
