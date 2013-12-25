@@ -177,7 +177,7 @@ public class NyyProtocolHelper {
 	 * @param nyyJsonStr
 	 *            json格式的nyy字符串
 	 * @param param
-	 *            要匹配的字段，比如appId sign data
+	 *            要匹配的字段，比如Constants.Param.APPID Constants.Param.SIGN Constants.Param.DATA
 	 * @return
 	 */
 	public static String parseNyyJsonStr(String nyyJsonStr, String param) {
