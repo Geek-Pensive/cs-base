@@ -6,7 +6,7 @@
 > | **项**   | **详细**                                             |
 > | ---      | ---                                                  |
 > | 状态     | 初稿                                                 |
-> | 撰写人   | 欧阳柱                                               |
+> | 撰写人   | 欧阳柱  吴浩清                                       |
 > | 应用业务 | 已有重要项目生产应用中<br>精彩世界数据接口（开发中） |
 
 目前很多业务和服务的开发过程中，有大量的通信需求，但缺少一种统一的设计思路。导致目前通信在协议形式，依赖技术，实现方式等方面都有较大的差异，重复的工作较多，不利于团队的积累。
@@ -175,7 +175,68 @@ HTTP返回（不作URL Encoding）
 ----
 ## 代码支持（Java）
 
-### TODO：通用代码开发中
+### 依赖Jar包
 
+	<dependency>
+		<groupId>com.yy.latte</groupId>
+		<artifactId>latte-client</artifactId>
+		<version>0.0.5-SNAPSHOT</version>
+	</dependency>
+	
+### 服务端示例(主要是使用NyyProtocolHelper类)
+	
+	/**
+	 * 支持get post的nyy协定
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/nyy")
+	@ResponseBody
+	public String nyyDemo(HttpServletRequest request, HttpServletResponse response){
+		String jsonStr = null;
+		NyyBeanObject object = null;
+		try{
+			//获取jsonStr, 返回是json格式,例如 {"appId":"test","sign":"testsign","data":{"k1":"v1"}}
+			jsonStr = NyyProtocolHelper.getNyyContent(request);
+			//sha256哈希检验, 如不需要,可去掉
+			NyyProtocolHelper.sha256HashSecurityCheck("test", jsonStr);
+			//NyyBeanObject 为业务自己封装的pojo
+			object = Json.strToObj(jsonStr, NyyBeanObject.class);
+			//TODO 业务逻辑
+		}catch(Exception e){
+			LOG.error("exception e = ", e);
+		}
+		//返回的数据
+		BizObject o = new BizObject(1, "resp", new Date(), true, 3.14, 500);
+		String respData = Json.ObjToStr(o);
+		//最终返回给client的json格式
+		String respStr = NyyProtocolHelper.genRespJson(object.getAppId(), "test", respData);
+		LOG.info("jsonStr = {}, respData = {}, respStr = {}", jsonStr, respData, respStr);
+		return respStr;
+	}
+	
 
+### 客户端示例(主要是使用NyyClient类)
 
+	String uri = "http://localhost:8080/nyy-demo-web/nyy";
+	//主要方法都集中在NyyClient类中
+	NyyClient client = new NyyClient("999", "test");
+	BizObject bo1 = new BizObject(1, "bo1", new Date(), true, 3.14, 500);
+	BizObject bo2 = new BizObject(1, "bo2", new Date(), true, 3.14, 500);
+	List<BizObject> list = new ArrayList<BizObject>();
+	list.add(bo1);
+	list.add(bo2);
+	Data data = new Data();
+	data.setItems("items in data");
+
+	data.setList(list);
+	String dataJson = Json.ObjToStr(data);
+	String doGetWithNyyJsonResult = client.doGet(uri, dataJson, true);
+	String doGetWithoutNyyJsonResult = client.doGet(uri, dataJson, false);
+	Data d = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, true); 
+	Data d1 = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, false); 
+	System.out.println(d);
+	System.out.println(d1);
+
+### 示例的SVN地址
