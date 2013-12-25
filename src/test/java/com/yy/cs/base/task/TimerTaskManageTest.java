@@ -8,7 +8,7 @@ import com.yy.cs.base.status.CsStatus;
 
 public class TimerTaskManageTest {
 	
-	TimerTaskManager timerTaskManage;
+	TimerTaskManager timerTaskManage = new TimerTaskManager();
 	@Before
     public void before() {
 //		ApplicationContext context = new ClassPathXmlApplicationContext("spring-task.xml");
@@ -40,24 +40,21 @@ public class TimerTaskManageTest {
     }
     
     
-//    @Test
+    @Test
     public void testTimerTaskManag() {
     	TimerTaskTest time = new TimerTaskTest();
     	time.setCron("*/30 * * * * *");
     	timerTaskManage.addTimerTask(time);
     	timerTaskManage.start();
-    	
-//    		for(int i=0; i<20;i++){
-//        		try {
-//        			Thread.sleep(8000);
-//        			for(TaskStatus t : timerTaskManage.getAllTaskStatus()){
-//        				System.out.println(t.toString());;
-//        			}
-//    			} catch (InterruptedException e) {
-//    				// TODO Auto-generated catch block
-//    				e.printStackTrace();
-//    			}
-//        	}
+    	timerTaskManage.getCsStatus();
+    		for(int i=0; i<20;i++){
+        		try {
+        			Thread.sleep(8000);
+    			} catch (InterruptedException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        	}
 //    		for(TaskStatus t : timerTaskManage.getAllTaskStatus()){
 //				System.out.println(t.toString());;
 //			}
