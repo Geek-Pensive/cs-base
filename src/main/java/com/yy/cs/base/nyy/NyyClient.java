@@ -24,10 +24,18 @@ public class NyyClient {
 	 */
 	private String key;
 	
-	public NyyClient(){
-	}
-	
+	/**
+	 *  
+	 * @param appId  业务id, 如果不需要,应为 ""
+	 * @param key    服务端与客户端协定好的key, 如果不需要,应为 "" 
+	 */
 	public NyyClient(String appId, String key){
+		if(appId == null){
+			appId = "";
+		}
+		if(key == null){
+			key = "";
+		}
 		this.key = key;
 		this.appId = appId;
 	}

@@ -121,7 +121,7 @@ public class NyyProtocolHelper {
 
 	/**
 	 * 获取nyy内容 </br>
-	 * 
+	 * 支持get 或者 post的nyy协议
 	 * @param request
 	 * @return 类似 {"appId":1,"sign":"x","data":{"k1":"v1"}}
 	 *         </br>如果method不是post或者get,则返回null
@@ -162,12 +162,15 @@ public class NyyProtocolHelper {
 	 * sha256算法的hash校验</br> 如果验证不通过,将抛出 CsNyySecurityException 的
 	 * RuntimeException
 	 * 
-	 * @param key   业务的key
+	 * @param key   业务的key,如果不需要key,则需为""
 	 * @param jsonStr  类似 {"appId":1,"sign":"x","data":{"k1":"v1"}}
 	 */
 	public static void sha256HashSecurityCheck(String key, String jsonStr) {
 		String data = parseNyyJsonStr(jsonStr, Param.DATA);
 		String sign = parseNyyJsonStr(jsonStr, Param.SIGN);
+		if(key  == null){
+			key = "";
+		}
 		NyySecureHelper.verifySha256Sign(key, sign, data);
 	}
 
@@ -202,11 +205,14 @@ public class NyyProtocolHelper {
 	 * 生成类似 {"appId":1,"sign":"x","data":{"k1":"v1"}} 返回给client
 	 * 
 	 * @param appId
-	 * @param key
+	 * @param key  业务的key,如果不需要key,则需为""
 	 * @param data  json格式的data
 	 * @return
 	 */
 	public static String genRespJson(String appId, String key, String data) {
+		if(key == null){
+			key = "";
+		}
 		String sign = NyySecureHelper.genSha256(key, data);
 		String resp = String.format(NYY_JSON_FORMAT, appId, sign, data);
 		return resp;
