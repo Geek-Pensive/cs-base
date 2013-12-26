@@ -180,7 +180,7 @@ HTTP返回（不作URL Encoding）
 	<dependency>
 		<groupId>com.yy.latte</groupId>
 		<artifactId>latte-client</artifactId>
-		<version>0.0.5-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</dependency>
 	
 ### 服务端示例(主要是使用NyyProtocolHelper类)
