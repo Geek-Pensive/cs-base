@@ -5,12 +5,13 @@
 	 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 		<bean name="taskManage" class="com.yy.cs.base.task.TimerTaskManager" init-method="start" >
-			<property name="poolSize"  value="1" />
+			<property name="poolSize"  value="2" />
 		  	<property name="timerTasks">
 			    <map>
 			      	<entry key="com.yy.cs.base.task.TimerTaskTest"   value-ref="timerTaskTest" />
 			    </map>
 		  	</property>
+		  	<property name="monitorType" value="LOG"/>
 		</bean>
 		<bean id="timerTaskTest" class="com.yy.cs.base.task.TimerTaskTest" >
 			<property name="cron" value="*/5 * * * * *" />
