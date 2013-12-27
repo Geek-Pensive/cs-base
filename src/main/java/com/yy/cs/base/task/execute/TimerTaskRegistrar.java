@@ -13,6 +13,7 @@ import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.status.StatusCode;
 import com.yy.cs.base.task.TimerTask;
 import com.yy.cs.base.task.context.Constants;
+import com.yy.cs.base.task.context.Constants.MonitorType;
 import com.yy.cs.base.task.context.MonitorTask;
 import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.thread.TaskScheduler;
@@ -55,9 +56,9 @@ public class TimerTaskRegistrar {
 	}
 
 	 
-	public void start(TaskScheduler taskScheduler,String monitorfile) {
+	public void start(TaskScheduler taskScheduler) {
 		this.taskScheduler = taskScheduler;
-		scheduleTasks(monitorfile);
+		scheduleTasks();
 	}
 
 //	public TaskContext getTaskContext(String id) {
@@ -98,7 +99,20 @@ public class TimerTaskRegistrar {
 		return csStatus;
 	}
 	
-	private void scheduleTasks(final String monitorfile) {
+	public void addMonitorTask(final String monitorfile,final MonitorType type){
+		this.taskScheduler.scheduleWithFixedDelay(new Runnable() {
+			MonitorTask monitor = new MonitorTask(monitorfile,type);
+			public void run() {
+                try {
+                	monitor.writeTaskFile(getCsStatus());
+                } catch (Throwable t) { // 防御性容错
+                	logger.error("monitorTask  expection: " + t.getMessage(), t);
+                }
+			}
+		}, 5 * 1000, 3 * 1000, TimeUnit.MILLISECONDS);
+	}
+	
+	private void scheduleTasks() {
 		if (this.cronTaskMap != null) {
 			for (Entry<String, TimerTask> entry : cronTaskMap.entrySet()) {
 				TimerTask task = entry.getValue();
@@ -113,17 +127,6 @@ public class TimerTaskRegistrar {
 				handlings.put(entry.getKey(), this.taskScheduler.clusterSchedule(task, trigger,task.getCluster()));
 			}
 		}
-		
-		this.taskScheduler.scheduleWithFixedDelay(new Runnable() {
-			MonitorTask monitor = new MonitorTask(monitorfile);
-			public void run() {
-                try {
-                	monitor.writeTaskFile(getCsStatus());
-                } catch (Throwable t) { // 防御性容错
-                	logger.error("monitorTask  expection: " + t.getMessage(), t);
-                }
-			}
-		}, 5 * 1000, 3 * 1000, TimeUnit.MILLISECONDS);
 	}
 
 	public void destroy() {

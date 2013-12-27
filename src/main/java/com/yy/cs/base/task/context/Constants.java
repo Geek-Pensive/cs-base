@@ -21,5 +21,8 @@ public class Constants {
 	
 	public final static String  TIMEOUT = "timeout";
 	
-	
+	public enum MonitorType{
+		LOG, HTML
+	}
+
 }

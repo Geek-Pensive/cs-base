@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.task.context.Constants.MonitorType;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
@@ -22,12 +23,22 @@ public class TimerTaskManager {
      
      private String monitorfile;
      
+     private MonitorType monitorType;
+     
      public String getMonitorfile() {
 		return monitorfile;
-	}
+     }
 
 	public void setMonitorfile(String monitorfile) {
 		this.monitorfile = monitorfile;
+	}
+	
+	public MonitorType getMonitorType() {
+		return monitorType;
+	}
+
+	public void setMonitorType(MonitorType monitorType) {
+		this.monitorType = monitorType;
 	}
 
 	public void addTimerTask(String id,TimerTask task){
@@ -47,7 +58,8 @@ public class TimerTaskManager {
     		 TaskScheduler taskScheduler = new ThreadPoolTaskScheduler(poolSize);
     		 registrar = new TimerTaskRegistrar();
     		 registrar.parse(timerTasks);
-    		 registrar.start(taskScheduler,monitorfile);
+    		 registrar.start(taskScheduler);
+    		 registrar.addMonitorTask(monitorfile, monitorType);
     	 }
      }
      
