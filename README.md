@@ -125,7 +125,7 @@
 		timerTaskManage.addTimerTask(time);
 		timerTaskManage.start();
 		//获取所有task状态
-		List<TaskStatus> status = timerTaskManage.getAllTaskStatus()；
+		CsStatus status = timerTaskManage.getCsStatus();
 		//释放所有任务
 		timerTaskManage.destroy();
 	
