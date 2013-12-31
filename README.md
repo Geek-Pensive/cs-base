@@ -92,7 +92,7 @@
 ## Timer Task
 ### 简要说明
 *	基于jdk原生线程池进行了封装，提供了任务调用。
-* 采用守护线程 | 支持cron表达式配置 | 提供了任务执行情况的状态获取
+* 采用守护线程 | 支持cron表达式配置 | 提供了任务执行情况的状态获取 | 支持监控文件路径配置和文件格式配置（现提供html格式和文本格式）
 *	接口简易
 
 ### 快速使用
@@ -104,6 +104,7 @@
 		      	<entry key="com.yy.cs.base.task.TimerTaskTest" value-ref="timerTaskTest" />
 		    </map>
 		  </property>
+		  <property name="monitorType" value="LOG"/>
 		</bean>
 		<bean id="timerTaskTest" class="com.yy.cs.base.task.TimerTaskTest" >
 			<property name="cron" value="*/5 * * * * *" /> 
@@ -123,6 +124,8 @@
 		TimerTaskTest time = new TimerTaskTest();
 		time.setCron("*/30 * * * * *");
 		timerTaskManage.addTimerTask(time);
+		 timerTaskManage.setMonitorfile("D:\\workspace\\monitorFile");
+    	timerTaskManage.setMonitorType(MonitorType.LOG);
 		timerTaskManage.start();
 		//获取所有task状态
 		CsStatus status = timerTaskManage.getCsStatus();
@@ -167,6 +170,8 @@
 					      	<entry key="com.yy.cs.base.task.TimerTaskTest" value-ref="timerTaskTest" />
 					    </map>
 				 </property>
+				 <property name="monitorfile" value="D:\\workspace\\monitorFile"/>
+				 <property name="monitorType" value="LOG"/>
 			</bean>
 			//获取状态对象
 			CsStatus t = timerTaskManage.getCsStatus();
@@ -174,6 +179,7 @@
 ### 状态监控说明
 *	 任务状态的监控数据，默认会间隔5秒输出到当前系统的user.dir目录下monitortask.html文件中。
 *	 此目录也支持配置，可以设置taskManage的monitorfile属性，输出到制定目录的指点文件中。
+*	 监控文件输出格式支持配置，现阶段可以设置monitorType属性为LOG或HTML两种形式，分别以文本和网页形式输出监控数据。
 *	 执行是否超时是指，本次执行的时间，超出了下次执行的时间；也就是本次执行时间超过了一个时间间隔。
 *	 如果如果执行超时任务状态为WRONG,任务执行异常则状态FAIL。
 
@@ -225,7 +231,12 @@
 	 		</table>
 	 	 
 *	 </br>	 	 
-	 
+
+*	 任务状态监控数据monitortask.log内容</br>
+		任务id;任务状态;异常时间:xxxxxx;异常信息:xxxxxx;
+
+*	 </br>
+
 ### 联系人
 	如果有问题或者建议，可联系李方杰，真诚为你服务
 
