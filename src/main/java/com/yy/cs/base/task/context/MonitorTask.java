@@ -267,11 +267,11 @@ public class MonitorTask {
 			strBuffer.append(throwableInfo(c
 					.getAdditionInfo(Constants.THROWABLE)));
 			strBuffer.append(";");
-			Object timeout = c.getAdditionInfo(Constants.TIMEOUT);
-			if(null != timeout &&  Boolean.parseBoolean(timeout.toString())){
+			Object out = c.getAdditionInfo(Constants.TIMEOUT);
+			if(null != out &&  Boolean.parseBoolean(out.toString())){
 				strBuffer.append(timeout);
 				strBuffer.append(":");
-				strBuffer.append(c.getAdditionInfo(Constants.TIMEOUT));
+				strBuffer.append(out);
 				strBuffer.append(";");
 			}
 			strBuffer.append("\r\n");
