@@ -124,7 +124,7 @@
 		TimerTaskTest time = new TimerTaskTest();
 		time.setCron("*/30 * * * * *");
 		timerTaskManage.addTimerTask(time);
-		timerTaskManage.setMonitorfile("D:\\workspace\\monitorFile");
+		timerTaskManage.setMonitorfile("D:\\workspace\\monitortask.log");
     	timerTaskManage.setMonitorType(MonitorType.LOG);
 		timerTaskManage.start();
 		//获取所有task状态
@@ -170,7 +170,7 @@
 					      	<entry key="com.yy.cs.base.task.TimerTaskTest" value-ref="timerTaskTest" />
 					    </map>
 				 </property>
-				 <property name="monitorfile" value="D:\\workspace\\monitorFile"/>
+				 <property name="monitorfile" value="D:\\workspace\\monitortask.log"/>
 				 <property name="monitorType" value="LOG"/>
 			</bean>
 			//获取状态对象
