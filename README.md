@@ -231,7 +231,7 @@
 	 		</table>	 	 
 
 *	 任务状态监控数据monitortask.log内容</br>
-		任务id;任务状态;异常时间:xxxxxx;异常信息:xxxxxx;
+		任务id;任务状态;异常时间:xxxxxx;异常信息:xxxxxx;(是否超时:xxxxxx;)
 
 
 ### 联系人
