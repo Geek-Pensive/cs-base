@@ -124,7 +124,7 @@
 		TimerTaskTest time = new TimerTaskTest();
 		time.setCron("*/30 * * * * *");
 		timerTaskManage.addTimerTask(time);
-		 timerTaskManage.setMonitorfile("D:\\workspace\\monitorFile");
+		timerTaskManage.setMonitorfile("D:\\workspace\\monitorFile");
     	timerTaskManage.setMonitorType(MonitorType.LOG);
 		timerTaskManage.start();
 		//获取所有task状态
