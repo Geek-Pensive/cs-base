@@ -228,14 +228,11 @@
 				 		<td align='center' style='padding:10px 10px 10px 10px;'></td>
 				 		<td align='center' style='padding:10px 10px 10px 10px;'>false</td>
 		 		</tr>
-	 		</table>
-	 	 
-*	 </br>	 	 
+	 		</table>	 	 
 
 *	 任务状态监控数据monitortask.log内容</br>
 		任务id;任务状态;异常时间:xxxxxx;异常信息:xxxxxx;
 
-*	 </br>
 
 ### 联系人
 	如果有问题或者建议，可联系李方杰，真诚为你服务
