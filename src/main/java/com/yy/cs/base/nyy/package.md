@@ -178,8 +178,8 @@ HTTP返回（不作URL Encoding）
 ### 依赖Jar包
 
 	<dependency>
-		<groupId>com.yy.latte</groupId>
-		<artifactId>latte-client</artifactId>
+		<groupId>com.yy.cs</groupId>
+ 		<artifactId>cs-base</artifactId>
 		<version>0.0.4-SNAPSHOT</version>
 	</dependency>
 	
