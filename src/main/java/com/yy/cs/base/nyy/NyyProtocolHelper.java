@@ -85,7 +85,7 @@ public class NyyProtocolHelper {
 				sb.append(line);
 			}
 		} catch (Exception e) {
-			throw new CsNyyRuntimeException("request can't get a bufferedReader or readLine");
+			throw new CsNyyRuntimeException("request can't get a bufferedReader or readLine", e);
 		} finally {
 			if (br != null) {
 				try {
