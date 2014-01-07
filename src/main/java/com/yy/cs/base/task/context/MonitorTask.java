@@ -73,7 +73,7 @@ public class MonitorTask {
 	/**
 	 * @return
 	 */
-	private String getWebPath() {
+	protected String getWebPath() {
 		if (monitorfile != null && !"".equals(monitorfile)) {
 			return monitorfile;
 		}
