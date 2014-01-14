@@ -1,12 +1,8 @@
 package com.yy.cs.base.task.execute;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -16,10 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.yy.cs.base.redis.RedisClient;
-import com.yy.cs.base.redis.RedisClientFactory;
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.TimerTaskTest;
-import com.yy.cs.base.task.thread.NamedThreadFactory;
 import com.yy.cs.base.task.trigger.CronTrigger;
 import com.yy.cs.base.task.trigger.Trigger;
 

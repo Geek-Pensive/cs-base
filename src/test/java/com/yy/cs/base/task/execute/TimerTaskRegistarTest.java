@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 
 import junit.framework.Assert;
 
-import org.junit.After;
 import org.junit.Test;
 
 import com.yy.cs.base.redis.RedisClient;
