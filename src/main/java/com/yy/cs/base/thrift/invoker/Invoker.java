@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.duowan.pooling.IObjectPoolManager;
+import com.yy.cs.base.thrift.client.Client;
 import com.yy.cs.base.thrift.proxy.Invocation;
-import com.yy.cs.base.thrift.transport.Client;
 
  
 

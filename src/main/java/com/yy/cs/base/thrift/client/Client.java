@@ -1,4 +1,4 @@
-package com.yy.cs.base.thrift.transport;
+package com.yy.cs.base.thrift.client;
 
 import java.lang.reflect.InvocationTargetException;
 

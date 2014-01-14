@@ -1,10 +1,13 @@
-package com.yy.cs.base.thrift.transport;
+package com.yy.cs.base.thrift.client;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.yy.cs.base.thrift.ThriftClientFactory;
 import com.yy.cs.base.thrift.ThriftConfig;
+import com.yy.cs.base.thrift.client.protocol.ProtocolFactory.ProtocolType;
+import com.yy.cs.base.thrift.client.transport.TransportFactory.TransportType;
 import com.yy.cs.base.thrift.exception.CsThriftException;
  
 
@@ -15,9 +18,15 @@ public class ClientFactory extends BasePoolableObjectFactory {
 
 	private final Class<?> interfaces;
 	
-	public ClientFactory(ThriftConfig config,Class<?> interfaces) {
+	private final TransportType ttype;
+	
+	private final ProtocolType ptype;
+	
+	public ClientFactory(ThriftConfig config,ThriftClientFactory<?> thriftClient) {
 		this.config = config;
-		this.interfaces = interfaces;
+		this.interfaces = thriftClient.getInterface();
+		this.ttype = thriftClient.getTransport();
+		this.ptype = thriftClient.getProtocol();
 	}
 
 	/**
@@ -25,7 +34,7 @@ public class ClientFactory extends BasePoolableObjectFactory {
 	 * TODO 应该根据配置支持多种TTransport
 	 */
 	public Client  makeObject() throws CsThriftException {
-		Client client = new SyncClient(config,interfaces);
+		Client client = new SyncClient(config,interfaces,ttype,ptype);
 		try {
 			client.open();
 		} catch (Exception e) {

@@ -9,20 +9,22 @@ import org.slf4j.LoggerFactory;
 import com.duowan.pooling.InitalizableObjectPool;
 import com.duowan.pooling.impl.InspectableBalanceController;
 import com.duowan.pooling.impl.WeightedObjectPoolManager;
+import com.yy.cs.base.thrift.client.Client;
+import com.yy.cs.base.thrift.client.ClientFactory;
+import com.yy.cs.base.thrift.client.protocol.ProtocolFactory.ProtocolType;
+import com.yy.cs.base.thrift.client.transport.TransportFactory.TransportType;
 import com.yy.cs.base.thrift.invoker.Invoker;
 import com.yy.cs.base.thrift.invoker.InvokerFacoty;
 import com.yy.cs.base.thrift.proxy.JDKProxy;
-import com.yy.cs.base.thrift.transport.Client;
-import com.yy.cs.base.thrift.transport.ClientFactory;
 
 
 public class ThriftClientFactory<T> {
 	
 	private static Logger log = LoggerFactory.getLogger(ThriftClientFactory.class);
 	
-	private String protocol;
+	private ProtocolType protocol;
 	
-	private String transport;
+	private TransportType transport;
 	
 	private JDKProxy proxy;
 	
@@ -53,7 +55,7 @@ public class ThriftClientFactory<T> {
 		mgr = new WeightedObjectPoolManager<InitalizableObjectPool, Client>(ctrl);
 		int poolNum = 0;
 		for(ThriftConfig tc : thriftConfig){
-			InitalizableObjectPool pool = new InitalizableObjectPool(new ClientFactory(tc,interfaceClass),tc);
+			InitalizableObjectPool pool = new InitalizableObjectPool(new ClientFactory(tc,this),tc);
 			mgr.addPool( tc.getHost() + tc.getPort() + "-" + ++poolNum, pool, tc.getWeight());
 		}
 	}
@@ -84,19 +86,19 @@ public class ThriftClientFactory<T> {
     }
 	
 	
-	public String getProtocol() {
+	public ProtocolType getProtocol() {
 		return protocol;
 	}
 	
-	public void setProtocol(String protocol) {
+	public void setProtocol(ProtocolType protocol) {
 		this.protocol = protocol;
 	}
 
-	public String getTransport() {
+	public TransportType getTransport() {
 		return transport;
 	}
 
-	public void setTransport(String transport) {
+	public void setTransport(TransportType transport) {
 		this.transport = transport;
 	}
 	

@@ -3,7 +3,7 @@ package com.yy.cs.base.thrift.invoker;
 import org.apache.commons.pool.ObjectPool;
 
 import com.duowan.pooling.IObjectPoolManager;
-import com.yy.cs.base.thrift.transport.Client;
+import com.yy.cs.base.thrift.client.Client;
 
 
 public class InvokerFacoty {
