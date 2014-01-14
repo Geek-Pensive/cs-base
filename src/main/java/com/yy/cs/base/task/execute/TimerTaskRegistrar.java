@@ -32,6 +32,10 @@ public class TimerTaskRegistrar {
 
 	private final Map<String , HandlingRunnable> handlings = new HashMap<String , HandlingRunnable>();
 	
+	public Map<String, HandlingRunnable> getHandlings() {
+		return handlings;
+	}
+
 	public void parse(Map<String,TimerTask> timerTasks) {
 		Set<Entry<String, TimerTask>> tasks = timerTasks.entrySet();
 		for (Entry<String, TimerTask> e : tasks) {
@@ -132,7 +136,6 @@ public class TimerTaskRegistrar {
 	public void destroy() {
 		for (Entry<String, HandlingRunnable> entry : this.handlings.entrySet()) {
 			entry.getValue().cancel(true);
-			handlings.remove(entry.getKey());
 		}
 		this.taskScheduler.shutdown();
 	}
