@@ -16,7 +16,7 @@
     <dependency>
       <groupId>com.yy.cs</groupId>
       <artifactId>cs-base</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>0.2</version>
     </dependency>
 
 
@@ -375,7 +375,7 @@
 ### 简要说明
 *	为了简化用户thrift接口初始化和池化的过程，封装了一套以简单方式来引用thrift接口的方式。
 *	默认采用libthrift-0.9.1版本的thrift，所依赖的版本取决于gen thrift接口所以的thrift.exe版本。
-*	0.1版本采用的是TSocket + TBinaryProtocol的同步的方式进行调用。后续版本传输和序列化的方式会支持配置可选方式。
+*	支持transport和protocol的配置。
 *	简单，高效使用
 
 ### 快速使用
@@ -388,6 +388,8 @@
 		  			<ref bean="thriftConfig"/>
 		  		</list>
 		  	</property>
+		  	<property name="protocol"   value="BINARY" /><!--可选-->
+		  	<property name="transport"  value="TSOCKET" /><!--可选-->
 		</bean>
 		<bean id="thriftConfig" class="com.yy.cs.base.thrift.ThriftConfig" >
 			<property  name="host" value="127.0.0.1"/>
@@ -430,6 +432,8 @@
 |-----------------------|-----------------------|-----------------------|-----------------------|-----------------------|
 | interfaceName			| String	|	 是		|				|	 		接口名称;thrift的实际接口都是内部类，在引用时需要用'$'替换'.'		|
 | thriftConfig			| 	List<ThriftConfig>		|	是		|			|  		多服务器列表			|
+| protocol			| 	ProtocolType		|	否		|	BINARY	|  	thrift原生protocol方式				|
+| transport			| 	TransportType		|	否		|	TFRAMED		|  thrift原生transport方式			|
 
 
 ---
