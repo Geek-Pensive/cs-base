@@ -5,7 +5,6 @@ import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.thrift.protocol.TTupleProtocol;
 import org.apache.thrift.transport.TTransport;
 
 public class ProtocolFactory {
@@ -23,8 +22,6 @@ public class ProtocolFactory {
 			protocol = new TJSONProtocol(transport);
 		}else if (type == ProtocolType.SIMPLEJSON){
 			protocol = new TSimpleJSONProtocol(transport);
-		}else if (type == ProtocolType.TUPLE){
-			protocol = new TTupleProtocol(transport);
 		}else{
 			 protocol = new TBinaryProtocol(transport);
 		}
