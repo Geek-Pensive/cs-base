@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,7 +252,7 @@ public class MonitorTask {
 			strBuffer.append(";");
 			strBuffer.append(c.getCode());
 			strBuffer.append(";");
-			if (StringUtils.isNotBlank(c.getMessage())) {
+			if (c.getMessage()== null || c.getMessage() == "") {
 				strBuffer.append(c.getMessage());
 				strBuffer.append(";");
 			}
