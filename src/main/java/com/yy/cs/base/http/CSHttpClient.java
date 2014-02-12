@@ -70,7 +70,7 @@ public class CSHttpClient {
     	StatusLine status = null;
     	String  result = "";
     	try {
-			setDefaultRequestConfig(httpRequestBase.getConfig());
+			setDefaultRequestConfig(httpRequestBase);
 			log.debug("executing request " + httpRequestBase.getURI());
 			response = httpClient.execute(httpRequestBase);
 			status = response.getStatusLine(); 
@@ -122,7 +122,7 @@ public class CSHttpClient {
         CloseableHttpResponse response = null;
     	StatusLine status = null;
     	try {
-			setDefaultRequestConfig(httpRequestBase.getConfig());
+			setDefaultRequestConfig(httpRequestBase);
 			log.debug("executing request " + httpRequestBase.getURI());
 			response = httpClient.execute(httpRequestBase);
 			status = response.getStatusLine(); 
@@ -158,7 +158,7 @@ public class CSHttpClient {
     	CloseableHttpResponse response = null;
     	StatusLine status = null;
     	try {
-			setDefaultRequestConfig(get.getConfig());
+			setDefaultRequestConfig(get);
 			log.debug("executing request " + get.getURI());
 			response = httpClient.execute(get);
 			status = response.getStatusLine(); 
@@ -236,9 +236,11 @@ public class CSHttpClient {
     }
     
     
-    private void setDefaultRequestConfig(RequestConfig config){
-    	if(config == null){
-    		config = defaultRequestConfig;	 
+    private void setDefaultRequestConfig(HttpRequestBase requestBase){
+
+        RequestConfig config = requestBase.getConfig();
+        if(config == null){
+            requestBase.setConfig(defaultRequestConfig);	 
     		return;
         }
     	Builder b = RequestConfig.custom();
@@ -251,7 +253,7 @@ public class CSHttpClient {
     	if(config.getSocketTimeout() == -1){
     		b.setSocketTimeout(defaultRequestConfig.getSocketTimeout());
     	}
-
+    	
 		config = b
 				.setExpectContinueEnabled(config.isExpectContinueEnabled())
 				.setStaleConnectionCheckEnabled(
@@ -270,6 +272,7 @@ public class CSHttpClient {
 						config.getTargetPreferredAuthSchemes())
 				.setProxyPreferredAuthSchemes(
 						config.getProxyPreferredAuthSchemes()).build();
+		requestBase.setConfig(config);
     }
     
     private boolean isInStatusArray(int status, int[] statusArray) {
