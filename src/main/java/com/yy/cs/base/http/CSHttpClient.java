@@ -99,6 +99,45 @@ public class CSHttpClient {
         return  result;
     }
     
+    
+    /**
+     * 执行一个http方法
+     * @param 执行方法的类型
+     * @return response正确返回后的byte[]
+     * @throws HttpClientException
+     */
+    public byte[] executeMethodAndReturnByteArray(HttpRequestBase httpRequestBase) throws HttpClientException {
+        CloseableHttpResponse response = null;
+        StatusLine status = null;
+        try {
+            setDefaultRequestConfig(httpRequestBase);
+            log.debug("executing request " + httpRequestBase.getURI());
+            response = httpClient.execute(httpRequestBase);
+            status = response.getStatusLine(); 
+            log.debug("response status " + status);
+            HttpEntity entity = response.getEntity();
+            if(status.getStatusCode() ==  HttpStatus.SC_OK){
+                return inputStream2ByteArray(entity.getContent());
+            }else{
+                throw new HttpClientException("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status);
+            }
+        }catch(ClientProtocolException e){
+            log.error("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+            throw new HttpClientException("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+        } catch (IOException e) {
+            log.error("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+            throw new HttpClientException("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+        }finally {
+            if(response != null){
+                try {
+                    response.close();
+                } catch (IOException e) {
+                     log.error("response close IOException:"+httpRequestBase.getURI(), e);
+                }
+            }
+        }
+    }
+    
     /**
      * 执行一个HttpGet方法
      * @param 请求地址
@@ -107,7 +146,9 @@ public class CSHttpClient {
      */
     public String doGet(String url) throws HttpClientException  {
     	HttpGet get = new HttpGet(url);
-        return this.executeMethod(get);
+        String result = this.executeMethod(get);
+        get.releaseConnection();
+        return result;
     }
     
     /**
@@ -179,6 +220,9 @@ public class CSHttpClient {
 					 log.error("response close IOException:"+get.getURI(), e);
 				}
 			}
+			if(get != null){
+			    get.releaseConnection();
+            }
 		}
         return false;
     }
@@ -227,14 +271,25 @@ public class CSHttpClient {
  
     
     private String inputStream2String(InputStream in) throws IOException{
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    	ByteArrayOutputStream baos = new ByteArrayOutputStream(1024 * 256);
+    	byte[] temp = new byte[1024 * 256];
     	int i=-1;
-    	while((i=in.read())!=-1){
-    		baos.write(i);
+    	while((i=in.read(temp))!=-1){
+    		baos.write(temp, 0, i);
     	}
     	return baos.toString();
     }
     
+    
+    private byte[] inputStream2ByteArray(InputStream in) throws IOException{
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024 * 256);
+        byte[] temp = new byte[1024 * 256];
+        int i=-1;
+        while((i=in.read(temp))!=-1){
+            baos.write(temp, 0, i);
+        }
+        return baos.toByteArray();
+    }
     
     private void setDefaultRequestConfig(HttpRequestBase requestBase){
 
@@ -282,5 +337,9 @@ public class CSHttpClient {
             }
         }
         return false;
+    }
+    
+    public void shutdown() throws IOException{
+        httpClient.close();
     }
 }
