@@ -40,12 +40,12 @@ public class RedisClient {
 	 * @param value
 	 * @return
 	 */
-	public synchronized String setAndReturn(int dbIndex, final String key, String value){
+	public String setAndReturn(int dbIndex, final String key, String value){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisMasterPool();
-			jedis = getJedisMasterPool().getResource();
+			jedis = jedisPool.getResource();
 			//如果为0,则不需通信表明select db0
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -67,7 +67,7 @@ public class RedisClient {
 	 * @param value
 	 * @return
 	 */
-	public synchronized String setAndReturn(final String key, String value){
+	public String setAndReturn(final String key, String value){
 		return setAndReturn(0, key, value);
 	}
 	
@@ -81,12 +81,12 @@ public class RedisClient {
 	 * @param seconds  有效时间
 	 * @return
 	 */
-	public synchronized String setAndReturn(int dbIndex, final String key, String value, int seconds){
+	public String setAndReturn(int dbIndex, final String key, String value, int seconds){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisMasterPool();
-			jedis = getJedisMasterPool().getResource();
+			jedis = jedisPool.getResource();
 			//如果为0,则不需通信表明select db0
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -109,7 +109,7 @@ public class RedisClient {
 	 * @param seconds  有效时间
 	 * @return
 	 */
-	public synchronized String setAndReturn(final String key, String value, int seconds){
+	public String setAndReturn(final String key, String value, int seconds){
 		return setAndReturn(0, key, value, seconds);
 	}
 	
@@ -123,12 +123,12 @@ public class RedisClient {
 	 * @param seconds  有效时间
 	 * @return
 	 */
-	public synchronized String setAndReturn(int dbIndex, final byte[] key, byte[] value, int seconds){
+	public String setAndReturn(int dbIndex, final byte[] key, byte[] value, int seconds){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-			jedisPool = getJedisMasterPool();
-			jedis = getJedisMasterPool().getResource();
+		    jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
 			}
@@ -150,7 +150,7 @@ public class RedisClient {
 	 * @param seconds  有效时间
 	 * @return
 	 */
-	public synchronized String setAndReturn(final byte[] key, byte[] value, int seconds){
+	public String setAndReturn(final byte[] key, byte[] value, int seconds){
 		return setAndReturn(0, key, value, seconds);
 	}
 	
@@ -158,12 +158,12 @@ public class RedisClient {
 	 * 获取info信息
 	 * @return
 	 */
-	public synchronized String infoAndReturn(){
+	public String infoAndReturn(){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisMasterPool();
-			jedis = getJedisMasterPool().getResource();
+			jedis = jedisPool.getResource();
 			return jedis.info();
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
@@ -181,12 +181,12 @@ public class RedisClient {
 	 * @param key
 	 * @return
 	 */
-	public synchronized String getAndReturn(int dbIndex, final String key){
+	public String getAndReturn(int dbIndex, final String key){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisSlavePool();
-			jedis = getJedisSlavePool().getResource();
+			jedis = jedisPool.getResource();
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
 			}
@@ -206,7 +206,7 @@ public class RedisClient {
 	 * @param key
 	 * @return
 	 */
-	public synchronized String getAndReturn(final String key){
+	public String getAndReturn(final String key){
 		return getAndReturn(0, key);
 	}
 	
@@ -219,12 +219,12 @@ public class RedisClient {
 	 * @param value
 	 * @return
 	 */
-	public synchronized String setAndReturn(int dbIndex, final byte[] key, byte[] value){
+	public String setAndReturn(int dbIndex, final byte[] key, byte[] value){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisMasterPool();
-			jedis = getJedisMasterPool().getResource();
+			jedis = jedisPool.getResource();
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
 			}
@@ -245,7 +245,7 @@ public class RedisClient {
 	 * @param value
 	 * @return
 	 */
-	public synchronized String setAndReturn(final byte[] key, byte[] value){
+	public String setAndReturn(final byte[] key, byte[] value){
 		return setAndReturn(0, key, value);
 	}
 	
@@ -257,12 +257,12 @@ public class RedisClient {
 	 * @param key
 	 * @return
 	 */
-	public synchronized byte[] getAndReturn(int dbIndex, final byte[] key){
+	public byte[] getAndReturn(int dbIndex, final byte[] key){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisSlavePool();
-			jedis = getJedisSlavePool().getResource();
+			jedis = jedisPool.getResource();
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
 			}
@@ -282,7 +282,7 @@ public class RedisClient {
 	 * @param key
 	 * @return
 	 */
-	public synchronized byte[] getAndReturn(final byte[] key){
+	public byte[] getAndReturn(final byte[] key){
 		return getAndReturn(0,key);
 	}
 	
@@ -298,12 +298,12 @@ public class RedisClient {
 	 * @param value
 	 * @return  Status code reply Basically +OK as MSET can't fail
 	 */
-	public synchronized String msetAndReturn(int dbIndex, String... keysvalues){
+	public String msetAndReturn(int dbIndex, String... keysvalues){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisMasterPool();
-			jedis = getJedisMasterPool().getResource();
+			jedis = jedisPool.getResource();
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
 			}
@@ -324,7 +324,7 @@ public class RedisClient {
 	 * @param value
 	 * @return  Status code reply Basically +OK as MSET can't fail
 	 */
-	public synchronized String msetAndReturn(String... keysvalues){
+	public String msetAndReturn(String... keysvalues){
 		return msetAndReturn(0, keysvalues);
 	}
 	
@@ -337,12 +337,12 @@ public class RedisClient {
 	 * @param value
 	 * @return  
 	 */
-	public synchronized List<String> mgetAndReturn(int dbIndex, String... keys){
+	public List<String> mgetAndReturn(int dbIndex, String... keys){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
 			jedisPool = getJedisMasterPool();
-			jedis = getJedisMasterPool().getResource();
+			jedis = jedisPool.getResource();
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
 			}
@@ -363,11 +363,9 @@ public class RedisClient {
 	 * @param value
 	 * @return  
 	 */
-	public synchronized List<String> mgetAndReturn(String... keys){
+	public List<String> mgetAndReturn(String... keys){
 		return mgetAndReturn(0, keys);
 	}
-	
-	
 	
 
 	public RedisClientFactory getFactory() {
