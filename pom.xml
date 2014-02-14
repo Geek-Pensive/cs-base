@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.yy.cs</groupId>
 	<artifactId>cs-base</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.3</version>
 	<name>cs-base</name>
 	<url>http://maven.apache.org</url>
 	<distributionManagement>
