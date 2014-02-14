@@ -56,6 +56,11 @@ public class RedisUtils {
 			throw new CsRedisRuntimeException("invalid param, param couldn't be blank");
 		}
 		String [] str = serverInfo.split(":");
+		for(int i = 0;i < str.length; i++){
+		    if("".equals(str[i])){
+		        str[i] = null;
+		    }
+		}
 		if(str.length < 2){
 			throw new CsRedisRuntimeException("invalid param, param should like ip:port:password:timeout, if not exists password, you can use ip:port::");
 		}
