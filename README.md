@@ -16,7 +16,7 @@
     <dependency>
       <groupId>com.yy.cs</groupId>
       <artifactId>cs-base</artifactId>
-      <version>0.2</version>
+      <version>x.x</version>
     </dependency>
 
 
