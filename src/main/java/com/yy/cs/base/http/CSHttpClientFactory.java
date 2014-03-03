@@ -18,7 +18,7 @@ public class CSHttpClientFactory {
     private int defaultMaxPerRoute = 4;
     private int connectionTimeout = 5000;
     private int socketTimeOut = 5000;
-    private int connectionRequestTimeout = 2000;
+    private int connectionRequestTimeout = 5000;
     
     public int getMaxTotal() {
         return maxTotal;
