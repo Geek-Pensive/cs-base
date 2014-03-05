@@ -374,7 +374,7 @@
 ## thrift
 ### 简要说明
 *	为了简化用户thrift接口初始化和池化的过程，封装了一套以简单方式来引用thrift接口的方式。
-*	默认采用libthrift-0.9.1版本的thrift，所依赖的版本取决于gen thrift接口所以的thrift.exe版本。
+*	默认采用libthrift-0.6.1版本的thrift，所依赖的版本取决于gen thrift接口所以的thrift.exe版本。
 *	支持transport和protocol的配置。
 *	简单，高效使用
 
