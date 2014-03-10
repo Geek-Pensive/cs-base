@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.thrift.transport.TTransportException;
 
+import com.yy.cs.base.thrift.ThriftConfig;
+
 public interface Client {
 
 	public void open() throws IllegalArgumentException, InstantiationException,
@@ -17,5 +19,6 @@ public interface Client {
 	
 	public Class<?>  getInterface();
 	
+	public ThriftConfig  getThriftConfig();
 
 }

@@ -12,7 +12,6 @@ import com.yy.cs.base.thrift.proxy.Invocation;
 
 public class Invoker  {
 	
-
 	private static Logger log = LoggerFactory.getLogger(Invoker.class);
 	
 	private final IObjectPoolManager<? extends ObjectPool, Client> objPoolMgr;
@@ -24,6 +23,7 @@ public class Invoker  {
 
 	public Object invoke(final Invocation invocation) throws Exception {
 		Client client = null; 
+		long startTime = System.currentTimeMillis();
 		try{
 			client = objPoolMgr.borrowObject();
 	    	return invocation.getMethod().invoke(client.thriftClinet(), invocation.getParameters());
@@ -35,6 +35,15 @@ public class Invoker  {
 			throw e;
 		}  finally{
 			if(client != null){
+				if(log.isInfoEnabled()){
+					long exeTime = System.currentTimeMillis() - startTime;
+					log.info("invoker thrift interface information : | "
+							+ client.getInterface().getName() + " "
+							+ invocation.getMethod().getName() + " "
+							+ client.getThriftConfig().getHost() + ":"
+							+ client.getThriftConfig().getPort() + " "
+							+ exeTime);
+				}
 				objPoolMgr.returnObject(client);
 			}
     	}

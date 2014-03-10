@@ -75,4 +75,9 @@ public abstract class AbstractClient  implements Client{
 	public Class<?> getInterface() {
 		return this.interfaces;
 	}
+	
+	@Override
+	public ThriftConfig  getThriftConfig(){
+		return this.config;
+	}
 }

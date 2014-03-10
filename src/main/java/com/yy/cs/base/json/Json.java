@@ -1,23 +1,17 @@
 package com.yy.cs.base.json;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public class Json {
 
 	private final static ObjectMapper mapper = new ObjectMapper();
-	private static final Logger LOG = LoggerFactory.getLogger(Json.class);
+//	private static final Logger LOG = LoggerFactory.getLogger(Json.class);
 
 	static {
 		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); // 忽略不存在的属性
@@ -77,6 +71,142 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
+	
+	private static JsonNode toJsonNode(String jsonStr ,String fieldName) throws JsonProcessingException, IOException{
+		JsonNode jsonNode = mapper.readTree(jsonStr);
+		if (jsonNode == null) {
+            return null;
+        }
+		JsonNode nameNode = jsonNode.get(fieldName);		
+		return nameNode;
+	}
+	
+	/**
+	 * 取json传里面的某个属性值。
+	 * 
+	 * @param jsonStr
+	 *            JSON字符串
+	 * @param fieldName
+	 *            熟悉名称
+	 * @exception e
+	 *                对象为空时，底层抛出异常时，均会封装成RuntimeException抛出
+	 * @return Integer 该属性名称所对应的值
+	 */
+	public static Integer getIntField(String jsonStr, String fieldName) {
+		try {
+			JsonNode nameNode = toJsonNode(jsonStr,fieldName);
+			if (nameNode != null) {
+				Integer value = nameNode.asInt();
+	            return value;
+	        }
+	        return null;
+		} catch (Exception e) {
+			String msg = String.format("Failed to parse json %s", jsonStr);
+			throw new RuntimeException(msg, e);
+		}
+	}
+	
+	
+	/**
+	 * 取json传里面的某个属性值。
+	 * 
+	 * @param jsonStr
+	 *            JSON字符串
+	 * @param fieldName
+	 *            属性名称
+	 * @exception e
+	 *                对象为空时，底层抛出异常时，均会封装成RuntimeException抛出
+	 * @return String 该属性名称所对应的值
+	 */
+	public static String  getStringField(String jsonStr, String fieldName) {
+		try {
+			JsonNode nameNode = toJsonNode(jsonStr,fieldName);
+			if (nameNode != null) {
+	            String value = nameNode.asText();
+	            return value;
+	        }
+	        return null;
+		} catch (Exception e) {
+			String msg = String.format("Failed to parse json %s", jsonStr);
+			throw new RuntimeException(msg, e);
+		}
+	}
+	
+	/**
+	 * 取json传里面的某个属性值。
+	 * 
+	 * @param jsonStr
+	 *            JSON字符串
+	 * @param fieldName
+	 *            属性名称
+	 * @exception e
+	 *                对象为空时，底层抛出异常时，均会封装成RuntimeException抛出
+	 * @return Long 该属性名称所对应的值
+	 */
+	public static Long getLongField(String jsonStr, String fieldName) {
+		try {
+			JsonNode nameNode = toJsonNode(jsonStr,fieldName);
+			if (nameNode != null) {
+				Long value = nameNode.asLong();
+	            return value;
+	        }
+	        return null;
+		} catch (Exception e) {
+			String msg = String.format("Failed to parse json %s", jsonStr);
+			throw new RuntimeException(msg, e);
+		}
+	}
+	
+	/**
+	 * 取json传里面的某个属性值。
+	 * 
+	 * @param jsonStr
+	 *            JSON字符串
+	 * @param fieldName
+	 *            属性名称
+	 * @exception e
+	 *                对象为空时，底层抛出异常时，均会封装成RuntimeException抛出
+	 * @return Boolean 该属性名称所对应的值
+	 */
+	public static Boolean getBooleanField(String jsonStr, String fieldName) {
+		try {
+			JsonNode nameNode = toJsonNode(jsonStr,fieldName);
+			if (nameNode != null) {
+				Boolean value = nameNode.asBoolean();
+	            return value;
+	        }
+	        return null;
+		} catch (Exception e) {
+			String msg = String.format("Failed to parse json %s", jsonStr);
+			throw new RuntimeException(msg, e);
+		}
+	}
+	
+	/**
+	 * 取json传里面的某个属性值。
+	 * 
+	 * @param jsonStr
+	 *            JSON字符串
+	 * @param fieldName
+	 *            属性名称
+	 * @exception e
+	 *                对象为空时，底层抛出异常时，均会封装成RuntimeException抛出
+	 * @return Double 该属性名称所对应的值
+	 */
+	public static Double getDoubleField(String jsonStr, String fieldName) {
+		try {
+			JsonNode nameNode = toJsonNode(jsonStr,fieldName);
+			if (nameNode != null) {
+				Double value = nameNode.asDouble();
+	            return value;
+	        }
+	        return null;
+		} catch (Exception e) {
+			String msg = String.format("Failed to parse json %s", jsonStr);
+			throw new RuntimeException(msg, e);
+		}
+	}
+	
 	
 	
 	/**

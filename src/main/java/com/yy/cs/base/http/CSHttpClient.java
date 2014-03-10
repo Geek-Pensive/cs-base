@@ -32,9 +32,9 @@ public class CSHttpClient {
 
     private static final Logger log = LoggerFactory.getLogger(CSHttpClient.class);
     
-    private   RequestConfig defaultRequestConfig;
+    private final  RequestConfig defaultRequestConfig;
     
-    private   CloseableHttpClient httpClient;
+    private final  CloseableHttpClient httpClient;
     
     public CSHttpClient(CSHttpClientFactory factory) {
     	PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
@@ -69,6 +69,7 @@ public class CSHttpClient {
     	CloseableHttpResponse response = null;
     	StatusLine status = null;
     	String  result = "";
+    	
     	try {
 			setDefaultRequestConfig(httpRequestBase);
 			log.debug("executing request " + httpRequestBase.getURI());

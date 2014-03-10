@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -200,6 +201,8 @@ public class NyyProtocolHelper {
 		}
 		return paramValue;
 	}
+	
+	
 
 	/**
 	 * 生成类似 {"appId":1,"sign":"x","data":{"k1":"v1"}} 返回给client
