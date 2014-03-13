@@ -207,6 +207,7 @@ HTTP返回（不作URL Encoding）
 		}catch(Exception e){
 			LOG.error("exception e = ", e);
 		}
+		
 		//返回的数据
 		BizObject o = new BizObject(1, "resp", new Date(), true, 3.14, 500);
 		String respData = Json.ObjToStr(o);
