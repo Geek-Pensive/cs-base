@@ -53,9 +53,12 @@ public class RedisClient {
 			return jedis.set(key, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+		        jedisPool.returnResource(jedis);
+		    }
 		}
 	}
 	
@@ -94,9 +97,12 @@ public class RedisClient {
 			return jedis.setex(key, seconds, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -135,9 +141,12 @@ public class RedisClient {
 			return jedis.setex(key, seconds, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -167,9 +176,12 @@ public class RedisClient {
 			return jedis.info();
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis info fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -193,9 +205,12 @@ public class RedisClient {
 			return jedis.get(key);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis get fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -231,9 +246,12 @@ public class RedisClient {
 			return jedis.set(key, value);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -269,9 +287,12 @@ public class RedisClient {
 			return jedis.get(key);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis get fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -310,9 +331,12 @@ public class RedisClient {
 			return jedis.mset(keysvalues);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis mset fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -349,9 +373,12 @@ public class RedisClient {
 			return jedis.mget(keys);
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
+			jedis = null;
 			throw new CsRedisRuntimeException("jedis mget fail", e);
 		}finally{
-			jedisPool.returnResource(jedis);
+		    if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
 		}
 	}
 	
@@ -391,9 +418,12 @@ public class RedisClient {
             return jedis.mset(keysvalues);
         }catch(Exception e){
             jedisPool.returnBrokenResource(jedis);
+            jedis = null;
             throw new CsRedisRuntimeException("jedis mset fail", e);
         }finally{
-            jedisPool.returnResource(jedis);
+            if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
         }
     }
     
@@ -430,9 +460,12 @@ public class RedisClient {
             return jedis.mget(keys);
         }catch(Exception e){
             jedisPool.returnBrokenResource(jedis);
+            jedis = null;
             throw new CsRedisRuntimeException("jedis mget fail", e);
         }finally{
-            jedisPool.returnResource(jedis);
+            if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
         }
     }
     
