@@ -29,7 +29,7 @@
 		<!-- 日志工具 -->
 		<jdk.version>1.7</jdk.version>
 		<slf4j.version>1.7.2</slf4j.version>
-		<redis.version>2.0.0</redis.version>
+		<redis.version>2.2.1</redis.version>
 		<thrift.version>0.6.1</thrift.version>
 		<jackson.version>2.3.0</jackson.version>
 		<logback.version>1.0.9</logback.version>
