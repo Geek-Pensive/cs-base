@@ -10,7 +10,7 @@ import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
 /**
  * redis client 的封装类
  * @author haoqing
- *
+ * 
  */
 public class RedisClient {
 	
@@ -355,6 +355,8 @@ public class RedisClient {
 		}
 	}
 	
+	
+	
 	/**
 	 * 执行mset操作，然后释放client连接
 	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
@@ -367,6 +369,87 @@ public class RedisClient {
 		return mgetAndReturn(0, keys);
 	}
 	
+	
+	/**
+     * 执行mset操作，然后释放client连接
+     * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+     * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
+     *@param dbIndex
+     * @param key
+     * @param value
+     * @return  Status code reply Basically +OK as MSET can't fail
+     */
+    public String msetAndReturn(int dbIndex, byte[]... keysvalues){
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try{
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if(dbIndex != 0){
+                jedis.select(dbIndex);
+            }
+            return jedis.mset(keysvalues);
+        }catch(Exception e){
+            jedisPool.returnBrokenResource(jedis);
+            throw new CsRedisRuntimeException("jedis mset fail", e);
+        }finally{
+            jedisPool.returnResource(jedis);
+        }
+    }
+    
+    /**
+     * 执行mset操作，然后释放client连接
+     * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+     * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
+     * @param key
+     * @param value
+     * @return  Status code reply Basically +OK as MSET can't fail
+     */
+    public String msetAndReturn(byte[]... keysvalues){
+        return msetAndReturn(0, keysvalues);
+    }
+    
+    /**
+     * 执行mget操作，然后释放client连接
+     * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+     * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
+     *@param dbIndex
+     * @param key
+     * @param value
+     * @return  
+     */
+    public List<byte[]> mgetAndReturn(int dbIndex, byte[]... keys){
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try{
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if(dbIndex != 0){
+                jedis.select(dbIndex);
+            }
+            return jedis.mget(keys);
+        }catch(Exception e){
+            jedisPool.returnBrokenResource(jedis);
+            throw new CsRedisRuntimeException("jedis mget fail", e);
+        }finally{
+            jedisPool.returnResource(jedis);
+        }
+    }
+    
+    
+    
+    /**
+     * 执行mset操作，然后释放client连接
+     * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
+     * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
+     * @param key
+     * @param value
+     * @return  
+     */
+    public List<byte[]> mgetAndReturn(byte[]... keys){
+        return mgetAndReturn(0, keys);
+    }
+    
 
 	public RedisClientFactory getFactory() {
 		return factory;
