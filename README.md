@@ -18,7 +18,13 @@
       <artifactId>cs-base</artifactId>
       <version>x.x</version>
     </dependency>
+---
 
+
+## Json工具
+### 简要说明
+*	在Jackson的基础上封装
+*	具体可见Api注释说明
 
 ---
 ## Redis连接
@@ -82,7 +88,7 @@
 	 
 *	 多线程性能
 	
-	将要进行
+	与原生JedisPool做多线程环境测试，不存在问题
 	 
 ### 联系人
 	如果有问题或者建议，可联系吴浩清，真诚为你服务
