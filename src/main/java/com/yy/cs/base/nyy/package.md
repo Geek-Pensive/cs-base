@@ -173,17 +173,18 @@ HTTP返回（不作URL Encoding）
 
 
 ----
-## 代码支持（Java）
+## 代码支持,目前支持三种方式（Java）
 
-### 依赖Jar包
+### 使用工具类
+1. 依赖Jar包
 
 	<dependency>
 		<groupId>com.yy.cs</groupId>
  		<artifactId>cs-base</artifactId>
-		<version>0.0.4-SNAPSHOT</version>
+		<version>0.5</version>
 	</dependency>
 	
-### 服务端示例(主要是使用NyyProtocolHelper类)
+2. 服务端示例(主要是使用NyyProtocolHelper类)
 	
 	/**
 	 * 支持get post的nyy协定
@@ -218,7 +219,7 @@ HTTP返回（不作URL Encoding）
 	}
 	
 
-### 客户端示例(主要是使用NyyClient类)
+3. 客户端示例(主要是使用NyyClient类)
 
 	String uri = "http://localhost:8080/nyy-demo-web/nyy";
 	//主要方法都集中在NyyClient类中
@@ -240,5 +241,70 @@ HTTP返回（不作URL Encoding）
 	System.out.println(d);
 	System.out.println(d1);
 
-### 示例的SVN地址 
-	https://svn.yy.com/web/gh/cs-demo/trunk/nyy-demo
+
+### 使用servlet filter方式(仅支持简单类型注入)
+1. 依赖Jar包
+
+	<dependency>
+		<groupId>com.yy.cs</groupId>
+ 		<artifactId>cs-base</artifactId>
+		<version>0.5</version>
+	</dependency>
+	
+2. 配置web.xml文件
+
+	<filter>
+		<filter-name>NYYFilter</filter-name>
+		<filter-class>com.yy.cs.base.nyy.NYYFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>NYYFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+3. 服务端可直接获取参数
+
+	//appId liveUid myUid followType ticket等参数都是直接从nyy 里面的data中获取
+	@RequestMapping("/followLive")
+    @ResponseBody
+    public Map<String, Object> followLive(HttpServletRequest request,@RequestParam String appId, @RequestParam Long liveUid, @RequestParam Long myUid, 
+    @RequestParam Integer followType,@RequestParam String ticket) throws HttpClientException {
+        boolean isCancel = (followType == 1 ? false : true);
+        Integer result = anchorService.toggleFollow(myUid, liveUid, isCancel);
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        resultMap.put(INNER_LIVE_UID_STR, liveUid);
+        resultMap.put(INNER_MYUID_STR, myUid);
+        resultMap.put(INNER_FOLLOW_TYPE_STR, followType);
+        resultMap.put(INNER_RESULT_STR, result);
+        return resultMap(resultMap, request);
+    }
+	
+	
+### 使用spring-web HandlerMethodArgumentResolver方式(支持简单、复杂组合类型注入,建议使用这种方式)	
+1. 依赖Jar包
+
+	<dependency>
+		<groupId>com.yy.cs</groupId>
+		<artifactId>nyy-springmvc</artifactId>
+		<version>0.1</version>
+	</dependency>
+	
+2. 配置spring配置文件，加入以下配置
+
+	<mvc:annotation-driven>
+	    <mvc:argument-resolvers>
+	        <bean class="com.yy.apachecommons.controller.NyyArgumentResolver" />
+	    </mvc:argument-resolvers>
+	</mvc:annotation-driven>
+	
+3. 服务端可直接获取参数
+
+	//NyyObject是个组合类型,有List String Integer Long等类型属性,可动态从nyy data中获取对应的属性值
+	@RequestMapping("/nyyDemo3")
+    @ResponseBody
+    public String nyyDemo3(HttpServletRequest request, @NyyData NyyObject data){
+        return data.toString();
+    }
+
+4. 示例的SVN地址 
+	https://svn.yy.com/web/gh/apachecommons
