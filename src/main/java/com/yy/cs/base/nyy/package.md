@@ -175,7 +175,7 @@ HTTP返回（不作URL Encoding）
 ----
 ## 代码支持,目前支持三种方式（Java）
 
-### 使用工具类
+### 1.使用工具类
 #### 依赖Jar包
 
 	<dependency>
@@ -242,7 +242,7 @@ HTTP返回（不作URL Encoding）
 	System.out.println(d1);
 
 
-### 使用servlet filter方式(仅支持简单类型注入)
+### 2.使用servlet filter方式(仅支持简单类型注入)
 ####  依赖Jar包
 
 	<dependency>
@@ -280,7 +280,7 @@ HTTP返回（不作URL Encoding）
     }
 	
 	
-### 使用spring-web HandlerMethodArgumentResolver方式(支持简单、复杂组合类型注入,建议使用这种方式)	
+### 3.使用spring-web HandlerMethodArgumentResolver方式(支持简单、复杂组合类型注入,建议使用这种方式)	
 #### 依赖Jar包
 
 	<dependency>
