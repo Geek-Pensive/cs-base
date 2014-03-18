@@ -176,7 +176,7 @@ HTTP返回（不作URL Encoding）
 ## 代码支持,目前支持三种方式（Java）
 
 ### 使用工具类
-1. 依赖Jar包
+#### 依赖Jar包
 
 	<dependency>
 		<groupId>com.yy.cs</groupId>
@@ -184,7 +184,7 @@ HTTP返回（不作URL Encoding）
 		<version>0.5</version>
 	</dependency>
 	
-2. 服务端示例(主要是使用NyyProtocolHelper类)
+#### 服务端示例(主要是使用NyyProtocolHelper类)
 	
 	/**
 	 * 支持get post的nyy协定
@@ -219,7 +219,7 @@ HTTP返回（不作URL Encoding）
 	}
 	
 
-3. 客户端示例(主要是使用NyyClient类)
+####  客户端示例(主要是使用NyyClient类)
 
 	String uri = "http://localhost:8080/nyy-demo-web/nyy";
 	//主要方法都集中在NyyClient类中
@@ -243,7 +243,7 @@ HTTP返回（不作URL Encoding）
 
 
 ### 使用servlet filter方式(仅支持简单类型注入)
-1. 依赖Jar包
+####  依赖Jar包
 
 	<dependency>
 		<groupId>com.yy.cs</groupId>
@@ -251,7 +251,7 @@ HTTP返回（不作URL Encoding）
 		<version>0.5</version>
 	</dependency>
 	
-2. 配置web.xml文件
+####  配置web.xml文件
 
 	<filter>
 		<filter-name>NYYFilter</filter-name>
@@ -262,7 +262,7 @@ HTTP返回（不作URL Encoding）
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-3. 服务端可直接获取参数
+####  服务端可直接获取参数
 
 	//appId liveUid myUid followType ticket等参数都是直接从nyy 里面的data中获取
 	@RequestMapping("/followLive")
@@ -281,7 +281,7 @@ HTTP返回（不作URL Encoding）
 	
 	
 ### 使用spring-web HandlerMethodArgumentResolver方式(支持简单、复杂组合类型注入,建议使用这种方式)	
-1. 依赖Jar包
+#### 依赖Jar包
 
 	<dependency>
 		<groupId>com.yy.cs</groupId>
@@ -289,7 +289,7 @@ HTTP返回（不作URL Encoding）
 		<version>0.1</version>
 	</dependency>
 	
-2. 配置spring配置文件，加入以下配置
+####  配置spring配置文件，加入以下配置
 
 	<mvc:annotation-driven>
 	    <mvc:argument-resolvers>
@@ -297,7 +297,7 @@ HTTP返回（不作URL Encoding）
 	    </mvc:argument-resolvers>
 	</mvc:annotation-driven>
 	
-3. 服务端可直接获取参数
+####  服务端可直接获取参数
 
 	//NyyObject是个组合类型,有List String Integer Long等类型属性,可动态从nyy data中获取对应的属性值
 	@RequestMapping("/nyyDemo3")
@@ -306,5 +306,5 @@ HTTP返回（不作URL Encoding）
         return data.toString();
     }
 
-4. 示例的SVN地址 
+####  示例的SVN地址 
 	https://svn.yy.com/web/gh/apachecommons
