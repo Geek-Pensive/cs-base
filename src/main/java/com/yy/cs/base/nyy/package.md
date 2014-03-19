@@ -293,7 +293,7 @@ HTTP返回（不作URL Encoding）
 
 	<mvc:annotation-driven>
 	    <mvc:argument-resolvers>
-	        <bean class="com.yy.apachecommons.controller.NyyArgumentResolver" />
+	        <bean class="com.yy.cs.base.nyy.resolver.NyyArgumentResolver" />
 	    </mvc:argument-resolvers>
 	</mvc:annotation-driven>
 	
