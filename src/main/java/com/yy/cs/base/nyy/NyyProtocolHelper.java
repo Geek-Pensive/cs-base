@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.protocol.HTTP;
 
 import com.yy.cs.base.json.Json;
 import com.yy.cs.base.nyy.Constants.Enc;
@@ -33,6 +34,8 @@ public class NyyProtocolHelper {
 	private static Pattern appIdPattern = Pattern.compile("\"appId\":\"(.*?)\"");
 
 	private static Pattern signPattern = Pattern.compile("\"sign\":\"(.*?)\"");
+	
+	private final static String X_WWW_FORM_URLENCODED = "x-www-form-urlencoded";
 
 	/**
 	 * 组装nyy协议的get url </br> </br> withNyyKey为false
@@ -77,6 +80,14 @@ public class NyyProtocolHelper {
 		if (request == null) {
 			throw new CsNyySecurityException("request can't be null");
 		}
+		//if content-type is application/x-www-form-urlencoded submit
+		if(request.getContentType().contains(X_WWW_FORM_URLENCODED)){
+		    String appId = request.getParameter(Constants.Param.APPID);
+		    String data = request.getParameter(Constants.Param.DATA);
+		    String sign = request.getParameter(Constants.Param.SIGN);
+		    return String.format(NYY_JSON_FORMAT, appId, data, sign);
+		}
+		//if content-type is text/plain and content is '{"appId":"xx","sign":"xx","data":{"k1":"v1","k2":"v2"}}'
 		StringBuilder sb = new StringBuilder();
 		String line = null;
 		BufferedReader br = null;
