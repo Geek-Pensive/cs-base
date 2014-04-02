@@ -173,7 +173,7 @@ HTTP返回（不作URL Encoding）
 
 
 ----
-## 代码支持,目前支持三种方式（Java）
+## 后端代码支持,目前支持三种方式（Java）
 
 ### 1.使用工具类
 #### 依赖Jar包
@@ -181,7 +181,7 @@ HTTP返回（不作URL Encoding）
 	<dependency>
 		<groupId>com.yy.cs</groupId>
  		<artifactId>cs-base</artifactId>
-		<version>0.5</version>
+		<version>0.5.4</version>
 	</dependency>
 	
 #### 服务端示例(主要是使用NyyProtocolHelper类)
@@ -286,7 +286,7 @@ HTTP返回（不作URL Encoding）
 	<dependency>
 		<groupId>com.yy.cs</groupId>
 		<artifactId>nyy-springmvc</artifactId>
-		<version>0.1</version>
+		<version>0.2</version>
 	</dependency>
 	
 ####  配置spring配置文件，加入以下配置
@@ -308,3 +308,56 @@ HTTP返回（不作URL Encoding）
 
 ####  示例的SVN地址 
 	https://svn.yy.com/web/gh/apachecommons
+	
+	
+----	
+## 前端Javascript代码支持,支持Get和Post方式
+
+### 1.引入js文件
+	
+	<!-- jquery v1.9.1 -->
+	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
+	<!-- nyy v1.0 -->
+	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
+	
+
+	
+### 2.使用示例
+
+	<html>
+	<body>
+	<div>
+		<button value="get请求" onclick="doGet()">get请求</button>
+		<button value="doTextPlainPost" onclick="doTextPlainPost()">doTextPlainPost请求</button>
+		<button value="doFormPost" onclick="doFormPost()">doFormPost请求</button>
+	</div>
+	</body>
+	<!-- jquery v1.9.1 -->
+	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
+	<!-- nyy v1.0 -->
+	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
+	<script type="text/javascript">
+		function doGet(){
+			nyyGet("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',function(dataObj){
+			  alert(dataObj);
+			},function(error){
+				alert(error);
+			});	  
+		};
+		function doTextPlainPost(){
+		  nyyTextPlainPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',function(dataObj){
+			alert(dataObj);
+			},function(error){
+				alert(error);
+			});	  
+		};
+		function doFormPost(){
+		  nyyFormPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',function(dataObj){
+			alert(dataObj);
+			},function(error){
+				alert(error);
+			});	  
+		}
+	</script>
+	</html>
+	
