@@ -370,11 +370,14 @@ HTTP返回（不作URL Encoding）
 
 ### 1.android端支持代码
 
+	import java.io.UnsupportedEncodingException;
+	import java.net.URLEncoder;
+	import java.security.MessageDigest;
+	import org.json.JSONObject;
 	/**
-	 * 
 	 * 由于yy android sdk已经提供了http请求和回调的模块,所以nyy对于android端的代码支持就不继续在httpclient基础上封装.
 	 * </br>该类提供了nyy协议中会使用到的sha256哈希算法、拼凑nyy协议的get 方式url等。
-	 * </br>由于nyy协议使用的数据格式是json格式，android开发也不希望引入太多jar包。所以在实际json解析和生成，
+	 * </br>由于nyy协议使用的数据格式是json格式，android开发也不希望引入太多jar包。所以在实际json解析和生成
 	 * 建议使用android基础库的org.json包
 	 * @author haoqing
 	 *
@@ -455,6 +458,7 @@ HTTP返回（不作URL Encoding）
 	        return toSHA256String(str);
 	    }
 	}
+
 	
 
 	
