@@ -364,3 +364,98 @@ HTTP返回（不作URL Encoding）
 ###  3.示例的SVN地址 
 	https://svn.yy.com/web/gh/apachecommons
 	
+	
+----	
+## 其他终端支持
+
+### 1.android端支持代码
+
+	/**
+	 * 
+	 * 由于yy android sdk已经提供了http请求和回调的模块,所以nyy对于android端的代码支持就不继续在httpclient基础上封装.
+	 * </br>该类提供了nyy协议中会使用到的sha256哈希算法、拼凑nyy协议的get 方式url等。
+	 * </br>由于nyy协议使用的数据格式是json格式，android开发也不希望引入太多jar包。所以在实际json解析和生成，
+	 * 建议使用android基础库的org.json包
+	 * @author haoqing
+	 *
+	 */
+	public class NyyAndroidClientUtils {
+	    /**
+	     * sha256哈希,使用android基础库的security模块
+	     * @param str
+	     * @return
+	     */
+	    public static String toSHA256String(String str) {
+	        String hash = "";
+	        try {
+	            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+	            digest.update(str.getBytes("UTF-8"));
+	            hash = bytesToHexString(digest.digest());
+	        } catch (Exception e) {
+	            //TODO 加上你们业务的异常处理
+	            //YLog.error("toHexString", "toHexString", e);
+	        }
+	        return hash;
+	    }
+	    /**
+	     * byte数组转为hex字符串
+	     * @param bytes
+	     * @return
+	     */
+	    public static String bytesToHexString(byte[] bytes) {
+	        StringBuilder sb = new StringBuilder();
+	        for (int i = 0; i < bytes.length; i++) {
+	            String hex = Integer.toHexString(0xFF & bytes[i]);
+	            if (hex.length() == 1) {
+	                sb.append('0');
+	            }
+	            sb.append(hex);
+	        }
+	        return sb.toString();
+	    }
+	    /**
+	     * 生成nyy get方式的请求url
+	     * @param sign   要验证的sign,如果没有,请使用""
+	     * @param appId  业务appId
+	     * @param requestUri   请求的uri,比如 http://www.gate.yy.com/abc
+	     * @param params  放入data的key-value参数
+	     * @return
+	     */
+	    public static String genNyyGetUrl(String sign,String appId,String requestUri,Object... params){
+	        String url = requestUri + "?appId=" + appId + "&sign=" + sign;
+	        if (params.length > 0 && params.length % 2 == 0) {
+	            JSONObject data = new JSONObject();
+	            for (int i = 0; i < params.length; i = i + 2) {
+	                try {
+	                    String key = (String) params[i];
+	                    Object value = params[i + 1];
+	                    data.putOpt(key, value);
+	                } catch (Exception e) {
+	                    //TODO 加上你们业务的异常处理
+	                    //YLog.error(this, "getUrl error! %s ,params: %s", request, params, e);
+	                }
+	            }
+	            try {
+	                url = url + "&data=" + URLEncoder.encode(data.toString(), "UTF-8");
+	            } catch (UnsupportedEncodingException e) {
+	                //TODO 加上你们业务的异常处理
+	                //YLog.error(this, "getUrl", e);
+	            }
+	        }
+	        return url;
+	    }
+	    /**
+	     * 根据nyy协议约定,生成sha256哈希的sign
+	     * @param data  没有经过urlEncode的data,为json格式
+	     * @param key   业务的key
+	     * @return    
+	     */
+	    public static String genSign(String data, String key){
+	        String str = "data=" + data + "&key=" + key;
+	        return toSHA256String(str);
+	    }
+	}
+	
+
+	
+	
