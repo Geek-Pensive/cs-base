@@ -85,7 +85,7 @@ public class NyyProtocolHelper {
 		    String appId = request.getParameter(Constants.Param.APPID);
 		    String data = request.getParameter(Constants.Param.DATA);
 		    String sign = request.getParameter(Constants.Param.SIGN);
-		    return String.format(NYY_JSON_FORMAT, appId, data, sign);
+		    return String.format(NYY_JSON_FORMAT, appId, sign, data);
 		}
 		//if content-type is text/plain and content is '{"appId":"xx","sign":"xx","data":{"k1":"v1","k2":"v2"}}'
 		StringBuilder sb = new StringBuilder();
