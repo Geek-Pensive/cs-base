@@ -286,7 +286,7 @@ HTTP返回（不作URL Encoding）
 	<dependency>
 		<groupId>com.yy.cs</groupId>
 		<artifactId>nyy-springmvc</artifactId>
-		<version>0.2</version>
+		<version>0.3</version>
 	</dependency>
 	
 ####  配置spring配置文件，加入以下配置
