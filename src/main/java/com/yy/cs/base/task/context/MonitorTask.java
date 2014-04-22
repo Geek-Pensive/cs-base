@@ -76,12 +76,25 @@ public class MonitorTask {
 		if (monitorfile != null && !"".equals(monitorfile)) {
 			return monitorfile;
 		}
-		String pathStr = System.getProperty("user.dir")
-				+ File.separatorChar;
+		String dragonProjName = System.getProperty("dragon.bizName.projName");
+    	String parent = null;
+    	if(dragonProjName != null && !"".equals(dragonProjName)){
+    		String p = "/data/file";
+    		File f = new File(p);
+    		if(f.exists() && f.isDirectory()){
+    			parent = p + File.separator + dragonProjName;	
+    		}
+    	}
+    	if(parent == null || "".equals(parent)){
+    		parent = System.getProperty("user.dir");
+    	}
+    	if(!parent.endsWith(File.separator)){
+    		parent += File.separator;
+    	}
 		if (MonitorType.LOG == this.monitorType) {
-			this.monitorfile = pathStr + "monitortask.log";
+			this.monitorfile = parent + "monitortask.log";
 		}else{
-			this.monitorfile = pathStr + "monitortask.html";
+			this.monitorfile = parent + "monitortask.html";
 		}
 		return monitorfile;
 	}
