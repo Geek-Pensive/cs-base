@@ -52,6 +52,9 @@ public class RedisClientFactory extends JedisPoolConfig{
 	 * @return  
 	 */
 	public JedisPool getMasterPool() {
+		if(masterServerSize <= 0){
+			return getSlavePool();
+		}
 		int currentIndex = atomitMasterCount.getAndIncrement();
 		currentIndex = currentIndex % masterServerSize;
 		JedisPool jedisPool = redisMasterPool.get(currentIndex);

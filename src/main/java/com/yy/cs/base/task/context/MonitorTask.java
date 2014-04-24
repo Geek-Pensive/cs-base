@@ -102,7 +102,6 @@ public class MonitorTask {
 	public void writeTaskFile(CsStatus csStatus) {
 
 		String path = getWebPath();
-		// log.info("file path is {}", new Object[] { path });
 		try {
 			File f = new File(path);
 			if (!f.exists()) {
@@ -121,7 +120,7 @@ public class MonitorTask {
 			fileOut.flush();
 			fileOut.close();
 		} catch (Exception e) {
-			log.error(" write csStatus {} error : {}", csStatus, e);
+			log.error("write file path:"+ path +" error:" + e.getMessage(), e);
 		}
 	}
 
