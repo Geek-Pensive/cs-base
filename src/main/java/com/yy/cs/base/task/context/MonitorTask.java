@@ -104,6 +104,14 @@ public class MonitorTask {
 		String path = getWebPath();
 		try {
 			File f = new File(path);
+			if (!f.exists() && f.getParentFile() != null
+					&& !f.getParentFile().exists()) {
+				if (!f.getParentFile().mkdirs()) {
+					 throw new
+					 IllegalArgumentException("Failed to create loacl directory "
+					 + f.getParentFile() + "!");
+				}
+			}
 			if (!f.exists()) {
 				if (!f.createNewFile()) {
 					return;
