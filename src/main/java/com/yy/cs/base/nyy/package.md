@@ -171,295 +171,322 @@ HTTP返回（不作URL Encoding）
 | 消息中data的值  | `BASE64(  AES({"chId":"Zfb","payer":"小王"}, 58wfwY5w33o5w95we)  )`<br/>注意：在HTTP请求中，生成的字节码需要转换成BASE64，**不需要**进行URL Encode |
 
 
+----
+## Tips
+
+#### data字段提取以验证sign的简易方式
+
+```java
+nyyStr.replaceAll("^\\s*\\{[^\\{]*|[^\\}]*\\}\\s*$", ""))
+```
+
+注意要提取原始信息中的data字符串，以确保校验成功。
+**不要把nyyStr转换成对象并得到data对象后再转换成字符串**
 
 ----
-## 后端代码支持,目前支持三种方式（Java）
+## 后端Java代码支持
 
-### 1.使用工具类
+### 1. 使用工具类
 #### 依赖Jar包
 
-	<dependency>
-		<groupId>com.yy.cs</groupId>
- 		<artifactId>cs-base</artifactId>
-		<version>0.5.4</version>
-	</dependency>
+```
+<dependency>
+	<groupId>com.yy.cs</groupId>
+	<artifactId>cs-base</artifactId>
+	<version>0.5.4</version>
+</dependency>
+```
 	
 #### 服务端示例(主要是使用NyyProtocolHelper类)
 	
-	/**
-	 * 支持get post的nyy协定
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping("/nyy")
-	@ResponseBody
-	public String nyyDemo(HttpServletRequest request, HttpServletResponse response){
-		String jsonStr = null;
-		NyyBeanObject object = null;
-		try{
-			//获取jsonStr, 返回是json格式,例如 {"appId":"test","sign":"testsign","data":{"k1":"v1"}}
-			jsonStr = NyyProtocolHelper.getNyyContent(request);
-			//sha256哈希检验, 如不需要,可去掉
-			NyyProtocolHelper.sha256HashSecurityCheck("test", jsonStr);
-			//NyyBeanObject 为业务自己封装的pojo
-			object = Json.strToObj(jsonStr, NyyBeanObject.class);
-			//TODO 业务逻辑
-		}catch(Exception e){
-			LOG.error("exception e = ", e);
-		}
-		
-		//返回的数据
-		BizObject o = new BizObject(1, "resp", new Date(), true, 3.14, 500);
-		String respData = Json.ObjToStr(o);
-		//最终返回给client的json格式
-		String respStr = NyyProtocolHelper.genRespJson(object.getAppId(), "test", respData);
-		LOG.info("jsonStr = {}, respData = {}, respStr = {}", jsonStr, respData, respStr);
-		return respStr;
+```
+/**
+ * 支持get post的nyy协定
+ */
+@RequestMapping("/nyy")
+@ResponseBody
+public String nyyDemo(HttpServletRequest request, HttpServletResponse response){
+	String jsonStr = null;
+	NyyBeanObject object = null;
+	try{
+		//获取jsonStr, 返回是json格式,例如 {"appId":"test","sign":"testsign","data":{"k1":"v1"}}
+		jsonStr = NyyProtocolHelper.getNyyContent(request);
+		//sha256哈希检验, 如不需要,可去掉
+		NyyProtocolHelper.sha256HashSecurityCheck("test", jsonStr);
+		//NyyBeanObject 为业务自己封装的pojo
+		object = Json.strToObj(jsonStr, NyyBeanObject.class);
+		//TODO 业务逻辑
+	}catch(Exception e){
+		//TODO 加上你们业务的异常处理
 	}
 	
+	//返回的数据
+	BizObject o = new BizObject(1, "resp", new Date(), true, 3.14, 500);
+	String respData = Json.ObjToStr(o);
+	//最终返回给client的json格式
+	String respStr = NyyProtocolHelper.genRespJson(object.getAppId(), "test", respData);
+	LOG.info("jsonStr = {}, respData = {}, respStr = {}", jsonStr, respData, respStr);
+	return respStr;
+}
+```
+
 
 ####  客户端示例(主要是使用NyyClient类)
 
-	String uri = "http://localhost:8080/nyy-demo-web/nyy";
-	//主要方法都集中在NyyClient类中
-	NyyClient client = new NyyClient("999", "test");
-	BizObject bo1 = new BizObject(1, "bo1", new Date(), true, 3.14, 500);
-	BizObject bo2 = new BizObject(1, "bo2", new Date(), true, 3.14, 500);
-	List<BizObject> list = new ArrayList<BizObject>();
-	list.add(bo1);
-	list.add(bo2);
-	Data data = new Data();
-	data.setItems("items in data");
+```java
+String uri = "http://localhost:8080/nyy-demo-web/nyy";
 
-	data.setList(list);
-	String dataJson = Json.ObjToStr(data);
-	String doGetWithNyyJsonResult = client.doGet(uri, dataJson, true);
-	String doGetWithoutNyyJsonResult = client.doGet(uri, dataJson, false);
-	Data d = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, true); 
-	Data d1 = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, false); 
-	System.out.println(d);
-	System.out.println(d1);
+//主要方法都集中在NyyClient类中
+NyyClient client = new NyyClient("999", "test");
+BizObject bo1 = new BizObject(1, "bo1", new Date(), true, 3.14, 500);
+BizObject bo2 = new BizObject(1, "bo2", new Date(), true, 3.14, 500);
+List<BizObject> list = new ArrayList<BizObject>();
+list.add(bo1);
+list.add(bo2);
+Data data = new Data();
+data.setItems("items in data");
 
+data.setList(list);
+String dataJson = Json.ObjToStr(data);
+String doGetWithNyyJsonResult = client.doGet(uri, dataJson, true);
+String doGetWithoutNyyJsonResult = client.doGet(uri, dataJson, false);
+Data d = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, true); 
+Data d1 = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, false); 
+System.out.println(d);
+System.out.println(d1);
+```
 
-### 2.使用servlet filter方式(仅支持简单类型注入)
-####  依赖Jar包
+### 2. servlet filter方式
 
-	<dependency>
-		<groupId>com.yy.cs</groupId>
- 		<artifactId>cs-base</artifactId>
-		<version>0.5</version>
-	</dependency>
-	
-####  配置web.xml文件
+目前仅支持简单类型注入。
 
-	<filter>
-		<filter-name>NYYFilter</filter-name>
-		<filter-class>com.yy.cs.base.nyy.NYYFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>NYYFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	
-####  服务端可直接获取参数
-
-	//appId liveUid myUid followType ticket等参数都是直接从nyy 里面的data中获取
-	@RequestMapping("/followLive")
-    @ResponseBody
-    public Map<String, Object> followLive(HttpServletRequest request,@RequestParam String appId, @RequestParam Long liveUid, @RequestParam Long myUid, 
-    @RequestParam Integer followType,@RequestParam String ticket) throws HttpClientException {
-        boolean isCancel = (followType == 1 ? false : true);
-        Integer result = anchorService.toggleFollow(myUid, liveUid, isCancel);
-        HashMap<String, Object> resultMap = new HashMap<String, Object>();
-        resultMap.put(INNER_LIVE_UID_STR, liveUid);
-        resultMap.put(INNER_MYUID_STR, myUid);
-        resultMap.put(INNER_FOLLOW_TYPE_STR, followType);
-        resultMap.put(INNER_RESULT_STR, result);
-        return resultMap(resultMap, request);
-    }
-	
-	
-### 3.使用spring-web HandlerMethodArgumentResolver方式(支持简单、复杂组合类型注入,建议使用这种方式)	
 #### 依赖Jar包
 
-	<dependency>
-		<groupId>com.yy.cs</groupId>
-		<artifactId>nyy-springmvc</artifactId>
-		<version>0.3</version>
-	</dependency>
+```xml
+<dependency>
+	<groupId>com.yy.cs</groupId>
+	<artifactId>cs-base</artifactId>
+	<version>0.5</version>
+</dependency>
+```
+	
+#### 配置web.xml文件
+
+```xml
+<filter>
+	<filter-name>NYYFilter</filter-name>
+	<filter-class>com.yy.cs.base.nyy.NYYFilter</filter-class>
+</filter>
+<filter-mapping>
+	<filter-name>NYYFilter</filter-name>
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+	
+#### 服务端可直接获取参数
+
+```java
+//appId liveUid myUid followType ticket等参数都是直接从nyy 里面的data中获取
+@RequestMapping("/followLive")
+@ResponseBody
+public Map<String, Object> followLive(HttpServletRequest request,
+    @RequestParam String appId, @RequestParam Long liveUid, 
+    @RequestParam Long myUid, @RequestParam Integer followType,
+    @RequestParam String ticket) throws HttpClientException {
+	boolean isCancel = (followType == 1 ? false : true);
+	Integer result = anchorService.toggleFollow(myUid, liveUid, isCancel);
+	HashMap<String, Object> resultMap = new HashMap<String, Object>();
+	resultMap.put(INNER_LIVE_UID_STR, liveUid);
+	resultMap.put(INNER_MYUID_STR, myUid);
+	resultMap.put(INNER_FOLLOW_TYPE_STR, followType);
+	resultMap.put(INNER_RESULT_STR, result);
+	return resultMap(resultMap, request);
+}
+```
+
+### 3. 使用spring-web HandlerMethodArgumentResolver
+
+支持简单、复杂组合类型注入,建议使用这种方式
+
+#### 依赖Jar包
+
+```xml
+<dependency>
+	<groupId>com.yy.cs</groupId>
+	<artifactId>nyy-springmvc</artifactId>
+	<version>0.3</version>
+</dependency>
+```
 	
 ####  配置spring配置文件，加入以下配置
 
-	<mvc:annotation-driven>
-	    <mvc:argument-resolvers>
-	        <bean class="com.yy.cs.base.nyy.resolver.NyyArgumentResolver" />
-	    </mvc:argument-resolvers>
-	</mvc:annotation-driven>
+```xml
+<mvc:annotation-driven>
+    <mvc:argument-resolvers>
+	<bean class="com.yy.cs.base.nyy.resolver.NyyArgumentResolver" />
+    </mvc:argument-resolvers>
+</mvc:annotation-driven>
+```
 	
-####  服务端可直接获取参数
+#### 服务端可直接获取参数
 
-	//NyyObject是个组合类型,有List String Integer Long等类型属性,可动态从nyy data中获取对应的属性值
-	@RequestMapping("/nyyDemo3")
-    @ResponseBody
-    public String nyyDemo3(HttpServletRequest request, @NyyData NyyObject data){
-        return data.toString();
-    }
+```java
+//NyyObject是个组合类型,有List String Integer Long等类型属性,可动态从nyy data中获取对应的属性值
+@RequestMapping("/nyyDemo3")
+@ResponseBody
+public String nyyDemo3(HttpServletRequest request, @NyyData NyyObject data){
+	return data.toString();
+}
+```
 
-####  示例的SVN地址 
+#### 示例的SVN地址 
+
 	https://svn.yy.com/web/gh/apachecommons
 	
 	
 ----	
-## 前端Javascript代码支持,支持Get和Post方式
+## 前端JS代码支持
 
-### 1.引入js文件
-	
-	<!-- jquery v1.9.1 -->
-	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
-	<!-- nyy v1.0 -->
-	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
-	
+支持Get和Post方式
 
+### 1. 引入js文件
+	
+```xml
+<!-- jquery v1.9.1 -->
+<script type="text/javascript" 
+	src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
+<!-- nyy v1.0 -->
+<script type="text/javascript" 
+	src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
+```
 	
 ### 2.使用示例
 
-	<html>
-	<body>
-	<div>
-		<button value="get请求" onclick="doGet()">get请求</button>
-		<button value="doTextPlainPost" onclick="doTextPlainPost()">doTextPlainPost请求</button>
-		<button value="doFormPost" onclick="doFormPost()">doFormPost请求</button>
-	</div>
-	</body>
-	<!-- jquery v1.9.1 -->
-	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
-	<!-- nyy v1.0 -->
-	<script type="text/javascript" src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
-	<script type="text/javascript">
-		function doGet(){
-			nyyGet("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',function(dataObj){
-			  alert(dataObj);
-			},function(error){
-				alert(error);
-			});	  
-		};
-		function doTextPlainPost(){
-		  nyyTextPlainPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',function(dataObj){
-			alert(dataObj);
-			},function(error){
-				alert(error);
-			});	  
-		};
-		function doFormPost(){
-		  nyyFormPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',function(dataObj){
-			alert(dataObj);
-			},function(error){
-				alert(error);
-			});	  
-		}
-	</script>
-	</html>
-	
+```html
+<html>
+<body>
+<div>
+	<button value="get请求" onclick="doGet()">get请求</button>
+	<button value="doTextPlainPost" onclick="doTextPlainPost()">doTextPlainPost请求</button>
+	<button value="doFormPost" onclick="doFormPost()">doFormPost请求</button>
+</div>
+</body>
+<!-- jquery v1.9.1 -->
+<script type="text/javascript" 
+	src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
+<!-- nyy v1.0 -->
+<script type="text/javascript" 
+	src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
+<script type="text/javascript">
+  function doGet(){
+    nyyGet("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',
+    function(dataObj){alert(dataObj);},
+    function(error){alert(error);});	  
+  };
+  function doTextPlainPost(){
+    nyyTextPlainPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',
+    function(dataObj){alert(dataObj);},
+    function(error){alert(error);});	  
+  };
+  function doFormPost(){
+    nyyFormPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',
+    function(dataObj){alert(dataObj);},
+    function(error){alert(error);});	  
+  }
+</script>
+</html>
+```
+
 ###  3.示例的SVN地址 
+
 	https://svn.yy.com/web/gh/apachecommons
 	
-	
 ----	
-## 其他终端支持
+## android端支持代码
 
-### 1.android端支持代码
+```java
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import org.json.JSONObject;
+/**
+ * 因yy android sdk已经提供http请求和回调的模块，故nyy对于android端的代码支持就不在httpclient基础上封装.
+ * </br>该类提供了nyy协议中会使用到的sha256哈希算法、拼凑nyy协议的get 方式url等。
+ * </br>由于nyy协议使用的数据格式是json格式，android开发也不希望引入太多jar包。所以在实际json解析和生成
+ * 建议使用android基础库的org.json包
+ */
+public class NyyAndroidClientUtils {
+    /**
+     * sha256哈希,使用android基础库的security模块
+     */
+    public static String toSHA256String(String str) {
+	String hash = "";
+	try {
+	    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+	    digest.update(str.getBytes("UTF-8"));
+	    hash = bytesToHexString(digest.digest());
+	} catch (Exception e) {
+	    //TODO 加上你们业务的异常处理
+	    //YLog.error("toHexString", "toHexString", e);
+	}
+	return hash;
+    }
 
-	import java.io.UnsupportedEncodingException;
-	import java.net.URLEncoder;
-	import java.security.MessageDigest;
-	import org.json.JSONObject;
-	/**
-	 * 由于yy android sdk已经提供了http请求和回调的模块,所以nyy对于android端的代码支持就不继续在httpclient基础上封装.
-	 * </br>该类提供了nyy协议中会使用到的sha256哈希算法、拼凑nyy协议的get 方式url等。
-	 * </br>由于nyy协议使用的数据格式是json格式，android开发也不希望引入太多jar包。所以在实际json解析和生成
-	 * 建议使用android基础库的org.json包
-	 * @author haoqing
-	 *
-	 */
-	public class NyyAndroidClientUtils {
-	    /**
-	     * sha256哈希,使用android基础库的security模块
-	     * @param str
-	     * @return
-	     */
-	    public static String toSHA256String(String str) {
-	        String hash = "";
-	        try {
-	            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-	            digest.update(str.getBytes("UTF-8"));
-	            hash = bytesToHexString(digest.digest());
-	        } catch (Exception e) {
-	            //TODO 加上你们业务的异常处理
-	            //YLog.error("toHexString", "toHexString", e);
-	        }
-	        return hash;
+    /**
+     * byte数组转为hex字符串
+     */
+    public static String bytesToHexString(byte[] bytes) {
+	StringBuilder sb = new StringBuilder();
+	for (int i = 0; i < bytes.length; i++) {
+	    String hex = Integer.toHexString(0xFF & bytes[i]);
+	    if (hex.length() == 1) {
+		sb.append('0');
 	    }
-	    /**
-	     * byte数组转为hex字符串
-	     * @param bytes
-	     * @return
-	     */
-	    public static String bytesToHexString(byte[] bytes) {
-	        StringBuilder sb = new StringBuilder();
-	        for (int i = 0; i < bytes.length; i++) {
-	            String hex = Integer.toHexString(0xFF & bytes[i]);
-	            if (hex.length() == 1) {
-	                sb.append('0');
-	            }
-	            sb.append(hex);
-	        }
-	        return sb.toString();
+	    sb.append(hex);
+	}
+	return sb.toString();
+    }
+
+    /**
+     * 生成nyy get方式的请求url
+     * @param sign   要验证的sign,如果没有,请使用""
+     * @param appId  业务appId
+     * @param requestUri   请求的uri,比如 http://www.gate.yy.com/abc
+     * @param params  放入data的key-value参数
+     */
+    public static String genNyyGetUrl(String sign,String appId,String requestUri,Object... params){
+	String url = requestUri + "?appId=" + appId + "&sign=" + sign;
+	if (params.length > 0 && params.length % 2 == 0) {
+	    JSONObject data = new JSONObject();
+	    for (int i = 0; i < params.length; i = i + 2) {
+		try {
+		    String key = (String) params[i];
+		    Object value = params[i + 1];
+		    data.putOpt(key, value);
+		} catch (Exception e) {
+		    //TODO 加上你们业务的异常处理
+		    //YLog.error(this, "getUrl error! %s ,params: %s", request, params, e);
+		}
 	    }
-	    /**
-	     * 生成nyy get方式的请求url
-	     * @param sign   要验证的sign,如果没有,请使用""
-	     * @param appId  业务appId
-	     * @param requestUri   请求的uri,比如 http://www.gate.yy.com/abc
-	     * @param params  放入data的key-value参数
-	     * @return
-	     */
-	    public static String genNyyGetUrl(String sign,String appId,String requestUri,Object... params){
-	        String url = requestUri + "?appId=" + appId + "&sign=" + sign;
-	        if (params.length > 0 && params.length % 2 == 0) {
-	            JSONObject data = new JSONObject();
-	            for (int i = 0; i < params.length; i = i + 2) {
-	                try {
-	                    String key = (String) params[i];
-	                    Object value = params[i + 1];
-	                    data.putOpt(key, value);
-	                } catch (Exception e) {
-	                    //TODO 加上你们业务的异常处理
-	                    //YLog.error(this, "getUrl error! %s ,params: %s", request, params, e);
-	                }
-	            }
-	            try {
-	                url = url + "&data=" + URLEncoder.encode(data.toString(), "UTF-8");
-	            } catch (UnsupportedEncodingException e) {
-	                //TODO 加上你们业务的异常处理
-	                //YLog.error(this, "getUrl", e);
-	            }
-	        }
-	        return url;
-	    }
-	    /**
-	     * 根据nyy协议约定,生成sha256哈希的sign
-	     * @param data  没有经过urlEncode的data,为json格式
-	     * @param key   业务的key
-	     * @return    
-	     */
-	    public static String genSign(String data, String key){
-	        String str = "data=" + data + "&key=" + key;
-	        return toSHA256String(str);
+	    try {
+		url = url + "&data=" + URLEncoder.encode(data.toString(), "UTF-8");
+	    } catch (UnsupportedEncodingException e) {
+		//TODO 加上你们业务的异常处理
+		//YLog.error(this, "getUrl", e);
 	    }
 	}
+	return url;
+    }
 
-	
-
-	
-	
+    /**
+     * 根据nyy协议约定,生成sha256哈希的sign
+     * @param data  没有经过urlEncode的data,为json格式
+     * @param key   业务的key
+     * @return    
+     */
+    public static String genSign(String data, String key){
+	String str = "data=" + data + "&key=" + key;
+	return toSHA256String(str);
+    }
+}
+```
