@@ -9,10 +9,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 public class HttpClientUtil {
+	
+	
+	public static final String HTTP_HEADER_XRP = "X-Real-IP";
+	
+	public static final String HTTP_HEADER_XFF = "HTTP_HEADER_XFF";
+	
+	public static final String DEFAULT_CHARSET = "UTF-8";
 	
     public static List<NameValuePair> toNameValuePairs(Map<String, String> params) {
 
@@ -47,7 +57,7 @@ public class HttpClientUtil {
             return "";
         }
         try {
-            return URLEncoder.encode(value, "UTF-8");
+            return URLEncoder.encode(value, DEFAULT_CHARSET);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -58,9 +68,36 @@ public class HttpClientUtil {
             return "";
         }
         try {
-            return URLDecoder.decode(value, "UTF-8");
+            return URLDecoder.decode(value, DEFAULT_CHARSET);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+    
+    /**
+     * 获取request 地址
+     * @param request
+     * @return
+     */
+    public static String getRequestorIp(HttpServletRequest request) {
+
+        // 优先级1：从X-Real-IP中取，有多重代理时，这个地址可能不准确，但一般不会被伪造
+        String ip = request.getHeader(HTTP_HEADER_XRP);
+        if (StringUtils.isNotBlank(ip)) {
+            return ip;
+        }
+
+        // 优先级2：从X-Forwarded-For中取，有被伪造的风险
+        String xff = request.getHeader(HTTP_HEADER_XFF);
+        if (StringUtils.isNotBlank(xff)) {
+            if (xff.indexOf(",") < 0) {
+                return xff;
+            }
+            return StringUtils.substringBefore(xff, ",");
+        }
+
+        // 优先级3：直接获取RemoteAddr，有反向代理时这个地址会不准确
+        return request.getRemoteAddr();
+    }
+    
 }
