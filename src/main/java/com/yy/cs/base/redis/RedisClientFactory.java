@@ -10,6 +10,7 @@ package com.yy.cs.base.redis;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,9 +32,9 @@ public class RedisClientFactory extends JedisPoolConfig{
 	private static final Logger log = LoggerFactory
 			.getLogger(RedisClientFactory.class);
 
-	private List<JedisPool> redisMasterPool = new ArrayList<JedisPool>();
+	private List<JedisPool> redisMasterPool = Collections.synchronizedList(new ArrayList<JedisPool>());
 	
-	private List<JedisPool> redisSlavePool = new ArrayList<JedisPool>();
+	private List<JedisPool> redisSlavePool = Collections.synchronizedList(new ArrayList<JedisPool>());
 	
 	private int totalServersSize;
 	
@@ -89,7 +90,7 @@ public class RedisClientFactory extends JedisPoolConfig{
 	public void init(){
 		JedisPool pool = null;
 		Jedis jedis = null;
-		try{
+		//try{
 			for(int i = 0; i < totalServersSize; i++){
 				String [] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
 				String ip = strArray[0];
@@ -97,8 +98,17 @@ public class RedisClientFactory extends JedisPoolConfig{
 				String password = strArray[2];
 				int timeout = strArray[3] != null? Integer.valueOf(strArray[3]) : 10000;//默认是10秒
 				pool = new JedisPool(this, ip, port,timeout, password);
+				try {
+					jedis = pool.getResource();
+				} catch (Exception e) {
+					//log.warn(e.getMessage(), e) ; 
+					if(jedis != null){
+						pool.returnBrokenResource(jedis);
+					}
+					continue ; 
+				}
 				//check master or slave
-				jedis = pool.getResource();
+				//jedis = pool.getResource();
 				String info = jedis.info();
 				boolean isMaster = RedisUtils.isMaster(info);
 				//主实例
@@ -111,10 +121,10 @@ public class RedisClientFactory extends JedisPoolConfig{
 				//释放
 				pool.returnResource(jedis);
 			}
-		}catch(Exception e){
-			log.error("occur error in init, error = {}", e);
-			pool.returnBrokenResource(jedis);
-		}
+		//}catch(Exception e){
+		//	log.error("occur error in init, error = {}", e);
+		//	pool.returnBrokenResource(jedis);
+	//	}
 		//如果没有master 避免用户直接获取master进行操作导致错误
 		if(redisMasterPool.size() == 0){
 			redisMasterPool = redisSlavePool;
@@ -140,6 +150,17 @@ public class RedisClientFactory extends JedisPoolConfig{
 			for(JedisPool p : redisSlavePool){
 				p.destroy();
 			}
-		}		
+		}
+	}
+	/**
+	 * 重新加载master/slave信息
+	 */
+	public synchronized void  reload(){
+		destroy() ; 
+		redisMasterPool.clear() ; 
+		redisSlavePool.clear() ; 
+		atomitMasterCount = new AtomicInteger(0);
+		atomitSlaveCount = new AtomicInteger(0);
+		init();
 	}
 }
