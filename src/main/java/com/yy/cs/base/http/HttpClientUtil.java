@@ -20,7 +20,7 @@ public class HttpClientUtil {
 	
 	public static final String HTTP_HEADER_XRP = "X-Real-IP";
 	
-	public static final String HTTP_HEADER_XFF = "HTTP_HEADER_XFF";
+	public static final String HTTP_HEADER_XFF = "X-Forwarded-For";
 	
 	public static final String DEFAULT_CHARSET = "UTF-8";
 	
