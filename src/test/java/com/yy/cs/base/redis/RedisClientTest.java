@@ -329,17 +329,42 @@ public class RedisClientTest {
 	@Test 
 	public void testCall() throws InterruptedException{
 		int i = 0 ; 
-		while(++i<40){
+		while(++i<500){
 			String str2 = null ; 
 			try {
 				 str2 = redisClient.msetAndReturn("hello","hello1","world","world1");
+				 Thread.currentThread().sleep(1000);
+			} catch (Exception e) {
+				System.out.println("execute time = "+i+" seconds !"+e);
+				Thread.currentThread().sleep(1000);
+				continue ;
+			}
+			try {
+				System.out.println(str2);
+				System.out.println(redisClient.mgetAndReturn("hello","hello1","world","world1"));
+			} catch (Exception e) {
+				System.out.println(e);
+				continue ; 
+			}
+			
+			
+		}
+	}
+	
+	@Test 
+	public void testGet() throws InterruptedException{
+		int i = 0 ; 
+		while(++i<2){
+			List<String> str2 = null ; 
+			try {
+				 str2 = redisClient.mgetAndReturn("hello","world");
 			} catch (Exception e) {
 				Thread.currentThread().sleep(1000);
+				e.printStackTrace();
 				System.out.println("execute time = "+i+" seconds !");
 				continue ;
 			}
 			System.out.println(str2);
-			System.out.println(redisClient.mgetAndReturn("hello","hello1","world","world1"));
 			
 		}
 	}
