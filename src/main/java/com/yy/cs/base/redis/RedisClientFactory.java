@@ -12,6 +12,7 @@ package com.yy.cs.base.redis;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
 
@@ -41,6 +43,8 @@ public class RedisClientFactory extends JedisPoolConfig{
 	private int masterServerSize;
 	
 	private int slaveServerSize;
+	
+	private String testKey = "$jedisMasterTestKey" ;  
 
 	private AtomicInteger atomitMasterCount = new AtomicInteger(0);
 	private AtomicInteger atomitSlaveCount = new AtomicInteger(0);
@@ -49,29 +53,89 @@ public class RedisClientFactory extends JedisPoolConfig{
 	private List<String> redisServers;
 	
 	/**
-	 * 从redisMasterPool中随机获取pool
+	 * 从redisMasterPool中随机获取pool,检测当前的当前Master是否可连接,且发送一个数据测试Master是否可写,
+	 * 不可写则抛出异常，当轮训到最后一个pool如果仍然不可写，则尝试初始化一次。
 	 * @return  
 	 */
 	public JedisPool getMasterPool() {
-		if(masterServerSize <= 0){
-			return getSlavePool();
+
+		Jedis jedis  = null ; 
+		JedisPool jedisPool  = null ; 
+		for(int i = 0 ; i<masterServerSize ; i++){
+			int currentIndex = atomitMasterCount.getAndIncrement();
+			currentIndex = currentIndex % masterServerSize;
+			jedisPool = redisMasterPool.get(currentIndex);
+			try {
+				jedis = jedisPool.getResource();
+				//尝试写一个数据，判断是否可写.
+				jedis.set(testKey, new Random().nextInt(47)+"") ; 
+				jedis.del(testKey) ; 
+				return jedisPool;
+			} catch (Exception e) {
+				if(i == masterServerSize-1){
+					//如果所有的MasterPool都不能获取jedis,则可能是Master宕机了,自动重新初始化一次,尝试下一次能够正确获取Pool
+					reload() ; 
+					 throw new JedisConnectionException(
+			                    "Could not get a resource from the MasterPool, Master may has shutdwon", e);
+				}
+			}finally{
+				if(jedis != null){
+					jedisPool.returnResource(jedis) ; 
+				}
+			}
 		}
-		int currentIndex = atomitMasterCount.getAndIncrement();
-		currentIndex = currentIndex % masterServerSize;
-		JedisPool jedisPool = redisMasterPool.get(currentIndex);
-		return jedisPool;
+		if(jedisPool == null || masterServerSize == 0){
+			reload();
+			log.error("there is no master redis server !") ; 
+		}
+		return jedisPool ; 
 	}
 
 	
 	/**
-	 * 从redisSlavePool中随机获取pool
+	 * 从redisSlavePool中随机获取pool,当前pool无法获取jedis连接时，切换到其他的Jedispool
 	 * @return 
 	 */
 	public JedisPool getSlavePool() {
-		int currentIndex = atomitSlaveCount.getAndIncrement();
-		currentIndex = currentIndex % slaveServerSize;
-		JedisPool jedisPool = redisSlavePool.get(currentIndex);
-		return jedisPool;
+		Jedis jedis  = null ; 
+		JedisPool jedisPool  = null ; 
+		for(int i = 0 ; i<slaveServerSize ; i++){
+			int currentIndex = atomitSlaveCount.getAndIncrement();
+			currentIndex = currentIndex % slaveServerSize;
+			jedisPool = redisSlavePool.get(currentIndex);
+			try {
+				//检测当前的当前slave是否可连接，否则切换到其他的slave
+				jedis = jedisPool.getResource();
+				jedis.ping();
+				return jedisPool;
+			} catch (Exception e) {
+				if(i == slaveServerSize-1){
+					//当所有的slave都不可获取时,尝试获取master
+					jedisPool = getMasterPool() ; 
+					log.warn("All slave servers may have been shutdown !",e) ; 
+					if(jedisPool == null){
+						//如果master/slave都不能获取jedis,则可能是网络问题,自动重新初始化一次。
+						reload() ; 
+						 throw new JedisConnectionException(
+				                    "Could not get a resource from the Master or Slaves, " +
+				                    "please check your network or your servers may have been shut dwon", e);
+					}
+				}
+			}finally{
+				if(jedis != null){
+					jedisPool.returnResource(jedis) ; 
+				}
+			}
+		}
+		//slave切换到master后，可能导致0个slave,这时尝试从master获取jedispool
+		if(jedisPool == null || slaveServerSize == 0){
+			jedisPool = getMasterPool() ; 
+			if(jedisPool == null){
+				reload();
+				log.error("redis server may has not startup!") ; 
+			}
+		}
+		return jedisPool ; 
 	}
 
 
@@ -126,13 +190,13 @@ public class RedisClientFactory extends JedisPoolConfig{
 		//	pool.returnBrokenResource(jedis);
 	//	}
 		//如果没有master 避免用户直接获取master进行操作导致错误
-		if(redisMasterPool.size() == 0){
-			redisMasterPool = redisSlavePool;
-		}
+//		if(redisMasterPool.size() == 0){
+//			redisMasterPool = redisSlavePool;
+//		}
 		//如果没有slave 避免用户直接获取slave进行操作导致错误
-		if(redisSlavePool.size() == 0){
-			redisSlavePool = redisMasterPool;
-		}
+//		if(redisSlavePool.size() == 0){
+//			redisSlavePool = redisMasterPool;
+//		}
 		this.masterServerSize = redisMasterPool.size();
 		this.slaveServerSize = redisSlavePool.size();
 	}
@@ -163,4 +227,5 @@ public class RedisClientFactory extends JedisPoolConfig{
 		atomitSlaveCount = new AtomicInteger(0);
 		init();
 	}
-}
+	
+ }

@@ -51,59 +51,6 @@ public class RedisClient {
 	public JedisPool getJedisSlavePool() {
 		return factory.getSlavePool();
 	}
-
-	/**
-	 * 获取MasterJedis MasterJedisPool
-	 * 获取MasterJedis失败时,会主动重新初始化RedisFactory一次
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private List getMasterJedisAndPool(){
-		List list = new ArrayList();
-		JedisPool jedisPool = null ; 
-		Jedis jedis = null ; 
-		try {
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-		} catch (Exception e) {
-			log.warn(e.getMessage() + ", please check the master ever has been shutdown," +
-					"\n here will try to reload and init the config again, " +
-					"you can reset the slave/master conf file and then restart the master!") ; 
-			factory.reload() ; 
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-		}
-		list.add(jedisPool) ; 
-		list.add(jedis) ; 
-		return list ; 
-	}
-	
-	/**
-	 * 获取slaveJedis slaveJedisPool
-	 * 获取MasterJedis失败时,会主动重新初始化RedisFactory一次
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private List getSlaveJedisAndPool(){
-		List list = new ArrayList();
-		JedisPool jedisPool = null ; 
-		Jedis jedis = null ; 
-		try {
-			jedisPool = getJedisSlavePool();
-			jedis = jedisPool.getResource();
-		} catch (Exception e) {
-			log.warn(e.getMessage() + ", the reason causing this problem is that master may shutdown,here will try to reload and init the config again, " +
-					"what  you need to do is reseting the slave/master conf file and then restart!") ; 
-			factory.reload() ; 
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-		}
-		list.add(jedisPool) ; 
-		list.add(jedis) ; 
-		return list ; 
-	}
-	
-	
 	
 	/**
 	 * 执行set操作，然后释放client连接
@@ -118,11 +65,9 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-			//jedisPool = getJedisMasterPool();
-			//jedis = jedisPool.getResource();
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis = (Jedis) ls.get(1) ; 
+			jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
+			
 			//如果为0,则不需通信表明select db0
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -165,11 +110,9 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//			jedisPool = getJedisMasterPool();
-//			jedis = jedisPool.getResource();
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis = (Jedis) ls.get(1) ; 
+			jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
+
 			//如果为0,则不需通信表明select db0
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -213,13 +156,9 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//		    jedisPool = getJedisMasterPool();
-//			jedis = jedisPool.getResource();
-			
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis = (Jedis) ls.get(1) ; 
-			
+		    jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
+
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
 			}
@@ -256,13 +195,9 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//			jedisPool = getJedisMasterPool();
-//			jedis = jedisPool.getResource();
+			jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
 			
-			@SuppressWarnings("rawtypes")
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
 			return jedis.info();
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
@@ -283,17 +218,12 @@ public class RedisClient {
 	 * @param key
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	public String getAndReturn(int dbIndex, final String key){
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//			jedisPool = getJedisSlavePool();
-//			jedis = jedisPool.getResource();
-			
-			List ls = getSlaveJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis = (Jedis) ls.get(1) ; 
+			jedisPool = getJedisSlavePool();
+			jedis = jedisPool.getResource();
 			
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -334,13 +264,8 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//			jedisPool = getJedisMasterPool();
-//			jedis = jedisPool.getResource();
-			
-			@SuppressWarnings("rawtypes")
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+			jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
 			
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -381,12 +306,8 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//			jedisPool = getJedisSlavePool();
-//			jedis = jedisPool.getResource();
-			@SuppressWarnings("rawtypes")
-			List ls = getSlaveJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+			jedisPool = getJedisSlavePool();
+			jedis = jedisPool.getResource();
 			
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -430,12 +351,8 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//			jedisPool = getJedisMasterPool();
-//			jedis = jedisPool.getResource();
-			@SuppressWarnings("rawtypes")
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+			jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
 			
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -444,7 +361,8 @@ public class RedisClient {
 		}catch(Exception e){
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
-			throw new CsRedisRuntimeException("jedis mset fail", e);
+			//throw new CsRedisRuntimeException("jedis mset fail", e);
+			throw new CsRedisRuntimeException(e.getMessage(), e);
 		}finally{
 		    if(jedis != null){
                 jedisPool.returnResource(jedis);
@@ -477,12 +395,8 @@ public class RedisClient {
 		Jedis jedis = null;
 		JedisPool jedisPool = null;
 		try{
-//			  jedisPool = getJedisMasterPool();
-//			  jedis = jedisPool.getResource();
-			@SuppressWarnings("rawtypes")
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+			  jedisPool = getJedisSlavePool();
+			  jedis = jedisPool.getResource();
 			
 			if(dbIndex != 0){
 				jedis.select(dbIndex);
@@ -527,13 +441,8 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try{
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-        	
-			@SuppressWarnings("rawtypes")
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
         	
             if(dbIndex != 0){
                 jedis.select(dbIndex);
@@ -571,17 +480,12 @@ public class RedisClient {
      * @param value
      * @return  
      */
-    @SuppressWarnings("rawtypes")
     public List<byte[]> mgetAndReturn(int dbIndex, byte[]... keys){
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try{
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-        	
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
             
             if(dbIndex != 0){
                 jedis.select(dbIndex);
@@ -621,11 +525,8 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisSlavePool();
-//            jedis = jedisPool.getResource();
-			List ls = getSlaveJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
 
             return jedis.smembers(key);
         } catch (Exception e) {
@@ -649,11 +550,8 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-			List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
         	
             return jedis.sadd(key, values);
         } catch (Exception e) {
@@ -677,11 +575,8 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-        	List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
 
             return jedis.srem(key, values);
         } catch (Exception e) {
@@ -706,11 +601,8 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisSlavePool();
-//            jedis = jedisPool.getResource();
-        	List ls = getSlaveJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
 
             return jedis.scard(key);
         } catch (Exception e) {
@@ -735,11 +627,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisSlavePool();
-//            jedis = jedisPool.getResource();
-              List ls = getSlaveJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+             
               return jedis.sismember(key, value);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -768,11 +658,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-        	  List ls = getMasterJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
+              jedisPool = getJedisMasterPool();
+              jedis = jedisPool.getResource();
+              
               return jedis.hset(key, field, value);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -797,11 +685,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-        	  List ls = getMasterJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
+        	
+             jedisPool = getJedisMasterPool();
+             jedis = jedisPool.getResource();
               return jedis.hmset(key, value);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -825,11 +711,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisSlavePool();
-//            jedis = jedisPool.getResource();
-              List ls = getSlaveJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
+	          jedisPool = getJedisSlavePool();
+	          jedis = jedisPool.getResource();
+        	
               return jedis.hget(key, field);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -854,13 +738,10 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisSlavePool();
-//            jedis = jedisPool.getResource();
-        	  List ls = getSlaveJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
+             jedisPool = getJedisSlavePool();
+             jedis = jedisPool.getResource();
 
-            return jedis.hmget(key, fields);
+             return jedis.hmget(key, fields);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
@@ -878,12 +759,8 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-              List ls = getMasterJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
-			
+             jedisPool = getJedisMasterPool();
+             jedis = jedisPool.getResource();
             return jedis.del(key);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -909,11 +786,9 @@ public class RedisClient {
     	Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-              List ls = getMasterJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+              
             return jedis.rename(oldkey, newkey);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -931,12 +806,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisSlavePool();
-//            jedis = jedisPool.getResource();
-	          List ls = getSlaveJedisAndPool();
-			  jedisPool = (JedisPool) ls.get(0) ; 
-			  jedis =     (Jedis) ls.get(1) ; 
-			
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+	         
             return jedis.exists(key);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -954,12 +826,9 @@ public class RedisClient {
     	Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisSlavePool();
-//            jedis = jedisPool.getResource();
-            List ls = getSlaveJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
-			
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+           
             return jedis.ping() ; 
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -978,13 +847,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
 
-            List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
-            
             jedis.watch(key);
         } catch (Exception e) {
             jedisPool.returnBrokenResource(jedis);
@@ -1001,11 +866,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-        	List ls = getMasterJedisAndPool();
- 			jedisPool = (JedisPool) ls.get(0) ; 
- 			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+        	
             Transaction transaction = jedis.multi();
             transactionAction.execute(transaction);
             return transaction.exec();
@@ -1024,12 +887,8 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
-
-            List ls = getMasterJedisAndPool();
-			jedisPool = (JedisPool) ls.get(0) ; 
-			jedis =     (Jedis) ls.get(1) ; 
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
             
             Pipeline pipline = jedis.pipelined();
             piplineAction.execute(pipline);
@@ -1049,14 +908,9 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-//            jedisPool = getJedisMasterPool();
-//            jedis = jedisPool.getResource();
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
         	
-        	List ls = getMasterJedisAndPool();
- 			jedisPool = (JedisPool) ls.get(0) ; 
- 			jedis =     (Jedis) ls.get(1) ; 
-        	
-
             Pipeline pipline = jedis.pipelined();
             piplineAction.execute(pipline);
             return pipline.syncAndReturnAll();
