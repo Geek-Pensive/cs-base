@@ -367,7 +367,6 @@ public class RedisClient {
 			factory.reload();
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
-			//throw new CsRedisRuntimeException("jedis mset fail", e);
 			throw new CsRedisRuntimeException(e.getMessage(), e);
 		}finally{
 		    if(jedis != null){

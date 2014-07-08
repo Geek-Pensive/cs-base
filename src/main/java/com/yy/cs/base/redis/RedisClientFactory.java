@@ -151,7 +151,6 @@ public class RedisClientFactory extends JedisPoolConfig{
 	public void init(){
 		JedisPool pool = null;
 		Jedis jedis = null;
-		//try{
 			for(int i = 0; i < totalServersSize; i++){
 				String [] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
 				String ip = strArray[0];
@@ -162,14 +161,12 @@ public class RedisClientFactory extends JedisPoolConfig{
 				try {
 					jedis = pool.getResource();
 				} catch (Exception e) {
-					//log.warn(e.getMessage(), e) ; 
+					log.warn(e.getMessage(), e) ; 
 					if(jedis != null){
-						pool.returnBrokenResource(jedis);
+						pool.returnResource(jedis);
 					}
 					continue ; 
 				}
-				//check master or slave
-				//jedis = pool.getResource();
 				String info = jedis.info();
 				boolean isMaster = RedisUtils.isMaster(info);
 				//主实例
@@ -182,18 +179,6 @@ public class RedisClientFactory extends JedisPoolConfig{
 				//释放
 				pool.returnResource(jedis);
 			}
-		//}catch(Exception e){
-		//	log.error("occur error in init, error = {}", e);
-		//	pool.returnBrokenResource(jedis);
-	//	}
-		//如果没有master 避免用户直接获取master进行操作导致错误
-//		if(redisMasterPool.size() == 0){
-//			redisMasterPool = redisSlavePool;
-//		}
-		//如果没有slave 避免用户直接获取slave进行操作导致错误
-//		if(redisSlavePool.size() == 0){
-//			redisSlavePool = redisMasterPool;
-//		}
 		this.masterServerSize = redisMasterPool.size();
 		this.slaveServerSize = redisSlavePool.size();
 	}
