@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -23,15 +23,16 @@ public class KeyWordUtil {
 	private String NORMAL_KEYWORD_LIST_URL = "http://do.yy.duowan.com/NormalKWordlist.txt";
 	private String LOW_KEYWORD_LIST_URL = "http://do.yy.duowan.com/LowKWordlist.txt";
 	
-	private long interval = 5 * 60 * 1000l;
+	private long interval = 5 * 1000l;
 	
 	private static Map<KeywordType, String> keywordMap = new HashMap<KeywordType, String>();
 	
-	private static ExecutorService executor = Executors.newCachedThreadPool();
+	//private static ExecutorService executor = Executors.newFixedThreadPool(1);
 	
 	private static KeyWordUtil keywordUtil = new  KeyWordUtil();
 	
-	
+	 ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+
 	public static class KeyWordUtilFactory{
 		
 		public static KeyWordUtil getInstance(){			
@@ -40,7 +41,7 @@ public class KeyWordUtil {
 	}
 	
 	private  KeyWordUtil() {
-		executor.execute(new Task()); 
+		scheduledExecutor.scheduleAtFixedRate(new Task(), 1000, interval, TimeUnit.MILLISECONDS) ; 
 	}
 	
 	private String getKeyword(KeywordType type) {
@@ -56,7 +57,9 @@ public class KeyWordUtil {
 		}
 		return false;
 	}
-
+  
+	
+	
 	/**
 	 * 检查是否为关键字
 	 * 
@@ -164,35 +167,20 @@ public class KeyWordUtil {
 						+ e.getMessage());
 			}
 		}
-		// long times = System.currentTimeMillis() - start;
+		 //long times = System.currentTimeMillis() - start;
 		 //logger.info("load keyword finished : " + times + " ms");
 		
 	}
 
-	private class Task extends Thread{
-		
-		private  AtomicInteger id = new AtomicInteger(0) ; 
-		@Override
+	private class Task implements Runnable{
 		public void run() {
-			while (true) {
 				try {
 					autoLoadKeyword();
 				} catch (Exception e) {
 					logger.error("autoLoadKeyword error!" + e.getMessage());
 				}
-				try {
-					Thread.sleep(interval);
-				} catch (InterruptedException e) {
-					return;
-				}
+				
 			}
-			
-		}
-		public Task(){
-			this.id.addAndGet(1) ; 
-			this.setName("thread[yy-keyword]-"+this.id) ; 
-		}
-		
 	}
 	
 	
