@@ -23,7 +23,7 @@ public class KeyWordUtil {
 	private String NORMAL_KEYWORD_LIST_URL = "http://do.yy.duowan.com/NormalKWordlist.txt";
 	private String LOW_KEYWORD_LIST_URL = "http://do.yy.duowan.com/LowKWordlist.txt";
 	
-	private long interval = 5 * 1000l;
+	private long interval = 5 * 1000l* 60;
 	
 	private static Map<KeywordType, String> keywordMap = new HashMap<KeywordType, String>();
 	
