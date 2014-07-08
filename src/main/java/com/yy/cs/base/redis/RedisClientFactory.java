@@ -22,6 +22,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+import redis.clients.jedis.exceptions.JedisDataException;
 
 import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
 
@@ -67,9 +68,6 @@ public class RedisClientFactory extends JedisPoolConfig{
 			jedisPool = redisMasterPool.get(currentIndex);
 			try {
 				jedis = jedisPool.getResource();
-				//尝试写一个数据，判断是否可写.
-				jedis.set(testKey, new Random().nextInt(47)+"") ; 
-				jedis.del(testKey) ; 
 				return jedisPool;
 			} catch (Exception e) {
 				if(i == masterServerSize-1){
@@ -84,7 +82,7 @@ public class RedisClientFactory extends JedisPoolConfig{
 				}
 			}
 		}
-		if(jedisPool == null || masterServerSize == 0){
+		if( masterServerSize == 0 ){
 			reload();
 			log.error("there is no master redis server !") ; 
 		}
@@ -106,7 +104,6 @@ public class RedisClientFactory extends JedisPoolConfig{
 			try {
 				//检测当前的当前slave是否可连接，否则切换到其他的slave
 				jedis = jedisPool.getResource();
-				jedis.ping();
 				return jedisPool;
 			} catch (Exception e) {
 				if(i == slaveServerSize-1){
@@ -220,12 +217,12 @@ public class RedisClientFactory extends JedisPoolConfig{
 	 * 重新加载master/slave信息
 	 */
 	public synchronized void  reload(){
-		destroy() ; 
-		redisMasterPool.clear() ; 
-		redisSlavePool.clear() ; 
-		atomitMasterCount = new AtomicInteger(0);
-		atomitSlaveCount = new AtomicInteger(0);
-		init();
+			destroy() ; 
+			redisMasterPool.clear() ; 
+			redisSlavePool.clear() ; 
+			atomitMasterCount = new AtomicInteger(0);
+			atomitSlaveCount = new AtomicInteger(0);
+			init();
 	}
 	
  }
