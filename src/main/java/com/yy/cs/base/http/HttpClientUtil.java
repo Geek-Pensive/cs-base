@@ -1,6 +1,8 @@
 package com.yy.cs.base.http;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -13,10 +15,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpClientUtil {
 	
+	 private static final Logger log = LoggerFactory.getLogger(HttpClientUtil.class);
 	
 	public static final String HTTP_HEADER_XRP = "X-Real-IP";
 	
@@ -98,6 +107,25 @@ public class HttpClientUtil {
 
         // 优先级3：直接获取RemoteAddr，有反向代理时这个地址会不准确
         return request.getRemoteAddr();
+    }
+    
+    
+    public static byte[] getUrlAsBytes(String uri) throws HttpClientException{
+    	CSHttpClient httpClient = new CSHttpClient();
+    	HttpGet get = new HttpGet();
+//    	 get.setHeader("User-Agent",
+//                 "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12");
+//         get.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+//         get.setHeader("Accept-Encoding", "gzip,deflate");
+//         get.setHeader("Accept-Charset", "utf-8;q=0.7,*;q=0.7");
+    	try {
+			get.setURI(new URI(uri)) ;
+			String result = httpClient.executeMethod(get) ;
+			return result.getBytes();
+		} catch (URISyntaxException e) {
+			log.error(e.getMessage()+"\n input arguments could not be parsed into uri !", e) ; 
+			throw new HttpClientException(e.getMessage(),e) ; 
+		} 
     }
     
 }
