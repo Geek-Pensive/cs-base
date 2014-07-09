@@ -70,7 +70,6 @@ public class GZIPUtil {
         if (length < 2) {
             return false;
         }
-
         if (signature[0] != 31) {
             return false;
         }

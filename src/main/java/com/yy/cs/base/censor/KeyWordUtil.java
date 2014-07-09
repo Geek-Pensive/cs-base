@@ -3,7 +3,6 @@ package com.yy.cs.base.censor;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -104,7 +103,7 @@ public class KeyWordUtil {
 			HttpClientException {
 		String txtURL = getKeywordURL(type);
 		byte[] bytes =HttpClientUtil.getUrlAsBytes(txtURL);
-		//byte[] bytes =HttpUtil.getUrlAsString(txtURL).getBytes();
+		//byte[] bytes =HttpUtil.getUrlAsString(txtURL).getBytes("utf-16");
 		if (bytes == null) {
 			return null;
 		}
