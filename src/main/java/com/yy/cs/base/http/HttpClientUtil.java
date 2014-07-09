@@ -113,18 +113,20 @@ public class HttpClientUtil {
     public static byte[] getUrlAsBytes(String uri) throws HttpClientException{
     	CSHttpClient httpClient = new CSHttpClient();
     	HttpGet get = new HttpGet();
-//    	 get.setHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36");
-//         get.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-//         get.setHeader("Accept-Encoding", "gzip,deflate,sdch");
-//         get.setHeader("Accept-Charset", "utf-8;q=0.7,*;q=0.7");
+    	 get.setHeader("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36");
+         get.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+         get.setHeader("Accept-Encoding", "gzip,deflate,sdch");
+         get.setHeader("Accept-Charset", "utf-8;q=0.7,*;q=0.7");
     	try {
 			get.setURI(new URI(uri)) ;
 			String result = httpClient.executeMethod(get) ;
-			return result.getBytes();
-		} catch (URISyntaxException e) {
+			return result.getBytes("utf-8");
+		} catch (Exception e) {
 			log.error(e.getMessage()+"\n input arguments could not be parsed into uri !", e) ; 
 			throw new HttpClientException(e.getMessage(),e) ; 
-		} 
+		}finally{
+			get.releaseConnection() ; 
+		}
     }
     
 }
