@@ -96,6 +96,9 @@ public class CSHttpClient {
 					 log.error("response close IOException:"+httpRequestBase.getURI(), e);
 				}
 			}
+			if(httpRequestBase != null ){
+            	httpRequestBase.releaseConnection();
+            }
 		}
         return  result;
     }
@@ -136,6 +139,9 @@ public class CSHttpClient {
                      log.error("response close IOException:"+httpRequestBase.getURI(), e);
                 }
             }
+            if(httpRequestBase != null ){
+            	httpRequestBase.releaseConnection();
+            }
         }
     }
     
@@ -148,7 +154,6 @@ public class CSHttpClient {
     public String doGet(String url) throws HttpClientException  {
     	HttpGet get = new HttpGet(url);
         String result = this.executeMethod(get);
-        get.releaseConnection();
         return result;
     }
     
@@ -188,6 +193,9 @@ public class CSHttpClient {
 					 log.error("response close IOException:"+httpRequestBase.getURI(), e);
 				}
 			}
+			if(httpRequestBase != null ){
+            	httpRequestBase.releaseConnection();
+            }
 		}
     }
     /**

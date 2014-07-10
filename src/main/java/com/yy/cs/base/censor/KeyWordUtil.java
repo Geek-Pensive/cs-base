@@ -10,9 +10,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.HttpGet;
 
+import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
-import com.yy.cs.base.http.HttpClientUtil;
+import com.yy.cs.base.task.thread.NamedThreadFactory;
+import com.yy.cs.base.zip.ZIPUtil;
 
 public class KeyWordUtil {
 
@@ -22,25 +25,23 @@ public class KeyWordUtil {
 	private String NORMAL_KEYWORD_LIST_URL = "http://do.yy.duowan.com/NormalKWordlist.txt";
 	private String LOW_KEYWORD_LIST_URL = "http://do.yy.duowan.com/LowKWordlist.txt";
 	
-	private long interval = 5 * 1000l* 60;
+	private long interval = 5 * 1000 * 60;
 	
 	private static Map<KeywordType, String> keywordMap = new HashMap<KeywordType, String>();
 	
-	//private static ExecutorService executor = Executors.newFixedThreadPool(1);
-	
 	private static KeyWordUtil keywordUtil = new  KeyWordUtil();
 	
-	 ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
-
-	public static class KeyWordUtilFactory{
-		
-		public static KeyWordUtil getInstance(){			
-			return keywordUtil ; 
-		}
-	}
+	ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,new NamedThreadFactory("KeyWordUtil",true));
 	
+	private final CSHttpClient httpClient;
+		
+	public static KeyWordUtil getInstance() {
+		return keywordUtil;
+	}
+
 	private  KeyWordUtil() {
-		scheduledExecutor.scheduleAtFixedRate(new Task(), 1000, interval, TimeUnit.MILLISECONDS) ; 
+		scheduledExecutor.scheduleAtFixedRate(new Task(), 1000, interval, TimeUnit.MILLISECONDS) ;
+		httpClient = new CSHttpClient();
 	}
 	
 	private String getKeyword(KeywordType type) {
@@ -102,14 +103,14 @@ public class KeyWordUtil {
 	private String loadKeyword(KeywordType type) throws IOException,
 			HttpClientException {
 		String txtURL = getKeywordURL(type);
-		byte[] bytes =HttpClientUtil.getUrlAsBytes(txtURL);
-		//byte[] bytes =HttpUtil.getUrlAsString(txtURL).getBytes("utf-16");
+		HttpGet get = new HttpGet(txtURL);
+		byte[] bytes = httpClient.executeMethodAndReturnByteArray(get);
 		if (bytes == null) {
 			return null;
 		}
-		boolean isGzip = GZIPUtil.matches(bytes, bytes.length);
+		boolean isGzip = ZIPUtil.matchesGZ(bytes, bytes.length);
 		if (isGzip) {
-			bytes = GZIPUtil.unGZip(bytes);
+			bytes = ZIPUtil.unGZip(bytes);
 		}
 		return decode(bytes);
 	}
@@ -214,17 +215,7 @@ public class KeyWordUtil {
 			}
 			return null;
 		}
-
 	}
 
-	public static void main(String[] args) {
-		KeyWordUtil kw = new KeyWordUtil();
-		kw.autoLoadKeyword();
-		for (KeywordType key : keywordMap.keySet()) {
-			System.out.println("key:" + key + ",length:"
-					+ keywordMap.get(key).replace("\n\t", "|"));
-		}
-		System.out.println(kw.isCensored("色情"));
-	}
 
 }

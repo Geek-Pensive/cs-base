@@ -1,14 +1,8 @@
 package com.yy.cs.base.redis;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -25,8 +19,7 @@ import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
 	
 public class RedisClient {
 	
-	private static final Logger log = LoggerFactory
-			.getLogger(RedisClient.class) ; 
+ 
 	private RedisClientFactory factory;
 	
 	public RedisClientFactory getFactory() {
@@ -74,9 +67,9 @@ public class RedisClient {
 			}
 			return jedis.set(key, value);
 		}catch(Exception e){
-			factory.reload();
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
+			factory.init();
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 		    if(jedis != null){
@@ -120,9 +113,9 @@ public class RedisClient {
 			}
 			return jedis.setex(key, seconds, value);
 		}catch(Exception e){
-			factory.reload();
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
+			factory.init();
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 		    if(jedis != null){
@@ -166,9 +159,9 @@ public class RedisClient {
 			}
 			return jedis.setex(key, seconds, value);
 		}catch(Exception e){
-			factory.reload();
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
+			factory.init();
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 		    if(jedis != null){
@@ -203,9 +196,9 @@ public class RedisClient {
 			
 			return jedis.info();
 		}catch(Exception e){
-			factory.reload();
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
+			factory.init();
 			throw new CsRedisRuntimeException("jedis info fail", e);
 		}finally{
 		    if(jedis != null){
@@ -276,9 +269,9 @@ public class RedisClient {
 			}
 			return jedis.set(key, value);
 		}catch(Exception e){
-			factory.reload();
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
+			factory.init();
 			throw new CsRedisRuntimeException("jedis set fail", e);
 		}finally{
 		    if(jedis != null){
@@ -364,9 +357,9 @@ public class RedisClient {
 			}
 			return jedis.mset(keysvalues);
 		}catch(Exception e){
-			factory.reload();
 			jedisPool.returnBrokenResource(jedis);
 			jedis = null;
+			factory.init();
 			throw new CsRedisRuntimeException(e.getMessage(), e);
 		}finally{
 		    if(jedis != null){
@@ -454,9 +447,9 @@ public class RedisClient {
             }
             return jedis.mset(keysvalues);
         }catch(Exception e){
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis mset fail", e);
         }finally{
             if(jedis != null){
@@ -498,9 +491,9 @@ public class RedisClient {
             }
             return jedis.mget(keys);
         }catch(Exception e){
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis mget fail", e);
         }finally{
             if(jedis != null){
@@ -537,9 +530,9 @@ public class RedisClient {
 
             return jedis.smembers(key);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null) {
@@ -563,9 +556,9 @@ public class RedisClient {
         	
             return jedis.sadd(key, values);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -589,9 +582,9 @@ public class RedisClient {
 
             return jedis.srem(key, values);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -673,9 +666,9 @@ public class RedisClient {
               
               return jedis.hset(key, field, value);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -701,9 +694,9 @@ public class RedisClient {
              jedis = jedisPool.getResource();
               return jedis.hmset(key, value);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -775,9 +768,9 @@ public class RedisClient {
              jedis = jedisPool.getResource();
             return jedis.del(key);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -804,9 +797,9 @@ public class RedisClient {
               
             return jedis.rename(oldkey, newkey);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -866,9 +859,9 @@ public class RedisClient {
 
             jedis.watch(key);
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -888,9 +881,9 @@ public class RedisClient {
             transactionAction.execute(transaction);
             return transaction.exec();
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -910,9 +903,9 @@ public class RedisClient {
             piplineAction.execute(pipline);
             pipline.sync();
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {
@@ -932,9 +925,9 @@ public class RedisClient {
             piplineAction.execute(pipline);
             return pipline.syncAndReturnAll();
         } catch (Exception e) {
-        	factory.reload();
             jedisPool.returnBrokenResource(jedis);
             jedis = null;
+            factory.init();
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null) {

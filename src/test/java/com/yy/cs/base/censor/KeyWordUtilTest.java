@@ -13,7 +13,7 @@ public class KeyWordUtilTest {
 
 	@Test
 	public void test() throws InterruptedException {
-		KeyWordUtil util = KeyWordUtil.KeyWordUtilFactory.getInstance() ;
+		KeyWordUtil util = KeyWordUtil.getInstance();
 		System.out.println(util.isCensored("色情"));
 		synchronized (KeyWordUtilTest.this) {
 			wait();
