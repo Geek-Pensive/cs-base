@@ -4,11 +4,10 @@ Backward compatible changes:
 
 BUG修改:
 	1、修改httpclient部分方法资源没有回收问题。
-	2、修改在调用服务异常，invalidateObject后还进行了returnObject逻辑，改调用多余。
   
 功能增加:
   1、增加反低俗校验工具类。
-  2、RedisClient如果操作master节点异常，重新加载redis的配置信息。
+  2、RedisClient如果操作master节点异常，重新加载redis的配置信息，可感知主从切换。
   3、丰富RedisClient封装的API。
 
 
