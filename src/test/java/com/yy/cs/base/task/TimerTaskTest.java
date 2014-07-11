@@ -16,6 +16,8 @@ public class TimerTaskTest extends TimerTask {
 //		date.compareTo(date);
 	}
 
+	
+	
 	public static void main(String[] agrs) {
 		TimerTaskManager timerTaskManager = new TimerTaskManager();
 		TimerTaskTest time = new TimerTaskTest();

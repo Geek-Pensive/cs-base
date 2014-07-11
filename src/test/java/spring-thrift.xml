@@ -6,7 +6,7 @@
 
 	
 		<bean id="clientFactory" class="com.yy.cs.base.thrift.ThriftClientFactory" destroy-method="destroy"  >
-			<property name="interfaceName"   value="com.yy.cs.base.nyy.remoting.thrift.nyyService.NyyService$Iface" />
+			<property name="interfaceName"   value="com.yy.cs.base.thrift.NyyService$Iface" />
 		  	<property name="thriftConfig">
 		  		<list>
 		  			<ref bean="thriftConfig"/>

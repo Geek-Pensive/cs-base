@@ -12,10 +12,15 @@
 			    </map>
 		  	</property>
 		  	<property name="monitorType" value="LOG"/>
+		  	<constructor-arg>
+		  		<list>
+		  			<ref/>
+		  		</list>
+		  	</constructor-arg>
 		</bean>
 		<bean id="timerTaskTest" class="com.yy.cs.base.task.TimerTaskTest" >
 			<property name="cron" value="*/5 * * * * *" />
-			<property name="cluster" ref="cluster"></property>
+<!-- 			<property name="cluster" ref="cluster"></property> -->
 		</bean>
 		<bean id="cluster" class="com.yy.cs.base.task.ClusterConfig" >
 			 <property name="redisClient" ref="redisClient" />

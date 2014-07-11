@@ -29,8 +29,8 @@ public class CronSequenceGeneratorTests {
 
 	@Test
 	public void testAt50Seconds() {
-		assertEquals(new Date(2012, 6, 2, 1, 0),
-				new CronSequenceGenerator("*/15 * 1-4 * * *").next(new Date(2012, 6, 1, 9, 53, 50)));
+		assertEquals(new Date(2012, 6, 2, 7, 0),
+				new CronSequenceGenerator("0 0 7 * * *").next(new Date(2012, 6, 2, 6, 53, 50)));
 	}
 
 	@Test

@@ -12,9 +12,4 @@ BUG修改:
   3、丰富RedisClient封装的API。
 
 
-Revision: 148544
-Author: lifangjie
-Date: 2014年7月10日 22:37:43
-Message:
- 
  
