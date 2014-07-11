@@ -3,7 +3,7 @@ Release 1.0 - 2014-07-11
 Backward compatible changes:
 
 BUG修改:
-	1、修改httpclient部分方法资源没有回收问题。
+
   
 功能增加:
   1、增加反低俗校验工具类。
