@@ -35,12 +35,12 @@ public class RedisClientTest {
 		RedisClientFactory redisClientFactory = new RedisClientFactory();
 		List<String> list = new ArrayList<String>();
 		//这里是业务要连接的redis
-//		list.add("172.19.103.105:6331::");
-//		list.add("172.19.103.105:6330::");
-//		list.add("172.19.103.105:6379:fdfs123:");
+		list.add("172.19.103.105:6331::");
+		list.add("172.19.103.105:6330::");
+		list.add("172.19.103.105:6379:fdfs123:");
 		
-		list.add("127.0.0.1:6380::");
-		list.add("127.0.0.1:6381::");
+//		list.add("127.0.0.1:6380::");
+//		list.add("127.0.0.1:6381::");
 		
 		redisClientFactory.setRedisServers(list);
 		redisClientFactory.init();

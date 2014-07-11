@@ -1,11 +1,14 @@
 package com.yy.cs.base.censor;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -15,8 +18,13 @@ import org.apache.http.client.methods.HttpGet;
 import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.task.thread.NamedThreadFactory;
-import com.yy.cs.base.zip.ZIPUtil;
 
+/**
+ *	反低俗内容检查工具类。
+ *	调用了的http://do.yy.duowan.com提供的反低俗内容。
+ *	5分钟定时刷新缓存内容。
+ *
+ */
 public class KeyWordUtil {
 
 	private Log logger = LogFactory.getLog(this.getClass());
@@ -48,8 +56,16 @@ public class KeyWordUtil {
 		String keyword = keywordMap.get(type);
 		return keyword;
 	}
-
-	public boolean isCensored(String text, KeywordType... types) {
+	
+	/**
+	 * 检查关键是否,为反低俗内容关键字
+	 * 
+	 * @param types 关键字类型
+	 * @param text 检查内容
+	 * @return 是反低俗内容：true
+	 */
+	public boolean isCensored(String text, KeywordType[] types) {
+		
 		for (KeywordType type : types) {
 			if (checkKeyword(text, type)) {
 				return true;
@@ -66,9 +82,15 @@ public class KeyWordUtil {
 	 * @param word
 	 * @param type
 	 * @return 如果是关键字则返回true,否则返回false
+	 * @throws HttpClientException 
+	 * @throws IOException 
 	 */
-	private boolean checkKeyword(String word, KeywordType type) {
+	public boolean checkKeyword(String word, KeywordType type) {
 		String keywords = getKeyword(type);
+		if(keywords == null || "".equals(keywords)){
+			autoLoadKeyword();
+			keywords = getKeyword(type);
+		}
 		boolean isKeyword = false;
 		String[] keywordArr = String.valueOf(keywords).split("\n");
 		String stext = word.trim();
@@ -77,16 +99,21 @@ public class KeyWordUtil {
 			if(key == null ||  key.isEmpty()){
 				continue;
 			}
+			keyword = key.trim();
 			if (stext.contains(keyword)) {
 				isKeyword = true;
 				break;
 			}
 		}
-		// logger.debug("isKeyword(" + stext + ") return " + isKeyword +
-		// "   keyword:" + keyword);
 		return isKeyword;
 	}
-
+	
+	/**
+	 * 检查关键是否,为反低俗内容关键字
+	 * 
+	 * @param text 检查内容
+	 * @return 是反低俗内容：true
+	 */
 	public boolean isCensored(String text) {
 		return isCensored(text, KeywordType.values());
 	}
@@ -108,13 +135,59 @@ public class KeyWordUtil {
 		if (bytes == null) {
 			return null;
 		}
-		boolean isGzip = ZIPUtil.matchesGZ(bytes, bytes.length);
+		boolean isGzip = matchesGZ(bytes, bytes.length);
 		if (isGzip) {
-			bytes = ZIPUtil.unGZip(bytes);
+			bytes = unGZip(bytes);
 		}
 		return decode(bytes);
 	}
+	
+	/**
+	 * unGZip解压缩方法
+	 * @throws IOException 
+	 */
+    public byte[] unGZip(byte[] data) throws IOException {
+		byte[] b = null;
+		ByteArrayInputStream bis = new ByteArrayInputStream(data);
+		GZIPInputStream gzip = new GZIPInputStream(bis);
+		byte[] buf = new byte[1024];
+		int num = -1;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		while ((num = gzip.read(buf, 0, buf.length)) != -1) {
+			baos.write(buf, 0, num);
+		}
+		b = baos.toByteArray();
+		baos.flush();
+		baos.close();
+		gzip.close();
+		bis.close();
+		return b;
+    }
+    
+	 /**
+     * Checks if the signature matches what is expected for a .gz file.
+     *
+     * @param signature the bytes to check
+     * @param length    the number of bytes to check
+     * @return          true if this is a .gz stream, false otherwise
+     *
+     */
+    private boolean matchesGZ(byte[] signature, int length) {
 
+        if (length < 2) {
+            return false;
+        }
+        if (signature[0] != 31) {
+            return false;
+        }
+
+        if (signature[1] != -117) {
+            return false;
+        }
+
+        return true;
+    }
+	
 	/**
 	 * 对加密过的字符进行解码
 	 * 

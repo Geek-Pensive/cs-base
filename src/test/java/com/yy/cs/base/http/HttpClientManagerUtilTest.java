@@ -28,7 +28,7 @@ public class HttpClientManagerUtilTest {
      
     @Test
     public void testExecuteMethod() throws  HttpClientException {
-    	HttpGet get = new HttpGet("http://www.baidu.com/");
+    	HttpGet get = new HttpGet("http://live.yy.com/api/queryGameliveUser3.php");
     	String s = http.executeMethod(get);
     	System.out.println(s);
     	org.junit.Assert.assertNotNull(s); 

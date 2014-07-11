@@ -312,6 +312,176 @@
 	如果有问题或者建议，可联系李方杰，真诚为你服务
 	
 
+
+---
+## KeyWordUtil
+### 简要说明
+*	反低俗内容检查工具类。
+*	调用了的http://do.yy.duowan.com提供的反低俗内容。
+*	5分钟定时刷新缓存内容。
+
+### 快速使用
+#### API
+	
+			/**
+			 * 检查关键是否,为反低俗内容关键字
+			 * 
+			 * @param types 关键字类型
+			 * @param text 检查内容
+			 * @return 是反低俗内容：true
+			 */
+			public boolean isCensored(String text, KeywordType[] types)
+			
+		  /**
+			 * 检查关键是否,为反低俗内容关键字
+			 * 
+			 * @param text 检查内容
+			 * @return 是反低俗内容：true
+			 */
+			public boolean isCensored(String text) 
+
+---
+## XmlUtils
+### 简要说明
+*	Xml解析工具类。
+*	封装了JDK的dom方式解析xml流。
+
+### 快速使用
+#### API
+    
+    
+	    /** 
+			 * 根据文件名获取RootElement
+			 * @param fileName	文件名
+			 * @return Element   
+			 */
+			public static Element getRootElement(String fileName)
+			
+			/** 
+			 * 根据InputStream获取RootElement
+			 * @param is	InputStream
+			 * @return Element   
+			 */
+			public static Element getRootElement(InputStream is) 
+			
+			
+			/** 
+			 * 根据InputSource获取RootElement
+			 * @param is	InputSource
+			 * @return Element   
+			 */
+			public static Element getRootElement(InputSource is) 
+			
+			
+			/** 
+			 * 根据父Element获取其子Elements信息
+			 * @param element	element
+			 * @return Element[]   
+			 */
+			public static Element[] getChildElements(Element element)
+			
+			
+			/** 
+			 * 根据父Element和名称获取子Element信息
+			 * @param element	父element
+			 * @param childName	子名
+			 * @return Element[]   
+			 */
+			public static Element[] getChildElements(Element element,
+					String childName) 
+					
+			
+			/** 
+			 * 根据父Node获取子Nodes信息
+			 * @param node	父Node
+			 * @return Node[]   
+			 */
+			public static Node[] getChildNodes(Node node) 
+			
+			
+			/** 
+			 * 根据父Element和名称获取子Element信息
+			 * @param element	父Element
+			 * @param childName	子名称
+			 * @return Element   
+			 */
+			public static Element getChildElement(Element element,
+					String childName) 
+					
+			
+			/** 
+			 * 根据父Element获取子Element信息
+			 * @param element	父Element
+			 * @return Element   
+			 */
+			public static Element getChildElement(Element element)
+			
+			
+			/** 
+			 * 根据Element获取Element Values信息
+			 * @param element	Element
+			 * @return String[]  Element Values信息  
+			 */
+			public static String[] getElenentValues(Element element) 
+			
+			
+			/** 
+			 * 根据Element获取Element Value信息
+			 * @param element	Element
+			 * @return String  Element Value信息  
+			 */
+			public static String getElenentValue(Element element) 
+			
+			
+			/** 
+			 * 根据Element和名字获取子Element信息
+			 * @param e	Element
+			 * @param name	名字
+			 * @return Element  返回Element  
+			 */
+			public static Element findElementByName(Element e, String name) 
+			
+			
+			/** 
+			 * 根据Element、属性名、属性值获取子Element信息
+			 * @param e	指定的Element
+			 * @param attrName	属性名
+			 * @param attrVal	属性值
+			 * @return Element  返回Element  
+			 */
+			public static Element findElementByAttr(Element e,
+					String attrName, String attrVal) 
+					
+			/**
+			 * 根据Element、属性名、属性值获取子Element信息
+			 * @param e 指定的Element
+			 * @param attrName 属性名
+			 * @param attrVal 属性值
+			 * @param dept 如果在子Element找不到是否在孙辈element中寻找
+			 * @return
+			 */
+			public static Element findElementByAttr(Element e,
+					String attrName, String attrVal, boolean dept) 
+					
+			
+			/** 
+			 * 获取Element指定名的属性
+			 * @param e	Element
+			 * @param name	名称
+			 * @return String	返回值 
+			 */
+			public static String getAttribute(Element e, String name)
+			
+			/**
+			 * 获取Element指定名的属性，元素或属性名称为空时返回指定字符串
+			 * @param e 指定的元素
+			 * @param name 属性名称
+			 * @param defval 元素或属性名称为空时返回的值
+			 * @return
+			 */
+			public static String getAttribute(Element e, String name,
+					String defval)
+    
 ---
 ## Time
 
