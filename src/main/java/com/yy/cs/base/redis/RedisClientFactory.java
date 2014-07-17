@@ -51,8 +51,7 @@ public class RedisClientFactory extends JedisPoolConfig{
 	private List<String> redisServers;
 	
 	/**
-	 * 从redisMasterPool中随机获取pool,检测当前的当前Master是否可连接,且发送一个数据测试Master是否可写,
-	 * 不可写则抛出异常，当轮训到最后一个pool如果仍然不可写，则尝试初始化一次。
+	 * 从redisMasterPool中随机获取pool
 	 * @return  
 	 */
 	public JedisPool getMasterPool() {
