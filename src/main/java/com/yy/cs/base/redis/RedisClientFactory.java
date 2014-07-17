@@ -136,15 +136,25 @@ public class RedisClientFactory extends JedisPoolConfig{
 			if (newMasterPool.size() != 0) {
 				List<JedisPool> oldMasterPool = redisMasterPool;
 				redisMasterPool = newMasterPool;
-				this.masterServerSize = redisMasterPool.size();
+//				this.masterServerSize = redisMasterPool.size();
 				destroy(oldMasterPool);
 			}
 			if (newRslavePool.size() != 0) {
 				List<JedisPool> oldRslavePool = redisSlavePool;
 				redisSlavePool = newRslavePool;
-				this.slaveServerSize = redisSlavePool.size();
+//				this.slaveServerSize = redisSlavePool.size();
 				destroy(oldRslavePool);
 			}
+			//如果没有master 避免用户直接获取master进行操作导致错误
+			if(redisMasterPool.size() == 0){
+				redisMasterPool = redisSlavePool;
+			}
+			//如果没有slave 避免用户直接获取slave进行操作导致错误
+			if(redisSlavePool.size() == 0){
+				redisSlavePool = redisMasterPool;
+			}
+			this.masterServerSize = redisMasterPool.size();
+			this.slaveServerSize = redisSlavePool.size();
 		} finally {
 			lock.unlock();
 		}
