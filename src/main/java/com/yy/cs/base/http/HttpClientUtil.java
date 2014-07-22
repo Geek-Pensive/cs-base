@@ -79,18 +79,14 @@ public class HttpClientUtil {
     
     /**
      * 获取request 地址
+     * 版本1.0.2之后调整了优先级，X-Forwarded-For优先获取
      * @param request
      * @return
      */
     public static String getRequestorIp(HttpServletRequest request) {
 
-        // 优先级1：从X-Real-IP中取，有多重代理时，这个地址可能不准确，但一般不会被伪造
-        String ip = request.getHeader(HTTP_HEADER_XRP);
-        if (StringUtils.isNotBlank(ip)) {
-            return ip;
-        }
-
-        // 优先级2：从X-Forwarded-For中取，有被伪造的风险
+        // 优先级1：从X-Forwarded-For中取，有被伪造的风险
+        // 适用于多级nginx代理的形式
         String xff = request.getHeader(HTTP_HEADER_XFF);
         if (StringUtils.isNotBlank(xff)) {
             if (xff.indexOf(",") < 0) {
@@ -98,6 +94,13 @@ public class HttpClientUtil {
             }
             return StringUtils.substringBefore(xff, ",");
         }
+        
+        // 优先级2：从X-Real-IP中取，有多重代理时，这个地址可能不准确，但一般不会被伪造
+        String ip = request.getHeader(HTTP_HEADER_XRP);
+        if (StringUtils.isNotBlank(ip)) {
+            return ip;
+        }
+
 
         // 优先级3：直接获取RemoteAddr，有反向代理时这个地址会不准确
         return request.getRemoteAddr();
