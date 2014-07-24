@@ -36,6 +36,11 @@ public class CSHttpClient {
     
     private final  CloseableHttpClient httpClient;
     
+    /**
+     * 带参数的构造函数，通过工厂类{@link CSHttpClientFactory}生成指定的CSHttpClient,
+     * @param 
+     * 	    factory 生成CSHttpClient的工厂类
+     */
     public CSHttpClient(CSHttpClientFactory factory) {
     	PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
     	this.defaultRequestConfig = RequestConfig.custom()
@@ -48,12 +53,17 @@ public class CSHttpClient {
         this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
     }
 
-    
+    /**
+     * 无参构造函数
+     */
     public CSHttpClient() {
     	this(new CSHttpClientFactory());
     }
+    
     /**
-     * @return 池化的原生httpClient
+     * 获取池化的原生httpClient
+     * @return 
+     * 		 httpClient
      */
     public HttpClient getHttpClient() {
         return httpClient;
@@ -61,7 +71,7 @@ public class CSHttpClient {
 
     /**
      * 执行一个http方法
-     * @param 执行方法的类型
+     * @param httpRequestBase  执行方法的类型
      * @return response正确返回后的字符串
      * @throws HttpClientException
      */
@@ -106,7 +116,7 @@ public class CSHttpClient {
     
     /**
      * 执行一个http方法
-     * @param 执行方法的类型
+     * @param httpRequestBase 执行方法的类型
      * @return response正确返回后的byte[]
      * @throws HttpClientException
      */
@@ -147,7 +157,7 @@ public class CSHttpClient {
     
     /**
      * 执行一个HttpGet方法
-     * @param 请求地址
+     * @param url 请求地址
      * @return response正确返回后的字符串
      * @throws HttpClientException
      */
@@ -159,8 +169,9 @@ public class CSHttpClient {
     
     /**
      * 执行一个HttpGet方法,返回response返回的流
-     * @param 请求地址
-     * @param 指点正确返回的状态码
+     * @param 
+     * 		url ,请求地址
+     * @param statusArray 指点正确返回的状态码
      * @return response正确返回后的流
      * @throws HttpClientException
      */
@@ -200,8 +211,10 @@ public class CSHttpClient {
     }
     /**
      * 发送一个HttpGet请求，检查地址是否正常 
-     * @param url地址
-     * @return true 'response返回响应状态码200或304'
+     * @param url
+     * 		地址
+     * @return 
+     * 		boolean 'response返回响应状态码200或304'
      */
     public boolean isGetOK(String url)  {
     	HttpGet get = new HttpGet(url);
@@ -347,7 +360,10 @@ public class CSHttpClient {
         }
         return false;
     }
-    
+    /**
+     * 关闭httpClient,关闭流并释放相关的系统资源
+     * @throws IOException
+     */
     public void shutdown() throws IOException{
         httpClient.close();
     }

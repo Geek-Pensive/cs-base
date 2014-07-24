@@ -13,7 +13,9 @@ public class RedisUtils {
 	 * </br>
 	 * 如果info为空，或者匹配信息不到，则返回 0
 	 * @param info
+	 * 		redis服务器的相关配置信息
 	 * @return 
+	 * 		connected client 数量
 	 */
 	public static int getConnectedClientNum(String info){
 		if(info == null || "".equals(info)){
@@ -32,7 +34,9 @@ public class RedisUtils {
 	 * </br>
 	 * 如果info为空，或者匹配信息不到，则返回  false
 	 * @param info
+	 * 		redis服务器的相关配置信息
 	 * @return
+	 * 		boolean
 	 */
 	public static boolean isMaster(String info){
 		if(info == null || "".equals(info)){
@@ -48,8 +52,10 @@ public class RedisUtils {
 	}
 
 	/**
-	 * @param serverInfo  格式如  ip:port:password:timeout
+	 * @param serverInfo  
+	 * 		格式如  ip:port:password:timeout
 	 * @return 
+	 * 		String数组，分别为ip,port，password,timeout
 	 */
 	public static String[] parseServerInfo(String serverInfo){
 		if(serverInfo == null || "".equals(serverInfo)){
@@ -77,12 +83,12 @@ public class RedisUtils {
 		return result;
 	}
 	
-	public static void main(String []args){
-		String [] strArray = parseServerInfo("172.19.103.105:6331::1000");
-		for(int i = 0; i < strArray.length; i++){
-			System.out.println(strArray[2] == null);
-			System.out.println(i + " " + strArray[i]);
-		}
-	}
+//	public static void main(String []args){
+//		String [] strArray = parseServerInfo("172.19.103.105:6331::1000");
+//		for(int i = 0; i < strArray.length; i++){
+//			System.out.println(strArray[2] == null);
+//			System.out.println(i + " " + strArray[i]);
+//		}
+//	}
 	
 }

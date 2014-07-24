@@ -2,6 +2,12 @@ package com.yy.cs.base.task;
 
 import java.util.Date;
 
+/**
+ * 任务状态对象
+ * <p>包括任务id、下一次执行时间、上一次开始执行时间、上一次执行完成时间、异常发生的时间等。
+ * @author duowan-PC
+ *
+ */
 public class TaskStatus {
 	
 	private String id;
@@ -21,6 +27,23 @@ public class TaskStatus {
 	public TaskStatus() {
 	}
 	
+	/**
+	 * 构造器函数
+	 * @param id
+	 * 		任务的id标识
+	 * @param nextScheduledExecutionTime
+	 * 		下一次任务调度时间
+	 * @param lastStartTime
+	 * 		上一次任务调度执行开始时间
+	 * @param lastCompletionTime
+	 * 		上一次任务调度执行完成时间
+	 * @param lastExceptionTime
+	 * 		上一次任务调度发生异常的时间
+	 * @param executeAddress
+	 * 		任务执行的地址
+	 * @param t
+	 * 		异常
+	 */
 	public TaskStatus(String id, Date nextScheduledExecutionTime,
 			Date lastStartTime, Date lastCompletionTime,
 			Date lastExceptionTime, String executeAddress, Throwable t) {
@@ -33,14 +56,36 @@ public class TaskStatus {
 		this.executeAddress = executeAddress;
 		this.t = t;
 	}
-	 
+	/**
+	 *  构造器函数
+	 * @param nextScheduledExecutionTime
+	 * 		下一次任务调度执行时间
+	 * @param lastStartTime
+	 * 		上一次任务调度执行开始时间
+	 * @param lastCompletionTime
+	 * 		上一次任务调度发生异常的时间
+	 */
 	public TaskStatus(Date nextScheduledExecutionTime, Date lastStartTime, Date lastCompletionTime) {
 		this.nextScheduledExecutionTime = nextScheduledExecutionTime;
 		this.lastStartTime = lastStartTime;
 		this.lastCompletionTime = lastCompletionTime;
 	}
 
-
+	/**
+	 * 构造器函数
+	 * @param id
+	 * 		任务的id标识
+	 * @param nextScheduledExecutionTime
+	 * 		下一次任务调度时间
+	 * @param lastStartTime
+	 * 		上一次任务调度执行开始时间
+	 * @param lastCompletionTime
+	 * 		上一次任务调度执行完成时间
+	 * @param lastExceptionTime
+	 * 		上一次任务调度发生异常的时间
+	 * @param t
+	 * 		异常
+	 */
 	public TaskStatus(String id,Date nextScheduledExecutionTime, Date lastStartTime,
 			Date lastCompletionTime, Date lastExceptionTime, Throwable t) {
 		super();
@@ -52,27 +97,47 @@ public class TaskStatus {
 		this.id = id;
 	}
 
-
+	/**
+	 * 设置上一次任务执行开始时间
+	 * @param lastStartTime
+	 * 		上一次任务执行开始时间
+	 */
 	public void setLastStartTime(Date lastStartTime) {
 		this.lastStartTime = lastStartTime;
 	}
 
-
+	/**
+	 * 设置上一次任务结束时间
+	 * @param lastCompletionTime
+	 * 		上一次任务结束时间
+	 */
 	public void setLastCompletionTime(Date lastCompletionTime) {
 		this.lastCompletionTime = lastCompletionTime;
 	}
 
-
+	/**
+	 * 设置生一次任务执行发生异常的时间
+	 * @param lastExceptionTime
+	 * 		上一次任务执行发生异常的时间
+	 */
 	public void setLastExceptionTime(Date lastExceptionTime) {
 		this.lastExceptionTime = lastExceptionTime;
 	}
 
-
+	/**
+	 * 获取下一次任务调度执行的时间
+	 * @return
+	 * 		下一次任务调度执行的时间
+	 */
 	public Date getNextScheduledExecutionTime() {
 		return nextScheduledExecutionTime;
 	}
 
-
+	/**
+	 * 设置下一次任务调度执行的时间
+	 * @param nextScheduledExecutionTime
+	 * 		下一次任务调度执行的时间
+	 */
 	public void setNextScheduledExecutionTime(Date nextScheduledExecutionTime) {
 		this.nextScheduledExecutionTime = nextScheduledExecutionTime;
 	}

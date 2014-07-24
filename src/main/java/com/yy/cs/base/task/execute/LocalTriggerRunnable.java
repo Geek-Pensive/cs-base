@@ -18,7 +18,7 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 //	private final Trigger trigger;
 	
 	private final ScheduledExecutorService executor;
-
+	
 	public LocalTriggerRunnable(Task task, Trigger trigger, ScheduledExecutorService executor) {
 		super(task,trigger);
 		if(trigger == null){
@@ -27,7 +27,9 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 		this.executor = executor;
 	}
 	
-	
+	/**
+	 * 调度一次要执行的任务,更新任务执行信息，返回任务本身
+	 */
 	public HandlingRunnable schedule() {
 		synchronized (this.triggerContextMonitor) {
 			this.scheduledExecutionTime = this.trigger.nextExecutionTime(this.context);

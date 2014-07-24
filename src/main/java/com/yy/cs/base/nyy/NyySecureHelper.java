@@ -20,9 +20,12 @@ public class NyySecureHelper {
 	/**
 	 * nyy hash算法采用sha256
 	 * </br>验证sign是否符合正确
-	 * @param key
+	 * @param key 
+	 * 		json串中的key字段
 	 * @param sign
+	 * 		加密信息
 	 * @param data
+	 * 		业务数据
 	 */
 	public static void verifySha256Sign(String key, String sign, String data) {
 		String expect = genSha256(key, data);
@@ -35,8 +38,11 @@ public class NyySecureHelper {
 	/**
 	 * nyy hash算法采用sha256
 	 * @param key
+	 * 		json串中的key字段
 	 * @param data
+	 * 		业务数据
 	 * @return
+	 *  	sign,加密后的sign
 	 */
 	public static String genSha256(String key, String data) {
 		String strForGen = "data=" + data + "&key=" + key;

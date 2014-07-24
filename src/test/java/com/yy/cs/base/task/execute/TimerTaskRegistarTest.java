@@ -1,5 +1,6 @@
 package com.yy.cs.base.task.execute;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.yy.cs.base.redis.RedisClient;
+import com.yy.cs.base.redis.RedisClientFactory;
 import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.TimerTask;
@@ -39,8 +41,13 @@ public class TimerTaskRegistarTest {
 		task_1 = new TimerTaskTest();
 		task_1.setCron("*/10 * * * * *");
 		RunnableInit rInit = new RunnableInit();
-		redisClient = new RedisClient();
-		rInit.setRedis(redisClient);
+		List<String> list = new ArrayList<String>();
+		list.add("127.0.0.1:6380::");
+		list.add("127.0.0.1:6381::");
+		RedisClientFactory factory = new RedisClientFactory(list);
+		factory.init();
+		redisClient = new RedisClient(factory);
+		redisClient.setFactory(factory);
 		task_2 = new TimerTaskTest();
 		cluster = new ClusterConfig();
 		rInit.addTimeTask(task_2, cluster, redisClient);

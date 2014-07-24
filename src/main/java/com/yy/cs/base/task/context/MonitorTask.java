@@ -70,7 +70,8 @@ public class MonitorTask {
 	}
 
 	/**
-	 * @return
+	 * @return 
+	 * 		获取监控数据存储的文件名
 	 */
 	protected String getWebPath() {
 		if (monitorfile != null && !"".equals(monitorfile)) {
@@ -98,7 +99,11 @@ public class MonitorTask {
 		}
 		return monitorfile;
 	}
-
+	/**
+	 *将监控的日志信息写入到文件中
+	 * @param csStatus
+	 * 		任务执行状态对象
+	 */
 	public void writeTaskFile(CsStatus csStatus) {
 
 		String path = getWebPath();

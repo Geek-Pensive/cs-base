@@ -58,8 +58,7 @@ public class CronTrigger implements Trigger {
 
 	/**
 	 * Determine the next execution time according to the given trigger context.
-	 * <p>Next execution times are calculated based on the
-	 * {@linkplain TriggerContext#lastCompletionTime completion time} of the
+	 * <p>Next execution times are calculated based on the of the
 	 * previous execution; therefore, overlapping executions won't occur.
 	 */
 	@Override

@@ -18,6 +18,12 @@ public class ClusterConfig {
 		this.redisClient = redisClient;
 	}
 
+	public ClusterConfig(){
+		
+	}
+	public ClusterConfig(RedisClient redisClient){
+		this.redisClient = redisClient ; 
+	}
 //	public int getExpireLockTime() {
 //		return expireLockTime;
 //	}

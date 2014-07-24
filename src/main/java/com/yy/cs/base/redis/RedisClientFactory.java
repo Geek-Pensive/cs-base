@@ -24,8 +24,8 @@ import redis.clients.jedis.JedisPoolConfig;
 import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
 
 /**
- * @author hongyuan
- * @author haoqing </br> redis client线程池工厂类
+ * redis client线程池工厂类
+ *  
  */
 public class RedisClientFactory extends JedisPoolConfig{
 
@@ -50,9 +50,29 @@ public class RedisClientFactory extends JedisPoolConfig{
 	
 	private List<String> redisServers;
 	
+	
+	/**
+	 * 构造器函数
+	 * @param redisServers
+	 * 		redis服务器地址列表   ip:port:username:password
+	 */
+	public RedisClientFactory(List<String> redisServers) {
+		super();
+		if(redisServers == null || redisServers.size() ==0){
+			throw new CsRedisRuntimeException("redisServers couldn't be null");
+		}
+		this.redisServers = redisServers;
+		this.totalServersSize = redisServers.size();
+		init();
+	}
+
+	public RedisClientFactory() {
+		
+	}
 	/**
 	 * 从redisMasterPool中随机获取pool
-	 * @return  
+	 * @return 
+	 *	   Master的jedisPool资源池 
 	 */
 	public JedisPool getMasterPool() {
 		
@@ -69,6 +89,7 @@ public class RedisClientFactory extends JedisPoolConfig{
 	/**
 	 * 从redisSlavePool中随机获取pool,当前pool无法获取jedis连接时，切换到其他的Jedispool
 	 * @return 
+	 * 		Slave的jedisPool资源池 
 	 */
 	public JedisPool getSlavePool() {
 		int currentIndex = atomitSlaveCount.getAndIncrement();
@@ -76,7 +97,6 @@ public class RedisClientFactory extends JedisPoolConfig{
 		JedisPool jedisPool = redisSlavePool.get(currentIndex);
 		return jedisPool;
 	}
-
 
 
 	public void setRedisServers(List<String> redisServers) {
@@ -91,6 +111,11 @@ public class RedisClientFactory extends JedisPoolConfig{
 	 * 初始化
 	 */
 	public void init() {
+		
+		if(this.totalServersSize == 0){
+			throw new IllegalArgumentException("redisServer is invalidly config,please correctly set Redis Servers.");
+		}
+		
 		/**
 		 * 在Master池上操作时,如果异常会重新init.操作master有可能会被并发。
 		 */
@@ -161,7 +186,7 @@ public class RedisClientFactory extends JedisPoolConfig{
 	}	
 	
 	/**
-	 * 销毁操作
+	 * 销毁Jedis资源池
 	 */
 	public void destroy(List<JedisPool> pool){
 		if(pool != null && pool.size() != 0){

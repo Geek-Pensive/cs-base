@@ -20,9 +20,8 @@ import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.task.thread.NamedThreadFactory;
 
 /**
- *	反低俗内容检查工具类。
- *	调用了的http://do.yy.duowan.com提供的反低俗内容。
- *	5分钟定时刷新缓存内容。
+ * 
+ * @author duowan-leedk
  *
  */
 public class KeyWordUtil {
@@ -42,7 +41,11 @@ public class KeyWordUtil {
 	ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,new NamedThreadFactory("KeyWordUtil",true));
 	
 	private final CSHttpClient httpClient;
-		
+	/**
+	 * 获取KeyWordUtil对象实例的方法
+	 * @return 
+	 * 		KeyWordUtil 
+	 */
 	public static KeyWordUtil getInstance() {
 		return keywordUtil;
 	}
@@ -62,7 +65,8 @@ public class KeyWordUtil {
 	 * 
 	 * @param types 关键字类型
 	 * @param text 检查内容
-	 * @return 是反低俗内容：true
+	 * @return 
+	 * 		boolean  是反低俗内容返回true，反之返回false
 	 */
 	public boolean isCensored(String text, KeywordType[] types) {
 		
@@ -77,13 +81,12 @@ public class KeyWordUtil {
 	
 	
 	/**
-	 * 检查是否为关键字
+	 * 检查是否为关键字是否属于给定的KeywordType类型
 	 * 
-	 * @param word
-	 * @param type
-	 * @return 如果是关键字则返回true,否则返回false
-	 * @throws HttpClientException 
-	 * @throws IOException 
+	 * @param word 关键字
+	 * @param type 关键字类型
+	 * @return 
+	 * 		boolean 如果是关键字则返回true,否则返回false
 	 */
 	public boolean checkKeyword(String word, KeywordType type) {
 		String keywords = getKeyword(type);
@@ -109,10 +112,10 @@ public class KeyWordUtil {
 	}
 	
 	/**
-	 * 检查关键是否,为反低俗内容关键字
+	 * 检查关键是否为反低俗内容关键字
 	 * 
 	 * @param text 检查内容
-	 * @return 是反低俗内容：true
+	 * @return boolean 类型
 	 */
 	public boolean isCensored(String text) {
 		return isCensored(text, KeywordType.values());
@@ -121,10 +124,9 @@ public class KeyWordUtil {
 	/**
 	 * 从固定数据分流服务器获取关键字
 	 * 
-	 * @param type
-	 * @return
+	 * @param type 关键字类型
+	 * @return String 获取
 	 * @throws IOException
-	 * @throws HttpClientException
 	 */
 
 	private String loadKeyword(KeywordType type) throws IOException,
@@ -144,7 +146,10 @@ public class KeyWordUtil {
 	
 	/**
 	 * unGZip解压缩方法
-	 * @throws IOException 
+	 * 
+	 * @param data 压缩的数据内容
+	 * @return byte[] 解缩后的数据，返回字节数组
+	 * @throws IOException
 	 */
     public byte[] unGZip(byte[] data) throws IOException {
 		byte[] b = null;
@@ -169,7 +174,7 @@ public class KeyWordUtil {
      *
      * @param signature the bytes to check
      * @param length    the number of bytes to check
-     * @return          true if this is a .gz stream, false otherwise
+     * @return    true if this is a .gz stream, false otherwise
      *
      */
     private boolean matchesGZ(byte[] signature, int length) {
@@ -191,8 +196,8 @@ public class KeyWordUtil {
 	/**
 	 * 对加密过的字符进行解码
 	 * 
-	 * @param source
-	 * @return
+	 * @param bytes
+	 * @return String
 	 * @throws IOException
 	 */
 	private String decode(byte[] bytes) throws IOException {
@@ -206,6 +211,7 @@ public class KeyWordUtil {
 	 * 
 	 * @param type
 	 * @return
+	 * 		String url
 	 */
 	private String getKeywordURL(KeywordType type) {
 		String url = null;
@@ -244,7 +250,11 @@ public class KeyWordUtil {
 		 //logger.info("load keyword finished : " + times + " ms");
 		
 	}
-
+	/**
+	 * 执行获取过滤关键字的任务
+	 * @author duowan-leedk
+	 *
+	 */
 	private class Task implements Runnable{
 		public void run() {
 				try {
@@ -256,7 +266,11 @@ public class KeyWordUtil {
 			}
 	}
 	
-	
+	/**
+	 * 关键字类型
+	 * @author duowan-leedk
+	 *
+	 */
 	public enum KeywordType {
 		HIGH(1, "A类敏感字符"), NORMAL(2, "B类敏感字符"), LOW(3, "C类敏感字符");
 		private Integer value;
@@ -277,7 +291,8 @@ public class KeyWordUtil {
 		 * 根据代号返回关键字类型对象
 		 * @param value
 		 *            代号
-		 * @return
+		 * @return  
+		 * 		type
 		 */
 		public static KeywordType getKeywordType(Integer value) {
 			if (value == null)

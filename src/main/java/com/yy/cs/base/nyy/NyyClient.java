@@ -91,6 +91,7 @@ public class NyyClient {
 	 * @param sha256HashSecurityCheck  是否要进行算法为sha256的哈希校验
 	 * </br>此方法会抛出runtimeException 
 	 * @return
+	 * 		T  返回 引用类型 T 的对象实例
 	 */
 	public <T> T parseDataFromRespJson(String respJson, Class<T> cls, boolean sha256HashSecurityCheck){
 		return NyyProtocolHelper.parseDataFromRespJson(key, respJson, cls, sha256HashSecurityCheck);

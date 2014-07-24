@@ -10,7 +10,11 @@ import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 
 
-
+/**
+ * 定时执行任务管理器
+ * @author duowan-PC
+ *
+ */
 public class TimerTaskManager {
 	
 	 private int poolSize = 2;
@@ -51,7 +55,10 @@ public class TimerTaskManager {
      public void addTimerTask(TimerTask task){
     	 this.addTimerTask(task.getClass().getName(),task);
      }
-     
+     /**
+      *  启动任务的调度器,执行任务,默认初始化包含两个线程的任务执行器。
+      *  并将执行任务过程中的信息通过检测器记录到日志或者html文件中
+      */
      public void start(){
     	 if(!isStart){
     		 isStart = true;
@@ -69,6 +76,11 @@ public class TimerTaskManager {
     		 isStart = false;
     	 }
      }
+     /**
+      * 获取任务的执行状态
+      * @return
+      * 	任务状态对象
+      */
      public CsStatus getCsStatus(){
     	 return registrar.getCsStatus();
      }

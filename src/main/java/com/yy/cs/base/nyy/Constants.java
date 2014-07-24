@@ -26,14 +26,22 @@ public class Constants {
 		this.sign = sign;
 		this.data = data;
 	}
-	
+	/**
+	 * nyy协议中参数的字段
+	 * @author duowan-PC
+	 *
+	 */
 	public interface Param {
 		public static String APPID = "appId";
 		public static String DATA = "data";
 		public static String SIGN = "sign";
 		public static String NYY = "nyy";
 	}
-
+	/**
+	 * url中常用的分隔符号
+	 * @author duowan-PC
+	 *
+	 */
 	public interface Symbol {
 		public static String SLASH = "/";
 		public static String QUESTION_MARK = "?";
@@ -80,7 +88,11 @@ public class Constants {
 			return builder.toString();
 		}
 	}
-
+	/**
+	 * 获得业务AppId值
+	 * @return
+	 * 	    业务AppId
+	 */
 	public String getAppId() {
 		return appId;
 	}
@@ -92,15 +104,21 @@ public class Constants {
 	public String getData() {
 		return data;
 	}
-
+	/**
+	 * 设置nyy协议中的data字段的内容
+	 * @param data
+	 */
 	public void setData(String data) {
 		this.data = data;
 	}
-
+	
 	public String getSign() {
 		return sign;
 	}
-
+	/**
+	 * 设置nyy协议中的sign加密信息
+	 * @param sign
+	 */
 	public void setSign(String sign) {
 		this.sign = sign;
 	}

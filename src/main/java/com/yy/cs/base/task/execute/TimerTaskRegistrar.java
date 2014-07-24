@@ -35,7 +35,11 @@ public class TimerTaskRegistrar {
 	public Map<String, HandlingRunnable> getHandlings() {
 		return handlings;
 	}
-
+	/**
+	 * 将Task解析到cronTaskMap中
+	 * @param timerTasks 
+	 * 		task的Map集合
+	 */
 	public void parse(Map<String,TimerTask> timerTasks) {
 		Set<Entry<String, TimerTask>> tasks = timerTasks.entrySet();
 		for (Entry<String, TimerTask> e : tasks) {
@@ -59,7 +63,11 @@ public class TimerTaskRegistrar {
 		return this.taskScheduler;
 	}
 
-	 
+	/**
+	 * 执行本地的调度任务 和 redis注册的调度任务
+	 * @param taskScheduler 
+	 * 		任务调度器
+	 */
 	public void start(TaskScheduler taskScheduler) {
 		this.taskScheduler = taskScheduler;
 		scheduleTasks();
@@ -69,7 +77,11 @@ public class TimerTaskRegistrar {
 //		HandlingRunnable handlingRunnable = handlings.get(id);
 //		return handlingRunnable.getContext();
 //	}
-	
+	/**
+	 * 获取任务执行的状态
+	 * @return
+	 * 		任务执行完成后的状态
+	 */
 	public CsStatus getCsStatus() {
 		CsStatus csStatus = new CsStatus();
 		for (Entry<String, HandlingRunnable> entry : this.handlings.entrySet()) {
@@ -102,7 +114,13 @@ public class TimerTaskRegistrar {
 		csStatus.setName("TimerTaskManager");
 		return csStatus;
 	}
-	
+	/**
+	 * 添加任务执行监听，并将任务执行日志信息写入文件
+	 * @param monitorfile
+	 * 		文件路径
+	 * @param type
+	 * 		记录监听信息方式{@link MonitorType}，将信息记录到日志或者 HTML文件中 
+	 */
 	public void addMonitorTask(final String monitorfile,final MonitorType type){
 		this.taskScheduler.scheduleWithFixedDelay(new Runnable() {
 			MonitorTask monitor = new MonitorTask(monitorfile,type);
@@ -132,7 +150,9 @@ public class TimerTaskRegistrar {
 			}
 		}
 	}
-
+	/**
+	 * 销毁任务的执行
+	 */
 	public void destroy() {
 		for (Entry<String, HandlingRunnable> entry : this.handlings.entrySet()) {
 			entry.getValue().cancel(true);

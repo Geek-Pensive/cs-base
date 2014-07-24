@@ -60,8 +60,10 @@ public class Json {
 	
 	/**
 	 * 通过JSON字符串生成指定类型的引用对象
-	 * @param <clazz>
-	 * @return ObjectMapper
+	 * @param jsonStr json串
+	 * @param type 引用类型  T
+	 * @return
+	 * 		T 引用类型的对象实例
 	 */
 	public static <T> T strToObj(String jsonStr, TypeReference<T> type){
 		try {

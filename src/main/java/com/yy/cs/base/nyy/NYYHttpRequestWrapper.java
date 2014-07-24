@@ -46,10 +46,10 @@ public class NYYHttpRequestWrapper extends HttpServletRequestWrapper {
         }
         return results;
     }
-
+    
     @Override
     public String getParameter(String name) {
-        // TODO 如果要严格遵循NYY，则除了appId和sign，其他字段必须从data中取
+        // TODO 
         String result = super.getParameter(name);
         if (result == null) {
             return getValueFromData(name);

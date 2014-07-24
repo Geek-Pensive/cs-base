@@ -53,6 +53,7 @@ public class NyyProtocolHelper {
 	 * @param withNyyKey
 	 *            是否包含命名为nyy的key
 	 * @return
+	 * 			组装nyy协议的url
 	 * @throws UnsupportedEncodingException
 	 */
 	protected static String assembleNyyGetUrl(String uri, String appId, String sign, String data, boolean withNyyKey)
@@ -75,6 +76,7 @@ public class NyyProtocolHelper {
 	 * 
 	 * @param request
 	 * @return
+	 * 		返回json格式的字符串数据
 	 */
 	protected static String getNyyPostMethodContent(HttpServletRequest request) {
 		if (request == null) {
@@ -113,8 +115,10 @@ public class NyyProtocolHelper {
 	 * 从request中获取get的数据</br> 兼容携带nyy参数或者不带nyy参数 最终返回类似
 	 * {"appId":1,"sign":"x","data":{"k1":"v1"}}
 	 * 
-	 * @param request
+	 * @param request 
+	 * 		发送请求的对象 HttpServletRequest
 	 * @return
+	 * 		返回json格式的字符串数据
 	 */
 	protected static String getNyyGetMethodContent(HttpServletRequest request) {
 		if (request == null) {
@@ -134,7 +138,8 @@ public class NyyProtocolHelper {
 	/**
 	 * 获取nyy内容 </br>
 	 * 支持get 或者 post的nyy协议
-	 * @param request
+	 * @param request 
+	 * 			发送请求的对象,HttpServletRequest
 	 * @return 类似 {"appId":1,"sign":"x","data":{"k1":"v1"}}
 	 *         </br>如果method不是post或者get,则返回null
 	 */
@@ -153,11 +158,16 @@ public class NyyProtocolHelper {
 	/**
 	 * 从返回的json字符串中获取data字段
 	 * 
-	 * @param key
-	 * @param respJson
-	 * @param cls
-	 * @param sha256HashCheck
+	 * @param key 
+	 * 		字段
+	 * @param respJson 
+	 * 		json字符串
+	 * @param cls 
+	 * 		将字段转换为引用类型T 的对象实例
+	 * @param sha256HashCheck 
+	 * 		boolean 是否使用sha256进行hash检验
 	 * @return
+	 * 		json字符串中获取的data字段字符串
 	 */
 	protected static <T> T parseDataFromRespJson(String key, String respJson, Class<T> cls, boolean sha256HashCheck) {
 		if (sha256HashCheck) {
@@ -194,6 +204,7 @@ public class NyyProtocolHelper {
 	 * @param param
 	 *            要匹配的字段，比如Constants.Param.APPID Constants.Param.SIGN Constants.Param.DATA
 	 * @return
+	 * 		返回符合正在表达式的内容
 	 */
 	public static String parseNyyJsonStr(String nyyJsonStr, String param) {
 		String paramValue = null;
@@ -218,10 +229,11 @@ public class NyyProtocolHelper {
 	/**
 	 * 生成类似 {"appId":1,"sign":"x","data":{"k1":"v1"}} 返回给client
 	 * 
-	 * @param appId
+	 * @param appId 业务Id
 	 * @param key  业务的key,如果不需要key,则需为""
 	 * @param data  json格式的data
 	 * @return
+	 * 		返回nyy格式的字符串
 	 */
 	public static String genRespJson(String appId, String key, String data) {
 		if(key == null){
@@ -236,6 +248,7 @@ public class NyyProtocolHelper {
 	 *  {"appId":"123","sign":"thisissign","data":{"k1":"v1","k2":"v2"}} 获取 data字段内容 {"k1":"v1","k2":"v2"} 
 	 * @param str
 	 * @return
+	 * 	返回从nyy格式的字符串中data字段的内容
 	 */
 	 protected static String parseDataFromNyyJsonStr(String str){
 		str = str.substring(str.indexOf("{")+1);

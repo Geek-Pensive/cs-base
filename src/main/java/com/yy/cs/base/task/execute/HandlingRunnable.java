@@ -14,25 +14,52 @@ import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.trigger.Trigger;
 
-
+/**
+ * 任务处理线程
+ * @author duowan-PC
+ *
+ */
 public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Object>{
 	
 	private static final Logger logger = LoggerFactory.getLogger(HandlingRunnable.class);
 	
+	/**
+	 * 任务
+	 */
 	protected final Task task;
-	
+	/**
+	 * 触发器
+	 */
 	protected final Trigger trigger;
-	
+	/**
+	 * 任务上下文
+	 */
 	protected final TaskContext context = new TaskContext();
-	
+	/**
+	 * 任务上下文监听对象
+	 */
 	protected final TaskContext contextMonitor = new TaskContext();
-
+	/**
+	 * 触发器监听器对象
+	 */
 	protected final Object triggerContextMonitor = new Object();
-	
+	/**
+	 * 任务执行时间
+	 */
 	protected Date scheduledExecutionTime;
 	
+	/**
+	 * 任务执行后的返回结果future
+	 */
 	protected ScheduledFuture<?> currentFuture;
 	
+	/**
+	 * 构造器函数
+	 * @param task
+	 * 		任务 {@link Task}
+	 * @param trigger
+	 * 		任务触发器 {@link Trigger}
+	 */
 	public HandlingRunnable(Task task,Trigger trigger) {
 		if(task == null){
 			throw new IllegalArgumentException("task must not be null");
@@ -40,11 +67,20 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 		this.task = task;
 		this.trigger = trigger;
 	}
-	
+	/**
+	 * 获取任务上下文对象
+	 * @return
+	 * 		当前执行任务的任务上下文对象 {@link TaskContext}
+	 */
 	public TaskContext getContext() {
 		return context;
 	}
 	
+	/**
+	 * 调度一次要执行的任务,更新任务执行信息，返回任务本身
+	 * @return
+	 * 		当前执行任务本身
+	 */
 	public abstract HandlingRunnable schedule();
 	
 	
@@ -130,7 +166,12 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	public String toString() {
 		return "HandlingRunnable for " + this.task;
 	}
-	
+	/**
+	 * 判断当前时间是否已经超出下一次任务执行的时间。如果超出了执行时间则任务失效返回true
+	 * ,反之返回false
+	 * @return
+	 * 		boolean
+	 */
 	public boolean isTimeout(){
 		Date nexdDate;
 		synchronized (this.triggerContextMonitor) {

@@ -11,6 +11,11 @@ import redis.clients.jedis.JedisPool;
 
 import com.yy.cs.base.redis.RedisClient;
 
+/**
+ * redis任务锁
+ * @author duowan-PC
+ *
+ */
 public class RedisTaskLock implements TaskLock {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RedisTaskLock.class);
@@ -24,11 +29,21 @@ public class RedisTaskLock implements TaskLock {
 	private static final String defaultSplit = "&";
 	
 	private final int expire;   //失效时间3 * 60秒
-	
+	/**
+	 * 构造器函数
+	 * @param redisClient
+	 * 		{@link RedisClient} redis的java客户端jedis封装类
+	 */
 	public RedisTaskLock(RedisClient redisClient) {
 		this(redisClient,defaultExpire);
 	}
-	
+	/**
+	 * 构造器函数
+	 * @param redisClient
+	 * 		redisClient对象
+	 * @param expire
+	 * 		锁失效时间
+	 */
 	public RedisTaskLock(RedisClient redisClient, int expire) {
 		super();
 		this.redisClient = redisClient;
@@ -89,7 +104,11 @@ public class RedisTaskLock implements TaskLock {
 		}
 		return result;
 	}
-
+	/**
+	 * 获取本地的ip地址
+	 * @return
+	 * 		本地地址字符串
+	 */
 	public static String getLocalAddress() {
     	try {
 			return InetAddress.getLocalHost().toString();
