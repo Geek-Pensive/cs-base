@@ -20,7 +20,8 @@
     </dependency>
 
 #### API帮助文档连接
-		<a href="docs/index.html">docs文档</a>
+
+		<a href="./docs/index.html">docs文档</a>
     
 ---
 ## Json工具
