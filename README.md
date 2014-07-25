@@ -20,7 +20,7 @@
     </dependency>
 
 #### API帮助文档连接
-		[docs文档](./docs/index.html)
+		[docs文档](https://svn.yy.com/web/gh/cs/trunk/cs-base/doc/index.html)
     
 ---
 ## Json工具
