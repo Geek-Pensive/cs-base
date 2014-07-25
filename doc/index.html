@@ -46,8 +46,11 @@
         return true;
     }
     function loadFrames() {
-        if (targetPage != "" && targetPage != "undefined")
-             top.classFrame.location = top.targetPage;
+        if (targetPage != "" && targetPage != "undefined"){
+				top.classFrame.location = top.targetPage;
+				console.log(top.classFrame.location );
+		}
+             
     }
 </script>
 </head>
