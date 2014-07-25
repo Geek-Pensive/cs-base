@@ -30,30 +30,15 @@
 		<jdk.version>1.7</jdk.version>
 		<slf4j.version>1.7.2</slf4j.version>
 		<redis.version>2.2.1</redis.version>
-		<thrift.version>0.6.1</thrift.version>
 		<jackson.version>2.3.0</jackson.version>
 		<logback.version>1.0.9</logback.version>
 		<surefire.version>2.16</surefire.version>
 		<httpclient.version>4.3.1</httpclient.version>
-		<libpooling.version>1.0.0.5</libpooling.version>
 		<servlet.version>3.0.1</servlet.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 	<dependencies>
-		<!-- duowan -->
-		<dependency>
-			<groupId>com.duowan.pooling</groupId>
-			<artifactId>libpooling</artifactId>
-			<version>${libpooling.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -109,33 +94,7 @@
 		      <artifactId>httpcore</artifactId>
 		      <version>4.3</version>
 	    </dependency>
-		<dependency>
-			<groupId>org.apache.thrift</groupId>
-			<artifactId>libthrift</artifactId>
-			<version>${thrift.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>log4j</artifactId>
-					<groupId>log4j</groupId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.httpcomponents</groupId>
-      				<artifactId>httpclient</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.httpcomponents</groupId>
-					<artifactId>httpcore</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		 
 		<!-- redis -->
 		<dependency>
 			<groupId>redis.clients</groupId>
