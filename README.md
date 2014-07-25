@@ -18,9 +18,10 @@
       <artifactId>cs-base</artifactId>
       <version>x.x</version>
     </dependency>
+]
+#### <strong>CS-Base API Docs</strong>
 
-#### API帮助文档连接
-		[docs文档](https://svn.yy.com/web/gh/cs/trunk/cs-base/doc/index.html)
+*	<a href="/posts/library/cs-base/docs/index.html" style="color:#800;font-size:20px;font-weight:bold">帮助文档</a>
     
 ---
 ## Json工具
