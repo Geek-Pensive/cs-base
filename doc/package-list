@@ -1,0 +1,13 @@
+com.yy.cs.base.censor
+com.yy.cs.base.http
+com.yy.cs.base.json
+com.yy.cs.base.nyy
+com.yy.cs.base.redis
+com.yy.cs.base.status
+com.yy.cs.base.task
+com.yy.cs.base.task.context
+com.yy.cs.base.task.execute
+com.yy.cs.base.task.execute.lock
+com.yy.cs.base.task.thread
+com.yy.cs.base.task.trigger
+com.yy.cs.base.xml
