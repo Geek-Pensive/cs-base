@@ -24,7 +24,7 @@ import com.yy.cs.base.task.context.TaskContext;
 
 
 /**
- * <p> 解析cron表达式,复制spring 3.0中的源代码
+ * <p> 解析cron表达式,复制spring 3.0中的源代码</p>
  * 
  * {@link Trigger} implementation for cron expressions.
  * Wraps a {@link CronSequenceGenerator}.

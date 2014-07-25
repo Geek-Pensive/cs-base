@@ -4,8 +4,7 @@ import java.util.Date;
 
 /**
  * 任务状态对象
- * <p>包括任务id、下一次执行时间、上一次开始执行时间、上一次执行完成时间、异常发生的时间等。
- * @author duowan-PC
+ * <p>包括任务id、下一次执行时间、上一次开始执行时间、上一次执行完成时间、异常发生的时间等。</p>
  *
  */
 public class TaskStatus {

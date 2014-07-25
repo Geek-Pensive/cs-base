@@ -28,7 +28,7 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 /**
- * <p>解析cron表达式的依赖, 复制spring 3.0中的源代码
+ * <p>解析cron表达式的依赖, 复制spring 3.0中的源代码</p>
  * 
  * Miscellaneous {@link String} utility methods.
  *

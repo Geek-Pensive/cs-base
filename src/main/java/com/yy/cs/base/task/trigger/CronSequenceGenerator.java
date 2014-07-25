@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * <p>解析cron表达式,复制spring 3.0中的源代码
+ * <p>解析cron表达式,复制spring 3.0中的源代码</p>
  * 
  * Date sequence generator for a <a href="http://www.manpagez.com/man/5/crontab/">Crontab pattern</a>,
  * allowing clients to specify a pattern that the sequence matches.
