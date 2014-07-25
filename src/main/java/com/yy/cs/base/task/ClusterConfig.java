@@ -2,6 +2,11 @@ package com.yy.cs.base.task;
 
 import com.yy.cs.base.redis.RedisClient;
 
+/**
+ * 
+ * 集中式task的属性配置对象,需要注入 {@link RedisClient}
+ *
+ */
 public class ClusterConfig {
 
 	private RedisClient redisClient;
@@ -21,6 +26,10 @@ public class ClusterConfig {
 	public ClusterConfig(){
 		
 	}
+	/**
+	 * 
+	 * @param redisClient
+	 */
 	public ClusterConfig(RedisClient redisClient){
 		this.redisClient = redisClient ; 
 	}

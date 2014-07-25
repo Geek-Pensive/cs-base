@@ -17,7 +17,7 @@ import org.xml.sax.InputSource;
 
 
 /**
- * 
+ * 基于JDK，封装了常用XMl解析的API
  */
 public final class XmlUtils {
 

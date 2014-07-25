@@ -3,8 +3,8 @@ package com.yy.cs.base.task;
 import com.yy.cs.base.status.CsStatus;
 
 /**
- * 定时执行任务
- * @author duowan-PC
+ * 
+ * 定时任务的的抽象类，提交到 {@link TimerTaskManager} 的任务都需要继承该类，并且实现  execute() 方法
  *
  */
 public abstract class TimerTask implements Task{

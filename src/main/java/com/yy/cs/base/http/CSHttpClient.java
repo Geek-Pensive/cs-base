@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ *  基于Apache的httpclient 4.3.X以上的版本，使用PoolingHttpClientConnectionManager封装了HttpClient常用API。
+ *  <br>
+ *  池化的参数设置：{@link CSHttpClientFactory}
  */
 public class CSHttpClient {
 
@@ -320,18 +322,18 @@ public class CSHttpClient {
             requestBase.setConfig(defaultRequestConfig);	 
     		return;
         }
-    	Builder b = RequestConfig.custom();
+    	Builder builder = RequestConfig.custom();
     	if(config.getConnectionRequestTimeout() == -1){
-    		b.setConnectionRequestTimeout(defaultRequestConfig.getConnectionRequestTimeout());
+    		builder.setConnectionRequestTimeout(defaultRequestConfig.getConnectionRequestTimeout());
     	}
     	if(config.getConnectTimeout() == -1){
-    		b.setConnectTimeout(defaultRequestConfig.getConnectTimeout());
+    		builder.setConnectTimeout(defaultRequestConfig.getConnectTimeout());
     	}
     	if(config.getSocketTimeout() == -1){
-    		b.setSocketTimeout(defaultRequestConfig.getSocketTimeout());
+    		builder.setSocketTimeout(defaultRequestConfig.getSocketTimeout());
     	}
     	
-		config = b
+		config = builder
 				.setExpectContinueEnabled(config.isExpectContinueEnabled())
 				.setStaleConnectionCheckEnabled(
 						config.isStaleConnectionCheckEnabled())

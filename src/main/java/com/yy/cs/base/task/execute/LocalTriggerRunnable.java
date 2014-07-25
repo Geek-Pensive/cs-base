@@ -10,7 +10,10 @@ import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.trigger.Trigger;
 
  
- 
+/**
+ *  执行本地task、cron表达式Runnable实现
+ *
+ */
 public class LocalTriggerRunnable extends HandlingRunnable {
 	
 	private static final Logger logger = LoggerFactory.getLogger(LocalTriggerRunnable.class);
@@ -28,7 +31,7 @@ public class LocalTriggerRunnable extends HandlingRunnable {
 	}
 	
 	/**
-	 * 调度一次要执行的任务,更新任务执行信息，返回任务本身
+	 * 提交一次要执行的任务,更新任务执行信息，返回任务本身
 	 */
 	public HandlingRunnable schedule() {
 		synchronized (this.triggerContextMonitor) {

@@ -1,7 +1,7 @@
 package com.yy.cs.base.task.execute.lock;
 
 /**
- * 
+ *  集中式task的锁对象接口
  */
 public interface TaskLock {
 

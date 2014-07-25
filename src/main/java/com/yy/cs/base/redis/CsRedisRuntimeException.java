@@ -1,8 +1,7 @@
-package com.yy.cs.base.thrift.exception;
+package com.yy.cs.base.redis;
 
 /**
- * 
- * @author haoqing
+ * 操作Redis时的运行是异常
  *
  */
 public class CsRedisRuntimeException extends RuntimeException{

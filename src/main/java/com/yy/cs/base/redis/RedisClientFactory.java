@@ -21,10 +21,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
-
 /**
- * redis client线程池工厂类
+ * 管理redis的连接池工厂类，redis连接的参数设置
  *  
  */
 public class RedisClientFactory extends JedisPoolConfig{

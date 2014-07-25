@@ -20,6 +20,11 @@ import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.trigger.CronTrigger;
 import com.yy.cs.base.task.trigger.Trigger;
 
+/**
+ * 
+ * Task的注册类，存放了所以的注册task的信息
+ *
+ */
 public class TimerTaskRegistrar {
 	
 	private static final Logger logger = LoggerFactory.getLogger(TimerTaskRegistrar.class);

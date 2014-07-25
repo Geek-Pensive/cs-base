@@ -3,9 +3,11 @@ package com.yy.cs.base.redis;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
-
-
+/**
+ * 
+ * 工具类
+ *
+ */
 public class RedisUtils {
 	
 	/**

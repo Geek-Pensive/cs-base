@@ -1,4 +1,4 @@
-package com.yy.cs.base.thrift.exception;
+package com.yy.cs.base.nyy;
 
 /**
  * 针对nyy协议的runtime异常

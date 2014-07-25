@@ -15,8 +15,7 @@ import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.trigger.Trigger;
 
 /**
- * 任务处理线程
- * @author duowan-PC
+ * 任务处理的Handling 抽象类，实现了{@link Runnable},{@link ScheduledFuture}接口
  *
  */
 public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Object>{
@@ -40,7 +39,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	 */
 	protected final TaskContext contextMonitor = new TaskContext();
 	/**
-	 * 触发器监听器对象
+	 * 锁
 	 */
 	protected final Object triggerContextMonitor = new Object();
 	/**

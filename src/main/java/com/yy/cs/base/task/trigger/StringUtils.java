@@ -28,6 +28,8 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 /**
+ * <p>解析cron表达式的依赖, 复制spring 3.0中的源代码
+ * 
  * Miscellaneous {@link String} utility methods.
  *
  * <p>Mainly for internal use within the framework; consider

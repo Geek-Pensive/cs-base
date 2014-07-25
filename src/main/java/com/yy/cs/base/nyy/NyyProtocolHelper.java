@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,14 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.protocol.HTTP;
 
 import com.yy.cs.base.json.Json;
 import com.yy.cs.base.nyy.Constants.Enc;
 import com.yy.cs.base.nyy.Constants.Param;
 import com.yy.cs.base.nyy.Constants.Symbol;
-import com.yy.cs.base.thrift.exception.CsNyyRuntimeException;
-import com.yy.cs.base.thrift.exception.CsNyySecurityException;
 
 /**
  * nyy协议解析帮忙类

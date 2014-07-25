@@ -11,8 +11,7 @@ import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 
 
 /**
- * 定时执行任务管理器
- * @author duowan-PC
+ * 定时执行任务管理器，所以需要执行的任务，都需要提交到此类中
  *
  */
 public class TimerTaskManager {
@@ -29,23 +28,36 @@ public class TimerTaskManager {
      
      private MonitorType monitorType;
      
+     
      public String getMonitorfile() {
 		return monitorfile;
      }
-
-	public void setMonitorfile(String monitorfile) {
-		this.monitorfile = monitorfile;
-	}
+     
+     /**
+      * set监控文件的存放路径，文件的全路径
+      * @param monitorfile 监控文件的存放路径
+      */
+	 public void setMonitorfile(String monitorfile) {
+		 this.monitorfile = monitorfile;
+	 }
 	
-	public MonitorType getMonitorType() {
-		return monitorType;
-	}
-
-	public void setMonitorType(MonitorType monitorType) {
-		this.monitorType = monitorType;
-	}
-
-	public void addTimerTask(String id,TimerTask task){
+	 public MonitorType getMonitorType() {
+		 return monitorType;
+	 }
+	 /**
+	  * 监控文件的格式，支持HTML和log格式
+	  * @param monitorType
+	  */
+	 public void setMonitorType(MonitorType monitorType) {
+		 this.monitorType = monitorType;
+	 }
+	 
+	 /**
+	  * 增加一个Task任务
+	  * @param id  任务id
+	  * @param task Task任务
+	  */
+	 public void addTimerTask(String id,TimerTask task){
     	 if(timerTasks ==  null){
     		 timerTasks = new HashMap<String,TimerTask>();
     	 }
@@ -70,10 +82,13 @@ public class TimerTaskManager {
     	 }
      }
      
+     /**
+      * 销毁定时任务器
+      */
      public void destroy(){
     	 if(isStart){
-    		 registrar.destroy();
     		 isStart = false;
+    		 registrar.destroy();
     	 }
      }
      /**
@@ -95,25 +110,31 @@ public class TimerTaskManager {
 //					context.getExceptionTime(),context.executeAddress(),context.getT());
 //     }
      
+     
+	 public Map<String, TimerTask> getTimerTasks() {
+		 return timerTasks;
+	 }
 
-	public Map<String, TimerTask> getTimerTasks() {
-		return timerTasks;
-	}
-
-
+	/**
+	 * 增加Task任务集合
+	 * @param timerTasks <taskid TimerTask>的集合关系映射
+	 */
 	public void setTimerTasks(Map<String, TimerTask> timerTasks) {
 		this.timerTasks = timerTasks;
 	}
 	
 	
-	
 	public int getPoolSize() {
 		return poolSize;
 	}
-
+	
+	/**
+	 * 设置任务池的线程数量
+	 * @param poolSize 池数量
+	 */
 	public void setPoolSize(int poolSize) {
 		if(poolSize < 1){
-			throw new IllegalArgumentException("TimerTaskManage poolSize Not less than 1"); 
+			throw new IllegalArgumentException(" poolSize Not less than 1"); 
 		}
 		this.poolSize = poolSize;
 	}

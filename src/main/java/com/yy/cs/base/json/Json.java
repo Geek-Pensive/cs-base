@@ -8,10 +8,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * 
+ * 封装了jackson常用的API，默认 disable了FAIL_ON_UNKNOWN_PROPERTIES参数，忽略不存在的属性
+ *
+ */
 public class Json {
 
 	private final static ObjectMapper mapper = new ObjectMapper();
-//	private static final Logger LOG = LoggerFactory.getLogger(Json.class);
 
 	static {
 		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); // 忽略不存在的属性

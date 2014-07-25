@@ -20,9 +20,9 @@ import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.task.thread.NamedThreadFactory;
 
 /**
- * 
- * @author duowan-leedk
- *
+ * 从http://do.yy.duowan.com获取检查反低俗关键子列表
+ * <br>
+ * 缓存了关键字，5分钟定时刷新数据
  */
 public class KeyWordUtil {
 
@@ -38,7 +38,7 @@ public class KeyWordUtil {
 	
 	private static KeyWordUtil keywordUtil = new  KeyWordUtil();
 	
-	ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,new NamedThreadFactory("KeyWordUtil",true));
+	private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,new NamedThreadFactory("KeyWordUtil",true));
 	
 	private final CSHttpClient httpClient;
 	/**
@@ -151,7 +151,7 @@ public class KeyWordUtil {
 	 * @return byte[] 解缩后的数据，返回字节数组
 	 * @throws IOException
 	 */
-    public byte[] unGZip(byte[] data) throws IOException {
+	private byte[] unGZip(byte[] data) throws IOException {
 		byte[] b = null;
 		ByteArrayInputStream bis = new ByteArrayInputStream(data);
 		GZIPInputStream gzip = new GZIPInputStream(bis);
@@ -169,14 +169,6 @@ public class KeyWordUtil {
 		return b;
     }
     
-	 /**
-     * Checks if the signature matches what is expected for a .gz file.
-     *
-     * @param signature the bytes to check
-     * @param length    the number of bytes to check
-     * @return    true if this is a .gz stream, false otherwise
-     *
-     */
     private boolean matchesGZ(byte[] signature, int length) {
 
         if (length < 2) {
@@ -252,7 +244,6 @@ public class KeyWordUtil {
 	}
 	/**
 	 * 执行获取过滤关键字的任务
-	 * @author duowan-leedk
 	 *
 	 */
 	private class Task implements Runnable{
@@ -268,7 +259,6 @@ public class KeyWordUtil {
 	
 	/**
 	 * 关键字类型
-	 * @author duowan-leedk
 	 *
 	 */
 	public enum KeywordType {

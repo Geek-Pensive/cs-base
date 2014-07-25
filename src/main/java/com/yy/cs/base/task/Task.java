@@ -2,8 +2,8 @@ package com.yy.cs.base.task;
 
 import com.yy.cs.base.status.CsStatus;
 /**
- * 任务
- * @author duowan-PC
+ * 
+ * 任务接口
  *
  */
 public interface Task {

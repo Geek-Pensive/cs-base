@@ -9,11 +9,8 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Transaction;
 
-import com.yy.cs.base.thrift.exception.CsRedisRuntimeException;
-
 /**
- * redis client 的封装类
- * @author duowan-leedk
+ * 基于jedis封装了,redis的一些常用工具类。
  *
  */
 public class RedisClient {

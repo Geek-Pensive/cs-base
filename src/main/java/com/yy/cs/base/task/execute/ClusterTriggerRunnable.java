@@ -14,8 +14,7 @@ import com.yy.cs.base.task.trigger.Trigger;
 
  
 /**
- * 通过在redis中注册任务执行的
- * @author duowan-PC
+ *  执行集中式task、cron表达式的Runnable实现
  *
  */
 public class ClusterTriggerRunnable extends HandlingRunnable {

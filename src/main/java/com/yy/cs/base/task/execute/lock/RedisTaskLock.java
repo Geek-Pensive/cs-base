@@ -12,8 +12,7 @@ import redis.clients.jedis.JedisPool;
 import com.yy.cs.base.redis.RedisClient;
 
 /**
- * redis任务锁
- * @author duowan-PC
+ * 执行redis任务锁对象
  *
  */
 public class RedisTaskLock implements TaskLock {

@@ -14,7 +14,6 @@ import com.yy.cs.base.task.trigger.Trigger;
 
 /**
  * 基于线程池的任务调度器
- * @author duowan-PC
  *
  */
 public class ThreadPoolTaskScheduler implements TaskScheduler  {
