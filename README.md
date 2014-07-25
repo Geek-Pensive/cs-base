@@ -22,6 +22,7 @@
 #### <strong>CS-Base API Docs</strong>
 
 *	<a href="/posts/library/cs-base/docs/index.html" style="color:#800;font-size:20px;font-weight:bold">帮助文档</a>
+*   <a href="https://svn.yy.com/web/gh/cs/trunk/cs-base/doc/index.html>xxx</a>
     
 ---
 ## Json工具
