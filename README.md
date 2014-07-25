@@ -18,6 +18,9 @@
       <artifactId>cs-base</artifactId>
       <version>x.x</version>
     </dependency>
+
+#### API帮助文档连接
+		<a href="docs/index.html">docs文档</a>
     
 ---
 ## Json工具
