@@ -9,6 +9,11 @@
 > | 负责人                               | 李方杰（开发），吴浩清（开发），欧阳柱（开发）              |
 > | 应用业务                             |                                                             |
 
+
+#### <strong>CS-Base API Docs</strong>
+
+*	<a href="/web/posts/library/cs-base/docs/index.html" style="color:#800;font-size:20px;font-weight:bold">帮助文档</a>
+
 ---
 ## 使用
 #### pom.xml配置
@@ -18,10 +23,7 @@
       <artifactId>cs-base</artifactId>
       <version>x.x</version>
     </dependency>
-]
-#### <strong>CS-Base API Docs</strong>
-
-*	<a href="/web/posts/library/cs-base/docs/index.html" style="color:#800;font-size:20px;font-weight:bold">帮助文档</a>
+	
     
 ---
 ## Json工具
