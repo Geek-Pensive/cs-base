@@ -172,6 +172,26 @@ HTTP返回（不作URL Encoding）
 
 
 ----
+## jsonp形式的nyy扩展
+
+在业务前后端交互时，会使用到jsonp技术进行函数回调。jsonp形式的nyy扩展为这种情况作了以下定义，并会在nyy-framework提供相关支持。
+
+如按照以下规范，将得到nyy-framework的相关支持
+
+1.前端请求发起
+Method: HTTP POST
+请求中的body内容：{"appId":"XXX","sign":"XXX","callback":"自定义的回调函数名称funcname","data":{"k1":"v1"}}
+或
+Method: HTTP GET
+请求中的参数列表的内容：appId="XXX"&sign="XXX"&callback="自定义的回调函数名称funcname"&data={"k1":"v1"}
+
+2.服务端响应
+纯字符串：funcname(...)
+funcname中的内容由服务端生成来响应
+
+注：据我了解，目前伟腾那边是如此格式使用的。如果大家OK，我们就把这种对jsonp的nyy扩展定下来，nyy-framework就可以开展支持工作
+
+----
 ## Tips
 
 #### data字段提取以验证sign的简易方式
