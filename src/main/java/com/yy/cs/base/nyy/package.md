@@ -181,7 +181,7 @@ HTTP返回（不作URL Encoding）
 1.前端请求发起
 Method: HTTP POST
 请求中的body内容：{"appId":"XXX","sign":"XXX","callback":"自定义的回调函数名称funcname","data":{"k1":"v1"}}
-或
+
 Method: HTTP GET
 请求中的参数列表的内容：appId="XXX"&sign="XXX"&callback="自定义的回调函数名称funcname"&data={"k1":"v1"}
 
