@@ -183,7 +183,7 @@ Method: HTTP POST
 请求中的body内容：{"appId":"XXX","sign":"XXX","callback":"自定义的回调函数名称funcname","data":{"k1":"v1"}}
 
 Method: HTTP GET
-请求中的参数列表的内容：appId="XXX"&sign="XXX"&callback="自定义的回调函数名称funcname"&data={"k1":"v1"}
+请求中的参数列表的内容：appId=XXX&sign=XXX&callback=自定义的回调函数名称funcname&data={"k1":"v1"}
 
 2.服务端响应
 纯字符串：funcname(...)
