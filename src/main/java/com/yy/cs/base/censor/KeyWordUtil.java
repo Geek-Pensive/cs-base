@@ -1,23 +1,24 @@
 package com.yy.cs.base.censor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPInputStream;
-
+import com.yy.cs.base.http.CSHttpClient;
+import com.yy.cs.base.http.HttpClientException;
+import com.yy.cs.base.task.thread.NamedThreadFactory;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.HttpGet;
 
-import com.yy.cs.base.http.CSHttpClient;
-import com.yy.cs.base.http.HttpClientException;
-import com.yy.cs.base.task.thread.NamedThreadFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
 /**
  * 从http://do.yy.duowan.com获取检查反低俗关键子列表
@@ -31,10 +32,10 @@ public class KeyWordUtil {
 	private String HIGH_KEYWORD_LIST_URL = "http://do.yy.duowan.com/HighKWordlist.txt";
 	private String NORMAL_KEYWORD_LIST_URL = "http://do.yy.duowan.com/NormalKWordlist.txt";
 	private String LOW_KEYWORD_LIST_URL = "http://do.yy.duowan.com/LowKWordlist.txt";
-	
+
 	private long interval = 5 * 1000 * 60;
-	
-	private static Map<KeywordType, String> keywordMap = new HashMap<KeywordType, String>();
+
+	private static Map<KeywordType, CensorWords> keywordMap = new HashMap<KeywordType, CensorWords>();
 	
 	private static KeyWordUtil keywordUtil = new  KeyWordUtil();
 	
@@ -55,8 +56,8 @@ public class KeyWordUtil {
 		httpClient = new CSHttpClient();
 	}
 	
-	private String getKeyword(KeywordType type) {
-		String keyword = keywordMap.get(type);
+	private CensorWords getKeyword(KeywordType type) {
+        CensorWords keyword = keywordMap.get(type);
 		return keyword;
 	}
 	
@@ -89,26 +90,12 @@ public class KeyWordUtil {
 	 * 		boolean 如果是关键字则返回true,否则返回false
 	 */
 	public boolean checkKeyword(String word, KeywordType type) {
-		String keywords = getKeyword(type);
-		if(keywords == null || "".equals(keywords)){
+        CensorWords cw = getKeyword(type);
+		if(cw == null || "".equals(cw)){
 			autoLoadKeyword();
-			keywords = getKeyword(type);
+            cw = getKeyword(type);
 		}
-		boolean isKeyword = false;
-		String[] keywordArr = String.valueOf(keywords).split("\n");
-		String stext = word.trim();
-		String keyword = "";
-		for (String key : keywordArr) {
-			if(key == null ||  key.isEmpty()){
-				continue;
-			}
-			keyword = key.trim();
-			if (stext.contains(keyword)) {
-				isKeyword = true;
-				break;
-			}
-		}
-		return isKeyword;
+		return cw.isCensor(word);
 	}
 	
 	/**
@@ -230,8 +217,14 @@ public class KeyWordUtil {
 			try {
 				String keyword = this.loadKeyword(type);
 				// logger.info("loading keyword by type:" + type);
+                List<String> ls = new LinkedList<String>();
+                String[] ar = keyword.split("\n");
+                for (String s: ar) {
+                    ls.add(s.trim());
+                }
+                CensorWords cw = CensorWords.build(ls);
 				if (keyword != null && ! keyword.isEmpty()) {
-					keywordMap.put(type, keyword);
+					keywordMap.put(type, cw);
 				}
 			} catch (Exception e) {
 				logger.error("load keyword error,type=[" + type + "] message="
