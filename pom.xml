@@ -6,22 +6,15 @@
 	<version>1.0.2</version>
 	<name>cs-base</name>
 	<url>http://maven.apache.org</url>
+
 	<distributionManagement>
 		<snapshotRepository> 
 			<id>jrepo2-public</id>
 			<url>http://jrepo2.yypm.com/nexus/content/repositories/snapshots/</url>
-			<!--
-			<id>nexus-snapshots</id>
-			<url>http://jrepo.yypm.com/nexus/content/repositories/snapshots/</url>
-			-->
 		</snapshotRepository>
 		<repository>
 			<id>jrepo2-public</id>
 			<url>http://jrepo2.yypm.com/nexus/content/repositories/releases/</url>
-			<!--
-			<id>nexus-releases</id>
-			<url>http://jrepo.yypm.com/nexus/content/repositories/releases/</url>
-			-->
 		</repository>
 	</distributionManagement>
 
