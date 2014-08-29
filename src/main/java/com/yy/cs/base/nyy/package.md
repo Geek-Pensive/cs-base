@@ -187,9 +187,8 @@ Method: HTTP GET
 
 2.服务端响应
 纯字符串：funcname(...)
-funcname中的内容由服务端生成来响应
-
-注：据我了解，目前伟腾那边是如此格式使用的。如果大家OK，我们就把这种对jsonp的nyy扩展定下来，nyy-framework就可以开展支持工作
+funcname中的内容格式为{"appId":"xx","sign":"xx","data":{"key1":"val1"}}
+其中服务端只需响应data中的数据，其它部分nyy-framework自动封装好
 
 ----
 ## Tips
