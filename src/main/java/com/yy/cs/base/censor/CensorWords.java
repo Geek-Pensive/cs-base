@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Author zhuhui@yy.com
+ * Created by lookatmeyou on 2014/8/21.
  */
 public class CensorWords {
     private CensorNode root = null;
@@ -60,3 +60,4 @@ public class CensorWords {
         return 1;
     }
 }
+

@@ -20,9 +20,16 @@ public interface Task {
 	 */
 	 String getId();
 	 /**
-	  * 获取执行返回状态
+	  * 获取当前task的运行状态
 	  * @return
 	  * 	任务状态 {@link CsStatus}
 	  */
 	 CsStatus getCsStatus();
+	 
+	 /**
+      * 设置当前task的运行状态
+      * @return
+      *     任务状态 {@link CsStatus}
+      */
+	 void setCsStatus(CsStatus csStatus);
 }

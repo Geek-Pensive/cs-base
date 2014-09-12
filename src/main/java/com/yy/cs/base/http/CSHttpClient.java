@@ -332,7 +332,6 @@ public class CSHttpClient {
     	if(config.getSocketTimeout() == -1){
     		builder.setSocketTimeout(defaultRequestConfig.getSocketTimeout());
     	}
-    	
 		config = builder
 				.setExpectContinueEnabled(config.isExpectContinueEnabled())
 				.setStaleConnectionCheckEnabled(

@@ -1,7 +1,7 @@
 package com.yy.cs.base.censor;
 
 /**
- * Author zhuhui@yy.com
+ * Created by lookatmeyou on 2014/8/21.
  */
 public class CensorNode {
     private boolean over = false;
@@ -21,3 +21,4 @@ public class CensorNode {
         over = true;
     }
 }
+

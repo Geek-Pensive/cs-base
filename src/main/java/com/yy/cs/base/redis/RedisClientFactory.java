@@ -134,8 +134,8 @@ public class RedisClientFactory extends JedisPoolConfig{
 				String password = strArray[2];
 				int timeout = strArray[3] != null ? Integer
 						.valueOf(strArray[3]) : 10000;// 默认是10秒
-				pool = new JedisPool(this, ip, port, timeout, password);
 				try {
+				    pool = new JedisPool(this, ip, port, timeout, password);
 					jedis = pool.getResource();
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);

@@ -10,7 +10,10 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.status.StatusCode;
 import com.yy.cs.base.task.Task;
+import com.yy.cs.base.task.context.Constants;
 import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.trigger.Trigger;
 
@@ -102,6 +105,25 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 			synchronized (this.triggerContextMonitor) {
 				startTime = null;
 			}
+			CsStatus status =  new CsStatus();
+            status.setName(task.getId());
+            TaskContext context = this.getContext();
+            status.additionInfo(Constants.TASK_ID, task.getId());
+            status.additionInfo(Constants.NEXT_EXECUTE_TIME, context.nextScheduledExecutionTime());
+            status.additionInfo(Constants.LAST_START_TIME, context.lastStartTime());
+            status.additionInfo(Constants.LAST_COMPLETION_TIME, context.lastCompletionTime());
+            status.additionInfo(Constants.EXECUTE_ADDRESS, context.executeAddress());
+            status.additionInfo(Constants.LAST_EXCEPTION_TIME, context.getExceptionTime());
+            status.additionInfo(Constants.THROWABLE, context.getT());
+            boolean istimeout =this.isTimeout();
+            status.additionInfo(Constants.TIMEOUT, istimeout);
+            if(istimeout){
+                status.setCode(StatusCode.WRONG);
+            }
+            if(context.getT() != null){
+                status.setCode(StatusCode.FAIL);
+            }
+            task.setCsStatus(status);
 		}
 	}
 
