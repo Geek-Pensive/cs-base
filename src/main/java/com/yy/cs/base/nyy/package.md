@@ -3,18 +3,25 @@
 ----
 ## 概要
 
-> | **项**   | **详细**                                             |
-> | ---      | ---                                                  |
-> | 状态     | 初稿                                                 |
-> | 撰写人   | 欧阳柱  吴浩清                                       |
-> | 应用业务 | 已有重要项目生产应用中<br>精彩世界数据接口（开发中）</br>在线集合 |
+> | **项**   | **详细**               |
+> | ---      | ---                    |
+> | 联系人   | 欧阳柱，温子恒         |
+> | 状态     | 已经大量应用于各种系统 |
 
-目前很多业务和服务的开发过程中，有大量的通信需求，但缺少一种统一的设计思路。导致目前通信在协议形式，依赖技术，实现方式等方面都有较大的差异，重复的工作较多，不利于团队的积累。
+业务开发通常有大量的通信需求，协议不统一容易导致通信在协议形式，依赖技术，实现方式等方面都有较大的差异，重复的工作较多，不利于团队的积累。
 
-这里尝试定义一种通信协议的设计思路，主要目的为简化通信协议的设计，减轻开发工作量，降低沟通的成本。理想的状态是，业务只需要约定业务数据与字段，说明使用”NYY协议，封装方式一，安全场景一”，即可以双方无依赖的进行开发。
+这里尝试定义一种通用的通信协议，主要目的为简化通信协议的设计，减轻开发工作量，降低沟通的成本。理想的状态是，业务只需要约定业务数据与字段，说明使用”NYY协议，封装方式一，安全场景一”，即可以双方无依赖的进行开发。
 
 ----
-## 思路
+## 代码支持
+
+目前已经针对NYY的主要场景进行了代码封装（Java）：[NYY Framework][]
+
+强烈建议使用它，可以极大的提高开发效率。
+
+
+----
+## 基本约定
 
 1. 统一编码与算法
 	- 说明一：对于ASCII以外的编码，使用UTF-8。
@@ -31,7 +38,7 @@
 	- 说明一：HTTP可以很简单的通过反向代理/DNS等支持Load Balance，Failover。HTTPS可以提供链路加密。
 	- 说明二：建议同时支持HTTP GET和POST方式。
 	- 说明三：普遍认为HTTP的短连接性能不高，其实HTTP也支持长连接，虽然理论上仍不及一些二进制协议，但大多数业务场景下并不是瓶颈所在。
-	- 好处：十分通用的技术，Web前端的Javascript天然支持，其它语言也容易支持。
+	- 好处：十分通用的技术，各种语言均容易支持。
 	<br/><br/>
 
 1. JSON作数据封装
@@ -41,14 +48,23 @@
 	<br/><br/>
 
 1. 提供通用的安全机制
-	- 说明：下面”具体设计”一节会有详细说明
+	- 说明：下面”安全机制”一节会有详细说明
 	- 好处：减轻业务在安全方面的工作量
 	<br/><br/>
 
 ----
 ## 具体设计
 
-### 协议内容
+### 设计思路
+
+- 协议主要有三个字段：appId，sign，data先其中一种
+- appId：字段用于标识请求的来源，一般由服务端分配
+- sign：用于安全校验，详见”安全机制”一节
+- data：用于业务数据，需要业务作具体设计（建议扁平的Key-Value形式）
+- 请求有两种GET方式和一种POST方式，服务器兼容三种方式最好，部分支持也可以
+
+
+### 协议设计
 
 实际内容（假设请求和返回都是它）
 >	`appId=1,sign="x",data={"k1":"v1"}` 
@@ -66,13 +82,6 @@ HTTP返回（不作URL Encoding）
 >	`{"appId":1,"sign":"x","data":{"k1":"v1"}}` 
 
 
-### 协议说明
-
-- appId：由服务器端分配给业务端的ID。
-- sign：用于安全校验的Hash（如SHA256），或是UDB的认证Token。
-- data：所有的业务数据（建议扁平的Key-Value形式）
-- 请求有两种GET方式和一种POST方式，服务器兼容三种方式最好，先其中一种支持也可以
-
 ### 建议
 
 1. 业务字段的设计中不建议使用"appId"这个key。因为如果与外层的"appId"值不一致的话，容易引起安全上的问题（身份伪造）。
@@ -84,7 +93,7 @@ HTTP返回（不作URL Encoding）
    - statusMsg：响应中的状态/结果信息，String，针对statusCode给出的详细信息
 
 ----
-## 安全机制
+## 安全场景
 
 这里的安全校验，是协议层面的安全机制。与其它层面的安全机制（如应用级的白名单，机器级的iptables等）并不冲突，而且往往可以形成互补，提高系统整体的安全性。
 
@@ -92,8 +101,11 @@ HTTP返回（不作URL Encoding）
 
 ### 安全场景一：无需安全检查
 
-在最简单的场景下，业务可能不需要任务安全检查。此时把appId和sign留空即可。
+<br/>
+<a target="_blank" href="/posts/standard/nyy/nyy_s1.jpg"><img class="img-responsive" src="/posts/standard/nyy/nyy_s1.jpg" alt= "NYY安全场景一" style="margin: 0 auto; width: 500px;"/></a>
+<br/>
 
+在最简单的场景下，业务可能不需要任务安全检查。此时把appId和sign留空即可。
 但仍旧建议保留appId和sign在设计中，一是为将来预留，二是通用的代码可以统一支持
 
 | **数据项**      | **示例**                                                       |
@@ -103,12 +115,17 @@ HTTP返回（不作URL Encoding）
 | 生成哈希的源串  | （不需要）                                                     |
 | 消息中appId的值 | （为空即可）                                                   |
 | 消息中sign的值  | （为空即可）                                                   |
-| 消息中data的值  | `{"chId":"Zfb","payer":"小王"}`                                |
+| 消息中data的值  | `{"chId":"Zfb","payer":"小王"}`                               |
 
-### 安全场景二：仅需要简单的完整性校验（服务器间通信）
+### 安全场景二：仅校验业务数据（服务器间通信）
+
+<br/>
+<a target="_blank" href="/posts/standard/nyy/nyy_s2.jpg"><img class="img-responsive" src="/posts/standard/nyy/nyy_s2.jpg" alt="NYY安全场景二" style="margin: 0 auto; width: 500px;"/></a>
+<br/>
 
 在一些简单的服务器间通信过程中，仅需要检验数据的完整性，并不需要作更高的安全要求。或者更高的安全需求已经通过其它机制完成。
 此时，服务端可以给每个不同的客户端（appId）分配一个唯一的key。通信中对data进行如下的哈希操作（哈希算法使用SHA256）：
+*注意*：校验sign时，需要使用原原本本的data json串，即在网络传输中的data json串。而不能是已经解析成对象后再次生成的Json串（存在乱序导致校验不成功的风险）
 
 | **数据项**      | **示例**                                                                                                   |
 | ----            | ----                                                                                                       |
@@ -117,15 +134,41 @@ HTTP返回（不作URL Encoding）
 | 生成哈希的源串  | `data={"chId":"Zfb","payer":"小王"}&key=ljfadjaf023ur32lj` <br>注意这里是字符串而不是对象，应使用UTF-8编码 |
 | 消息中appId的值 | （事先分配给对应业务的id）                                                                                 |
 | 消息中sign的值  | `SHA256(data={"chId":"Zfb","payer":"小王"}&key=ljfadjaf023ur32lj)`                                         |
-| 消息中data的值  | `{"chId":"Zfb","payer":"小王"}`<br/>在HTTP请求中**需要**进行URL Encode                                     |
+| 消息中data的值  | `{"chId":"Zfb","payer":"小王"}`                                    |
 	
-### 安全场景三：仅需要简单的完整性校验（客户端与服务器端通信）
+### 安全场景三：仅校验用户身份（客户端与服务器端通信）
 
-在一些非服务器间通信的过程中，因为代码运行于用户端，分配appId和key的做法变得不安全。此时需要通过UDB的安全Token来进行校验才可以实现。
+<br/>
+<a target="_blank" href="/posts/standard/nyy/nyy_s3.jpg"><img class="img-responsive" src="/posts/standard/nyy/nyy_s3.jpg" alt="NYY安全场景三" style="margin: 0 auto; width: 500px;"/></a>
+<br/>
 
-简述一下背后原理：客户端生成UDB Token时，UDB接口允许带入一个字符串，而服务器端利用UDB接口验证这个Token时，接口会返回生成Token时所带入的字符串。这里的字符串我们采用data的哈希值（哈希算法使用SHA256，但不再附加key），之所以采用data的哈希值而不使用data本身，是为了避免生成的Token过大。
+在客户端与服务器间通信的过程中，因为代码运行于用户端，需要通过UDB的安全Token来进行校验才可以实现。
+在一些业务中，需要校验用户的身份信息，但业务字段（data）中的信息并不重要。
+此时，客户端只需要把UDB的Token放在sign中即可。好处是直接利用UDB的Token即可明确用户身份。
+//TODO：cookie
+*注意*：这种场景中，业务数据（data）中的内容存在被篡改的可能，业务需要明确此风险。
 
+| **数据项**      | **示例**                                                       |
+| ----            | ----                                                           |
+| 业务数据        | `{"chId":"Zfb","payer":"小王"}` <br/>Json字符串，使用UTF-8编码 |
+| 事先约定的Key   | （利用UDB的安全机制，无需事先确定key）                         |
+| 生成哈希的源串  | 无                                                             |
+| 消息中appId的值 | （事先分配给对应业务的id）                                     |
+| 消息中sign的值  | UDB的Token                                                     |
+| 消息中data的值  | `{"chId":"Zfb","payer":"小王"}`                                |
+	
+### 安全场景四：同时校验用户身份和业务数据（客户端与服务器端通信）
+
+<br/>
+<a target="_blank" href="/posts/standard/nyy/nyy_s4.jpg"><img class="img-responsive" src="/posts/standard/nyy/nyy_s4.jpg" alt="NYY安全场景四" style="margin: 0 auto; width: 500px;"/></a>
+<br/>
+
+类似安全场景三，很多业务不仅需要确认用户的身份，还需要确认业务数据的完整性。此时需要借助UDB的另一种带附加信息的安全Token才可以实现。
+
+简述一下背后原理：客户端生成UDB Token时，这个UDB接口允许带入一个字符串，而服务器端利用UDB接口验证这个Token时，接口会返回生成Token时所带入的字符串。
+协议可以利用这个字符串来传输data的哈希值（哈希算法使用SHA256，但不再附加key），以确认数据的完整性。之所以采用data的哈希值而不使用data本身，是为了避免生成的Token过大。
 这种机制需要依赖公司UDB的相关验证接口，UDB对已有一定的支持（Javascript前端暂时好像没支持）。目前在一些重要的业务过程中已经成功使用了这种机制，欢迎联系咨询。
+*注意*：校验sign时，需要使用原原本本的data json串，即在网络传输中的data json串。而不能是已经解析成对象后再次生成的Json串（存在乱序导致校验不成功的风险）
 
 | **数据项**      | **示例**                                                                                                        |
 | ----            | ----                                                                                                            |
@@ -136,11 +179,14 @@ HTTP返回（不作URL Encoding）
 | 消息中sign的值  | `gen_udb_token(  SHA256(data={"chId":"Zfb","payer":"小王"})  )` <br>使用UDB提供的库，把上面”源串”的哈希值也带入 |
 | 消息中data的值  | `{"chId":"Zfb","payer":"小王"}`<br/>在HTTP请求中**需要**进行URL Encode                                          |
 
-### 安全场景四：需要较安全的加密（服务器间通信）
+### 安全场景五：加密业务数据（服务器间通信）
+
+<br/>
+<a target="_blank" href="/posts/standard/nyy/nyy_s5.jpg"><img class="img-responsive" src="/posts/standard/nyy/nyy_s5.jpg" alt="NYY安全场景五" style="margin: 0 auto; width: 500px;"/></a>
+<br/>
 
 在一些安全性要求很高的场合，也可以对data进行加密，这样既除了保证数据的完整性，还可以加强数据的保密性。加密算法使用AES。
-
-注：也可以通过HTTPS的方式实现数据的保密性，但不能做到针对不同appId这样的粒度。
+*注意*：也可以通过HTTPS的方式实现数据的保密性，但不能做到针对不同appId这样的粒度。
 
 | **数据项**      | **示例**                                                                                                                        |
 | ----            | ----                                                                                                                            |
@@ -151,15 +197,19 @@ HTTP返回（不作URL Encoding）
 | 消息中sign的值  | （为空即可）                                                                                                                    |
 | 消息中data的值  | `BASE64(  AES({"chId":"Zfb","payer":"小王"}, ljfadjaf023ur32lj)  )`<br/>注意：在HTTP请求中，生成的字节码需要转换成BASE64，**不需要**进行URL Encode |
 	
-### 安全场景五：需要较安全的加密（客户端与服务器端通信）
+### 安全场景六：加密业务数据（客户端与服务器端通信）
+
+<br/>
+<a target="_blank" href="/posts/standard/nyy/nyy_s6.jpg"><img class="img-responsive" src="/posts/standard/nyy/nyy_s6.jpg" alt="NYY安全场景六" style="margin: 0 auto; width: 500px;"/></a>
+<br/>
 
 在一些安全性要求很高的场合，也可以对data进行加密，这样既除了保证数据的完整性，还可以加强数据的保密性。加密算法使用AES。
-
 在一些非服务器间通信的过程中，因为代码运行于用户端，分配appId和key的做法变得不安全。此时需要通过UDB的安全Token来进行校验才可以实现。
 
 简述一下背后原理：客户端生成UDB Token时，UDB接口允许带入一个字符串，而服务器端利用UDB接口验证这个Token时，接口会返回生成Token时所带入的字符串。这里的字符串我们采用针对data加密的随机密钥。
-
 这种机制需要依赖公司UDB的相关验证接口，UDB对已有一定的支持（Javascript前端暂时好像没支持）。
+
+*注意*：也可以通过HTTPS的方式实现数据的保密性，但不能做到针对不同appId这样的粒度。
 
 | **数据项**      | **示例**                                                                                                                                            |
 | ----            | ----                                                                                                                                                |
@@ -172,256 +222,146 @@ HTTP返回（不作URL Encoding）
 
 
 ----
-## jsonp形式的nyy扩展
+## 扩展一：文件上传
 
-在业务前后端交互时，会使用到jsonp技术进行函数回调。jsonp形式的nyy扩展为这种情况作了以下定义，并会在nyy-framework提供相关支持。
+在一些业务场景中，需要上传文件。简单的做法是直接把文件编码后（例如Base64）放在data中作为一个字段来传输。
 
-如按照以下规范，将得到nyy-framework的相关支持
+但这样做一方面会因为编码降低传输效率（例如Base64会使尺寸增大三分之一），另一方面没有较好的利用HTTP协议本身的multipart特性。
 
-1.前端请求发起
-Method: HTTP POST
-请求中的body内容：{"appId":"XXX","sign":"XXX","callback":"自定义的回调函数名称funcname","data":{"k1":"v1"}}
+*注意*：此扩展已经在[NYY Framework][]中支持。
 
-Method: HTTP GET
-请求中的参数列表的内容：appId=XXX&sign=XXX&callback=自定义的回调函数名称funcname&data={"k1":"v1"}
+### 请求
 
-2.服务端响应
-纯字符串：funcname(...)
-funcname中的内容格式为{"appId":"xx","sign":"xx","data":{"key1":"val1"}}
-其中服务端只需响应data中的数据，其它部分nyy-framework自动封装好
+通过标准的HTTP Multipart的方式来传输文件，即：
+
+- 参数有appId, sign, data, files。
+- 设置HTTP Header的"Content-Type"为"multipart/form-data"。
+- files的参数filename为文件名，同一个请求中filename不能重复
+
+### 请求示例
+
+HTTP Header（略去其它无关Header）：
+
+```
+Content-Type: multipart/form-data; boundary=---------------------------7dc3aff105d0
+```
+
+HTTP Body：
+
+```
+-----------------------------7dc3aff105d0
+Content-Disposition: form-data; name="appId"
+Content-Type: text/plain
+
+app01
+-----------------------------7dc3aff105d0
+Content-Disposition: form-data; name="sign"
+Content-Type: text/plain
+
+xxxx
+-----------------------------7dc3aff105d0
+Content-Disposition: form-data; name="data"
+Content-Type: text/plain
+
+{"k1":"v1"}
+-----------------------------7dc3aff105d0
+Content-Disposition: form-data; name="files"; filename="1.jpg"
+Content-Type: image/jpeg
+
+>> 文件1.jpg的二进制数据 <<
+-----------------------------7dc3aff105d0
+Content-Disposition: form-data; name="files"; filename="2.jpg"
+Content-Type: image/jpeg
+
+>> 文件2.jpg的二进制数据 <<
+-----------------------------7dc3aff105d0--
+```
+
+### 响应
+
+与普通的NYY响应一致。
+
+
+----
+## 扩展二：JSONP支持
+
+在业务前后端交互时，常会使用到JSONP技术进行函数回调。对于这种情况，可以使用NYY扩展形式。
+具体来说就是在请求中新增加一个"callback"字段来代标识需要返回的函数名，这样服务端应返回使用这个函数名的JSONP数据。前端即可直接使用。
+
+*注意*：此扩展已经在[NYY Framework][]中支持。
+
+### 请求
+
+形式一：`{"appId":"XXX","sign":"XXX","callback":"funcname","data":{"k1":"v1"}}`
+
+形式二：`appId=XXX&sign=XXX&callback=funcname&data={"k1":"v1"}`
+
+其中"funcname"即为自定义的JSONP函数名。
+
+
+### 响应
+
+`funcname({"appId":"xx","sign":"xx","data":{"key1":"val1"}})`
+
 
 ----
 ## Tips
 
-#### data字段提取以验证sign的简易方式
+如果是Java语言，强烈推荐使用[NYY Framework][]。
+
+以下是针对其它语言的一些小的Tips，或是无法使用[NYY Framework][]的情况。
+
+### 注意data字段的"原始性"
+
+因为data字段会被用于校验，所以它里面的字段顺序不应该随意变更。应当注意：
+
+- 生成sign时，应先生成data字段的json串，这个串既用于生成sign，也用于实际的发送请求中。
+- 校验sign时，应先从收到的消息中原样的提取出data字段的json串，用于生成校验用的sign。
+- 不要把data对应的串转换成对象后再转换成字符串才用于校验
+
+
+对于普通的NYY消息（非NYY扩展消息），可以使用简单的正则表达式来提取data字段。
+*前提是appId和sign中不包含"{"或"}"符号。
 
 ```java
 nyyStr.replaceAll("^\\s*\\{[^\\{]*|[^\\}]*\\}\\s*$", ""))
 ```
 
-注意要提取原始信息中的data字符串，以确保校验成功。
-**不要把nyyStr转换成对象并得到data对象后再转换成字符串**
+### Javascript代码支持
 
-----
-## 后端Java代码支持
-
-### 1. 使用工具类
-#### 依赖Jar包
-
-```
-<dependency>
-	<groupId>com.yy.cs</groupId>
-	<artifactId>cs-base</artifactId>
-	<version>0.5.4</version>
-</dependency>
-```
+对于Javascript语言，前端同事已经编写了一些封装的接口，可以直接使用。
 	
-#### 服务端示例(主要是使用NyyProtocolHelper类)
-	
-```
-/**
- * 支持get post的nyy协定
- */
-@RequestMapping("/nyy")
-@ResponseBody
-public String nyyDemo(HttpServletRequest request, HttpServletResponse response){
-	String jsonStr = null;
-	NyyBeanObject object = null;
-	try{
-		//获取jsonStr, 返回是json格式,例如 {"appId":"test","sign":"testsign","data":{"k1":"v1"}}
-		jsonStr = NyyProtocolHelper.getNyyContent(request);
-		//sha256哈希检验, 如不需要,可去掉
-		NyyProtocolHelper.sha256HashSecurityCheck("test", jsonStr);
-		//NyyBeanObject 为业务自己封装的pojo
-		object = Json.strToObj(jsonStr, NyyBeanObject.class);
-		//TODO 业务逻辑
-	}catch(Exception e){
-		//TODO 加上你们业务的异常处理
-	}
-	
-	//返回的数据
-	BizObject o = new BizObject(1, "resp", new Date(), true, 3.14, 500);
-	String respData = Json.ObjToStr(o);
-	//最终返回给client的json格式
-	String respStr = NyyProtocolHelper.genRespJson(object.getAppId(), "test", respData);
-	LOG.info("jsonStr = {}, respData = {}, respStr = {}", jsonStr, respData, respStr);
-	return respStr;
-}
-```
-
-
-####  客户端示例(主要是使用NyyClient类)
-
-```java
-String uri = "http://localhost:8080/nyy-demo-web/nyy";
-
-//主要方法都集中在NyyClient类中
-NyyClient client = new NyyClient("999", "test");
-BizObject bo1 = new BizObject(1, "bo1", new Date(), true, 3.14, 500);
-BizObject bo2 = new BizObject(1, "bo2", new Date(), true, 3.14, 500);
-List<BizObject> list = new ArrayList<BizObject>();
-list.add(bo1);
-list.add(bo2);
-Data data = new Data();
-data.setItems("items in data");
-
-data.setList(list);
-String dataJson = Json.ObjToStr(data);
-String doGetWithNyyJsonResult = client.doGet(uri, dataJson, true);
-String doGetWithoutNyyJsonResult = client.doGet(uri, dataJson, false);
-Data d = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, true); 
-Data d1 = client.parseDataFromRespJson(doGetWithoutNyyJsonResult, Data.class, false); 
-System.out.println(d);
-System.out.println(d1);
-```
-
-### 2. servlet filter方式
-
-目前仅支持简单类型注入。
-
-#### 依赖Jar包
-
-```xml
-<dependency>
-	<groupId>com.yy.cs</groupId>
-	<artifactId>cs-base</artifactId>
-	<version>0.5</version>
-</dependency>
-```
-	
-#### 配置web.xml文件
-
-```xml
-<filter>
-	<filter-name>NYYFilter</filter-name>
-	<filter-class>com.yy.cs.base.nyy.NYYFilter</filter-class>
-</filter>
-<filter-mapping>
-	<filter-name>NYYFilter</filter-name>
-	<url-pattern>/*</url-pattern>
-</filter-mapping>
-```
-	
-#### 服务端可直接获取参数
-
-```java
-//appId liveUid myUid followType ticket等参数都是直接从nyy 里面的data中获取
-@RequestMapping("/followLive")
-@ResponseBody
-public Map<String, Object> followLive(HttpServletRequest request,
-    @RequestParam String appId, @RequestParam Long liveUid, 
-    @RequestParam Long myUid, @RequestParam Integer followType,
-    @RequestParam String ticket) throws HttpClientException {
-	boolean isCancel = (followType == 1 ? false : true);
-	Integer result = anchorService.toggleFollow(myUid, liveUid, isCancel);
-	HashMap<String, Object> resultMap = new HashMap<String, Object>();
-	resultMap.put(INNER_LIVE_UID_STR, liveUid);
-	resultMap.put(INNER_MYUID_STR, myUid);
-	resultMap.put(INNER_FOLLOW_TYPE_STR, followType);
-	resultMap.put(INNER_RESULT_STR, result);
-	return resultMap(resultMap, request);
-}
-```
-
-### 3. 使用spring-web HandlerMethodArgumentResolver
-
-支持简单、复杂组合类型注入,建议使用这种方式
-
-#### 依赖Jar包
-
-```xml
-<dependency>
-	<groupId>com.yy.cs</groupId>
-	<artifactId>nyy-springmvc</artifactId>
-	<version>0.3</version>
-</dependency>
-```
-	
-####  配置spring配置文件，加入以下配置
-
-```xml
-<mvc:annotation-driven>
-    <mvc:argument-resolvers>
-	<bean class="com.yy.cs.base.nyy.resolver.NyyArgumentResolver" />
-    </mvc:argument-resolvers>
-</mvc:annotation-driven>
-```
-	
-#### 服务端可直接获取参数
-
-```java
-//NyyObject是个组合类型,有List String Integer Long等类型属性,可动态从nyy data中获取对应的属性值
-@RequestMapping("/nyyDemo3")
-@ResponseBody
-public String nyyDemo3(HttpServletRequest request, @NyyData NyyObject data){
-	return data.toString();
-}
-```
-
-#### 示例的SVN地址 
-
-	https://svn.yy.com/web/gh/apachecommons
-	
-	
-----	
-## 前端JS代码支持
-
-支持Get和Post方式
-
-### 1. 引入js文件
-	
-```xml
-<!-- jquery v1.9.1 -->
+```javascript
+<!-- 引入依赖 -->
 <script type="text/javascript" 
-	src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
-<!-- nyy v1.0 -->
+        src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
 <script type="text/javascript" 
-	src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
-```
-	
-### 2.使用示例
-
-```html
-<html>
-<body>
-<div>
-	<button value="get请求" onclick="doGet()">get请求</button>
-	<button value="doTextPlainPost" onclick="doTextPlainPost()">doTextPlainPost请求</button>
-	<button value="doFormPost" onclick="doFormPost()">doFormPost请求</button>
-</div>
-</body>
-<!-- jquery v1.9.1 -->
-<script type="text/javascript" 
-	src="http://file.do.yy.com/group2/M00/34/71/tz0CVFM7dO6ATqGiAAFp2WUy4C84783.js"></script>
-<!-- nyy v1.0 -->
-<script type="text/javascript" 
-	src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
+        src="http://file.do.yy.com/group2/M00/33/19/tz0CN1M7dMKACmXOAAAIy5koT3Y6953.js"></script>
 <script type="text/javascript">
-  function doGet(){
-    nyyGet("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',
-    function(dataObj){alert(dataObj);},
-    function(error){alert(error);});	  
-  };
-  function doTextPlainPost(){
-    nyyTextPlainPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',
-    function(dataObj){alert(dataObj);},
-    function(error){alert(error);});	  
-  };
-  function doFormPost(){
-    nyyFormPost("/nyyDemo3","1001","abcdef",'{"intValue":123,"strValue":"thisIsStrValue中文"}',
-    function(dataObj){alert(dataObj);},
-    function(error){alert(error);});	  
-  }
+    function doGet() {
+        nyyGet("/demo1", "1001", "abcdef", '{"key1":123,"key2":"thisIsStrValue中文"}',
+            function(dataObj){alert(dataObj);},
+            function(error){alert(error);}
+        );	  
+    };
+    function doTextPlainPost() {
+        nyyTextPlainPost("/demo2","1001","abcdef",'{"key1":123,"key2":"thisIsStrValue中文"}',
+            function(dataObj){alert(dataObj);},
+            function(error){alert(error);}
+        );
+    };
+    function doFormPost() {
+        nyyFormPost("/nyyDemo3", "1001", "abcdef", '{"key1":123,"key2":"thisIsStrValue中文"}',
+            function(dataObj){alert(dataObj);},
+            function(error){alert(error);}
+        );
+    }
 </script>
 </html>
 ```
 
-###  3.示例的SVN地址 
-
-	https://svn.yy.com/web/gh/apachecommons
 	
-----	
-## android端支持代码
+### Android端支持代码
 
 ```java
 import java.io.UnsupportedEncodingException;
@@ -439,31 +379,31 @@ public class NyyAndroidClientUtils {
      * sha256哈希,使用android基础库的security模块
      */
     public static String toSHA256String(String str) {
-	String hash = "";
-	try {
-	    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-	    digest.update(str.getBytes("UTF-8"));
-	    hash = bytesToHexString(digest.digest());
-	} catch (Exception e) {
-	    //TODO 加上你们业务的异常处理
-	    //YLog.error("toHexString", "toHexString", e);
-	}
-	return hash;
+        String hash = "";
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(str.getBytes("UTF-8"));
+            hash = bytesToHexString(digest.digest());
+        } catch (Exception e) {
+            //TODO 加上你们业务的异常处理
+            //YLog.error("toHexString", "toHexString", e);
+        }
+        return hash;
     }
 
     /**
      * byte数组转为hex字符串
      */
     public static String bytesToHexString(byte[] bytes) {
-	StringBuilder sb = new StringBuilder();
-	for (int i = 0; i < bytes.length; i++) {
-	    String hex = Integer.toHexString(0xFF & bytes[i]);
-	    if (hex.length() == 1) {
-		sb.append('0');
-	    }
-	    sb.append(hex);
-	}
-	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(0xFF & bytes[i]);
+            if (hex.length() == 1) {
+                sb.append('0');
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
     }
 
     /**
@@ -474,27 +414,27 @@ public class NyyAndroidClientUtils {
      * @param params  放入data的key-value参数
      */
     public static String genNyyGetUrl(String sign,String appId,String requestUri,Object... params){
-	String url = requestUri + "?appId=" + appId + "&sign=" + sign;
-	if (params.length > 0 && params.length % 2 == 0) {
-	    JSONObject data = new JSONObject();
-	    for (int i = 0; i < params.length; i = i + 2) {
-		try {
-		    String key = (String) params[i];
-		    Object value = params[i + 1];
-		    data.putOpt(key, value);
-		} catch (Exception e) {
-		    //TODO 加上你们业务的异常处理
-		    //YLog.error(this, "getUrl error! %s ,params: %s", request, params, e);
-		}
-	    }
-	    try {
-		url = url + "&data=" + URLEncoder.encode(data.toString(), "UTF-8");
-	    } catch (UnsupportedEncodingException e) {
-		//TODO 加上你们业务的异常处理
-		//YLog.error(this, "getUrl", e);
-	    }
-	}
-	return url;
+        String url = requestUri + "?appId=" + appId + "&sign=" + sign;
+        if (params.length > 0 && params.length % 2 == 0) {
+            JSONObject data = new JSONObject();
+            for (int i = 0; i < params.length; i = i + 2) {
+                try {
+                    String key = (String) params[i];
+                    Object value = params[i + 1];
+                    data.putOpt(key, value);
+                } catch (Exception e) {
+                    //TODO 加上你们业务的异常处理
+                    //YLog.error(this, "getUrl error! %s ,params: %s", request, params, e);
+                }
+            }       
+            try {
+                url = url + "&data=" + URLEncoder.encode(data.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                //TODO 加上你们业务的异常处理
+                //YLog.error(this, "getUrl", e);
+            }
+        }
+        return url;
     }
 
     /**
@@ -504,8 +444,11 @@ public class NyyAndroidClientUtils {
      * @return    
      */
     public static String genSign(String data, String key){
-	String str = "data=" + data + "&key=" + key;
-	return toSHA256String(str);
+        String str = "data=" + data + "&key=" + key;
+        return toSHA256String(str);
     }
 }
 ```
+
+[示例的SVN地址]: https://svn.yy.com/web/gh/apachecommons
+[NYY Framework]: http://dev.yypm.com/web/?post=posts/library/nyy-framework/nyy-framework.md
