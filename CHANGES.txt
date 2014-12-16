@@ -2,6 +2,10 @@ Release 1.0 - 2014-07-11
 
 Backward compatible changes:
 
+#1.0.4-SNAPSHOT
+	1、重构 http 包，提过获取 response inputStream 方法
+	2、修正 pom 对 javax.servlet-api 的支持
+	
 BUG修改:
 
   
