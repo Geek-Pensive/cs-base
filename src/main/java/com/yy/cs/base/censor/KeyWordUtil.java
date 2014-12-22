@@ -1,5 +1,7 @@
 package com.yy.cs.base.censor;
 
+import com.yy.cs.base.censor.impl.CensorWordsImpl;
+import com.yy.cs.base.censor.impl.StandardWordsFilterImpl;
 import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.task.thread.NamedThreadFactory;
@@ -222,7 +224,7 @@ public class KeyWordUtil {
                 for (String s: ar) {
                     ls.add(s.trim());
                 }
-                CensorWords cw = CensorWords.build(ls);
+                CensorWords cw = CensorWordsImpl.build(ls, new StandardWordsFilterImpl());
 				if (keyword != null && ! keyword.isEmpty()) {
 					keywordMap.put(type, cw);
 				}
