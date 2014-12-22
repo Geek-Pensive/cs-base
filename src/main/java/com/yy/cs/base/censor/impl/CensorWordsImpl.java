@@ -18,7 +18,7 @@ public class CensorWordsImpl implements CensorWords {
     private WordsFilter wf;
     private CensorWordsImpl() {}
     public static CensorWords build(List<String> words) {
-        return build(words, new EmptyWordsFilterImpl());
+        return build(words, new StandardWordsFilterImpl());
     }
     public static CensorWords build(List<String> words, WordsFilter wf) {
         Comparator<String> cmp = new Comparator<String>() {
