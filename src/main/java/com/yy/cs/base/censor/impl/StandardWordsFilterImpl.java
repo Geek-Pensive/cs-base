@@ -1,6 +1,6 @@
 package com.yy.cs.base.censor.impl;
 
-import com.spreada.utils.chinese.ZHConverter;
+import com.yy.cs.base.chinese.ZHConverter;
 import com.yy.cs.base.censor.WordsFilter;
 
 /**

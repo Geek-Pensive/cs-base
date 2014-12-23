@@ -1,4 +1,4 @@
-package com.spreada.utils.chinese;
+package com.yy.cs.base.chinese;
 
 import java.io.*;
 import java.util.*;
