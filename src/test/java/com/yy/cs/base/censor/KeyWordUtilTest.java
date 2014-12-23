@@ -14,7 +14,7 @@ public class KeyWordUtilTest {
 	@Test
 	public void test() throws InterruptedException {
 		KeyWordUtil util = KeyWordUtil.getInstance();
-		System.out.println(util.isCensored("XXa"));
+		System.out.println(util.isCensor("XXa"));
 		synchronized (KeyWordUtilTest.this) {
 			wait();
 		}
