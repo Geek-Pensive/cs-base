@@ -82,7 +82,7 @@ public class KeyWordUtil {
     }
 
     private CensorWords updateCensorWords() {
-        List<String> list = new LinkedList<>();
+        List<String> list = new LinkedList<String>();
         try {
             HttpUriRequest hur = new HttpGet(censorUrl);
             hur.addHeader("If-None-Match", eTag);

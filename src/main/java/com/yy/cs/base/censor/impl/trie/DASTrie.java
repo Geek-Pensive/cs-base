@@ -189,7 +189,7 @@ public class DASTrie {
         check = new int[4];
         base = new int[4];
         tail = new int[4];
-        childs = new ArrayList<>();
+        childs = new ArrayList<Set<Integer>>();
         int i;
         for (i = 0; i < 4; ++i) {
             childs.add(null);
@@ -223,7 +223,7 @@ public class DASTrie {
             childs.set(p, new HashSet<Integer>());
         }
         Set<Integer> ss = childs.get(p);
-        Set<Integer> rs = new HashSet<>();
+        Set<Integer> rs = new HashSet<Integer>();
         cnt += ss.size();
         byte[] tc = new byte[cnt];
         System.arraycopy(t, 0, tc, 0, t.length);

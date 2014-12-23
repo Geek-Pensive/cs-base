@@ -31,7 +31,7 @@ public class CensorWordsImpl implements CensorWords {
         CensorWordsImpl cw = new CensorWordsImpl();
         cw.trie = new DASTrie();
         cw.wf = wf;
-        List<byte[]> wli = new LinkedList<>();
+        List<byte[]> wli = new LinkedList<byte[]>();
         String strf;
         for (String w: words) {
             strf = wf.filter(w);

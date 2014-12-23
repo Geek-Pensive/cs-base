@@ -4,9 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -74,30 +72,49 @@ public class CSHttpClient {
     }
 
     /**
-     * 执行一个http方法。为了方法的名称更加易懂和清晰，建议使用executeMethodAndReturnString(HttpRequestBase)
+     * 执行一个http方法
      * @param httpRequestBase  执行方法的类型
      * @return response正确返回后的字符串
      * @throws HttpClientException
-     * @see com.yy.cs.base.http.CSHttpClient.executeMethodAndReturnString(HttpRequestBase)
      */
-    @Deprecated
     public String executeMethod(HttpRequestBase httpRequestBase) throws HttpClientException {
-    	InputStream in = executeMethodAndReturnInputStream(httpRequestBase);
+    	CloseableHttpResponse response = null;
+    	StatusLine status = null;
+    	String  result = "";
+    	
     	try {
-            return inputStream2String(in);
-        } catch (IOException e) {
-            throw new HttpClientException("cannot convert response inputStream into String due to IOE",e);
-        }finally{
-            if (in !=null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    // may ignore
-                    e.printStackTrace();
-                }
+			setDefaultRequestConfig(httpRequestBase);
+			log.debug("executing request " + httpRequestBase.getURI());
+			response = httpClient.execute(httpRequestBase);
+			status = response.getStatusLine(); 
+			log.debug("response status " + status);
+			HttpEntity entity = response.getEntity();
+			if(status.getStatusCode() ==  HttpStatus.SC_OK){
+				result = inputStream2String(entity.getContent());
+			}else{
+				throw new HttpClientException("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status);
+			}
+		}catch(ClientProtocolException e){
+			log.error("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+			throw new HttpClientException("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+		} catch (IOException e) {
+			log.error("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+			throw new HttpClientException("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+		}finally {
+			if(response != null){
+				try {
+					response.close();
+				} catch (IOException e) {
+					 log.error("response close IOException:"+httpRequestBase.getURI(), e);
+				}
+			}
+			if(httpRequestBase != null ){
+            	httpRequestBase.releaseConnection();
             }
-        }
+		}
+        return  result;
     }
+    
     
     /**
      * 执行一个http方法
@@ -106,19 +123,36 @@ public class CSHttpClient {
      * @throws HttpClientException
      */
     public byte[] executeMethodAndReturnByteArray(HttpRequestBase httpRequestBase) throws HttpClientException {
-        InputStream in = executeMethodAndReturnInputStream(httpRequestBase);
+        CloseableHttpResponse response = null;
+        StatusLine status = null;
         try {
-            return inputStream2ByteArray(in);
+            setDefaultRequestConfig(httpRequestBase);
+            log.debug("executing request " + httpRequestBase.getURI());
+            response = httpClient.execute(httpRequestBase);
+            status = response.getStatusLine(); 
+            log.debug("response status " + status);
+            HttpEntity entity = response.getEntity();
+            if(status.getStatusCode() ==  HttpStatus.SC_OK){
+                return inputStream2ByteArray(entity.getContent());
+            }else{
+                throw new HttpClientException("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status);
+            }
+        }catch(ClientProtocolException e){
+            log.error("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+            throw new HttpClientException("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
         } catch (IOException e) {
-            throw new HttpClientException("could not convert response strean to byte array",e);
-        }finally{
-            if (in !=null) {
+            log.error("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+            throw new HttpClientException("get byte array from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+        }finally {
+            if(response != null){
                 try {
-                    in.close();
+                    response.close();
                 } catch (IOException e) {
-                    // may ignore
-                    e.printStackTrace();
+                     log.error("response close IOException:"+httpRequestBase.getURI(), e);
                 }
+            }
+            if(httpRequestBase != null ){
+            	httpRequestBase.releaseConnection();
             }
         }
     }
@@ -131,24 +165,52 @@ public class CSHttpClient {
      */
     public String doGet(String url) throws HttpClientException  {
     	HttpGet get = new HttpGet(url);
-        return executeMethodAndReturnString(get);
+        String result = this.executeMethod(get);
+        return result;
     }
     
     /**
      * 执行一个HttpGet方法,返回response返回的流
      * @param 
      * 		url ,请求地址
-     * @param statusArray 指定正确返回的状态码
+     * @param statusArray 指点正确返回的状态码
      * @return response正确返回后的流
      * @throws HttpClientException
      */
     public InputStream getResponseStream(String url, int[] statusArray) throws HttpClientException{
-        Set<Integer> statusSet = intArrayToSet(statusArray);
-        HttpGet httpGet = new HttpGet(url);
-        
-        return executeMethodAndReturnInputStream(httpGet, statusSet);
+    	HttpGet httpRequestBase = new HttpGet(url);
+        CloseableHttpResponse response = null;
+    	StatusLine status = null;
+    	try {
+			setDefaultRequestConfig(httpRequestBase);
+			log.debug("executing request " + httpRequestBase.getURI());
+			response = httpClient.execute(httpRequestBase);
+			status = response.getStatusLine(); 
+			log.debug("response status " + status);
+			HttpEntity entity = response.getEntity();
+			if(isInStatusArray(status.getStatusCode(),statusArray)){
+				return entity.getContent();
+			}
+			throw new HttpClientException("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status);
+		}catch(ClientProtocolException e){
+			log.error("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+			throw new HttpClientException("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+		} catch (IOException e) {
+			log.error("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+			throw new HttpClientException("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
+		}finally {
+			if(response != null){
+				try {
+					response.close();
+				} catch (IOException e) {
+					 log.error("response close IOException:"+httpRequestBase.getURI(), e);
+				}
+			}
+			if(httpRequestBase != null ){
+            	httpRequestBase.releaseConnection();
+            }
+		}
     }
-
     /**
      * 发送一个HttpGet请求，检查地址是否正常 
      * @param url
@@ -207,7 +269,7 @@ public class CSHttpClient {
 				throw new HttpClientException(e1);
 			}
 		}
-        return this.executeMethodAndReturnString(httpRequestBase);
+        return this.executeMethod(httpRequestBase);
     }
     
     /**
@@ -227,92 +289,10 @@ public class CSHttpClient {
 				throw new HttpClientException(e1);
 			}
 		}
-        return this.executeMethodAndReturnString(httpRequestBase);
+        return this.executeMethod(httpRequestBase);
     }
     
-    /**
-     * 执行一个 http 方法
-     * @param httpRequestBase 执行方法的类型
-     * @return response正确返回后的 inputstream
-     * @throws HttpClientException
-     */
-    public String executeMethodAndReturnString(HttpRequestBase httpRequestBase) throws HttpClientException {
-        InputStream in = executeMethodAndReturnInputStream(httpRequestBase);
-        try {
-            return inputStream2String(in);
-        } catch (IOException e) {
-            throw new HttpClientException("cannot convert response inputStream into String due to IOException",e);
-        }finally{
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    // may ignore
-                    e.printStackTrace();
-                }
-            }
-        }
-        
-    }
-    
-    /**
-     * 执行一个 http 方法
-     * @param httpRequestBase 执行方法的类型
-     * @return response 正确返回后(状态码为 200）的 inputstream
-     * @throws HttpClientException
-     */
-    public InputStream executeMethodAndReturnInputStream(HttpRequestBase httpRequestBase) throws HttpClientException {
-        Set<Integer> statusSet = new HashSet<Integer>();
-        statusSet.add(200);
-        return executeMethodAndReturnInputStream(httpRequestBase,statusSet);
-    }
-    
-    /**
-     * 执行一个 http 方法
-     * @param httpRequestBase 执行方法的类型
-     * @param acceptStatus 可以接受的返回请求状态码，为 null 时，代表可接受任何返回状态码，当返回非接受状态码时，会抛出 HttpClientException
-     * @return response正确返回后的 inputstream
-     * @throws HttpClientException
-     */
-    public InputStream executeMethodAndReturnInputStream(HttpRequestBase httpRequestBase,Set<Integer> acceptStatus) throws HttpClientException{
-        CloseableHttpResponse response = null;
-        StatusLine status = null;
-        try {
-            setDefaultRequestConfig(httpRequestBase);
-            log.debug("executing " +httpRequestBase.getMethod() +" request " + httpRequestBase.getURI());
-            response = httpClient.execute(httpRequestBase);
-            status = response.getStatusLine(); 
-            log.debug("response status " + status);
-            HttpEntity entity = response.getEntity();
-            if (acceptStatus == null) {
-                return entity.getContent();
-            }else {
-                int statusCode = status.getStatusCode();
-                if (isAcceptStatus(acceptStatus, statusCode)) {
-                    return entity.getContent();
-                }else {
-                    throw new HttpClientException("faile to get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status);
-                }
-            }
-        }catch(ClientProtocolException e){
-            log.error("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
-            throw new HttpClientException("fail to get data from url:"+ httpRequestBase.getURI() + " , status: " + status,e);
-        } catch (IOException e) {
-            log.error("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status,e);
-            throw new HttpClientException("fail to get data from url:"+ httpRequestBase.getURI() + " , status: " + status,e);
-        }finally {
-            if(response != null){
-                try {
-                    response.close();
-                } catch (IOException e) {
-                     log.error("response close IOException:"+httpRequestBase.getURI(), e);
-                }
-            }
-            if(httpRequestBase != null ){
-                httpRequestBase.releaseConnection();
-            }
-        }
-    }
+ 
     
     private String inputStream2String(InputStream in) throws IOException{
     	ByteArrayOutputStream baos = new ByteArrayOutputStream(1024 * 256);
@@ -373,53 +353,12 @@ public class CSHttpClient {
 		requestBase.setConfig(config);
     }
     
-//    private boolean isInStatusArray(int status, int[] statusArray) {
-//        for (int i = 0; i < statusArray.length; i++) {
-//            if (status == statusArray[i]) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-    
-    /**
-     * int 数组转换为 Set<Integer>
-     * <br /> 增减此方法是为了与 旧API 兼容 
-     * @param intArray
-     * @return
-     */
-    private Set<Integer> intArrayToSet(int[] intArray){
-        Set<Integer> set = new HashSet<Integer>();
-        for (int i = 0; i < intArray.length; i++) {
-            set.add(intArray[i]);
-        }
-        
-        return set;
-    }
-    
-    /**
-     * 判断当前状态码是否可以接受
-     * @param acceptStatus  可接受的状态码集
-     * @param status        当前状态码
-     * <pre>
-     *      status == null          return false
-     *      acceptStatus == null    return false
-     * </pre>
-     * @return
-     */
-    private boolean isAcceptStatus(Set<Integer> acceptStatus,Integer status){
-        if (status == null) {
-            return false;
-        }
-        if (acceptStatus == null) {
-           return false;
-        }
-        for (Integer s : acceptStatus) {
-            if (s.intValue() == status.intValue()) {
+    private boolean isInStatusArray(int status, int[] statusArray) {
+        for (int i = 0; i < statusArray.length; i++) {
+            if (status == statusArray[i]) {
                 return true;
             }
         }
-        
         return false;
     }
     /**

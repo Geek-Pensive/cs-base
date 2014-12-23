@@ -131,7 +131,7 @@ public class HiidoApi {
     }
 
     public static void main(String[] args) {
-        Map<String, Object> req = new HashMap<>();
+        Map<String, Object> req = new HashMap<String, Object>();
         req.put("sd", "2014-11-26");
         req.put("ed", "2014-11-28");
         req.put("dataType", "DAU");
