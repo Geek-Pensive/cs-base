@@ -3,11 +3,9 @@ package com.yy.cs.base.http;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,31 +60,31 @@ public class HttpClientManagerUtilTest {
     	System.out.println(s);
     	org.junit.Assert.assertNotNull(s); 
     }
-    
-    @Test
-    public void testExecuteAndReturnString() throws Exception {
-        HttpGet httpGet = new HttpGet("http://www.baidu.com");
-        String str1 = http.executeMethodAndReturnString(httpGet);
-        System.out.println("str1 :\n" + str1);
-        assertNotNull(str1);
-        
-        HttpPost httpPost = new HttpPost("http://localhost:8080/TestAndStudy/testServlet");
-        String str2 = http.executeMethodAndReturnString(httpPost);
-        System.out.println("str2 :\n" + str2);
-        assertNotNull(str2);
-    }
-    
-    @Test
-    public void testExecuteAndReturnInputStream() throws Exception {
-        HttpGet httpGet = new HttpGet("http://www.baidu.com");
-        assertNotNull(http.executeMethodAndReturnInputStream(httpGet));
-        assertNotNull(http.executeMethodAndReturnInputStream(httpGet,new HashSet<Integer>(200)));
-        
-        HttpPost httpPost = new HttpPost("http://localhost:8080/TestAndStudy/testServlet");
-        assertNotNull(http.executeMethodAndReturnInputStream(httpPost));
-        assertNotNull(http.executeMethodAndReturnInputStream(httpPost,new HashSet<Integer>(200)));
-    }
-    
+//    
+//    @Test
+//    public void testExecuteAndReturnString() throws Exception {
+//        HttpGet httpGet = new HttpGet("http://www.baidu.com");
+//        String str1 = http.executeMethodAndReturnString(httpGet);
+//        System.out.println("str1 :\n" + str1);
+//        assertNotNull(str1);
+//        
+//        HttpPost httpPost = new HttpPost("http://localhost:8080/TestAndStudy/testServlet");
+//        String str2 = http.executeMethodAndReturnString(httpPost);
+//        System.out.println("str2 :\n" + str2);
+//        assertNotNull(str2);
+//    }
+//    
+//    @Test
+//    public void testExecuteAndReturnInputStream() throws Exception {
+//        HttpGet httpGet = new HttpGet("http://www.baidu.com");
+//        assertNotNull(http.executeMethodAndReturnInputStream(httpGet));
+//        assertNotNull(http.executeMethodAndReturnInputStream(httpGet,new HashSet<Integer>(200)));
+//        
+//        HttpPost httpPost = new HttpPost("http://localhost:8080/TestAndStudy/testServlet");
+//        assertNotNull(http.executeMethodAndReturnInputStream(httpPost));
+//        assertNotNull(http.executeMethodAndReturnInputStream(httpPost,new HashSet<Integer>(200)));
+//    }
+//    
     @Test
     public void testGetResponseStream() throws Exception {
         assertNotNull(http.getResponseStream("http://localhost:8080/TestAndStudy/testServlet",new int[]{200}));
