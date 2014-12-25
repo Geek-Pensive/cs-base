@@ -1,5 +1,8 @@
 package com.yy.cs.base.censor.impl.trie;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -67,6 +70,48 @@ public class DASTrie {
             extendBaseArrays(t);
         }
         return q;
+    }
+    private int integrityCheck()
+    {
+        int i, r = 0;
+        for (i = 1; i < base.length; ++i) {
+            if (i > 1 && ((base[i] != 0 && check[i] == 0) || (base[i] == 0 && check[i] != 0))) {
+                System.out.println(String.format("Node %d wrong1, check[%d]=%d, base[%d]=%d.\n", i, i, check[i], i, base[i]));
+                r = 1;
+            }
+            if (checkChilds(i) != 0) {
+                System.out.println(String.format("Node %d wrong2.\n", i));
+                r = 1;
+            }
+        }
+        return r;
+    }
+    private int checkChilds(int p)
+    {
+        int i, cnt = 0;
+        Set<Integer> s = childs.get(p);
+        for (i = 1; i < check.length; ++i) {
+            if (check[i] == p) {
+                ++cnt;
+                if (base[i] == 0) {
+                    return 1;
+                }
+                if (null != s) {
+                    if (!s.contains(i)) {
+                        return 1;
+                    }
+                }
+                else {
+                    return 1;
+                }
+            }
+        }
+        if (cnt > 0) {
+            if (null == s || s.size() != cnt) {
+                return 1;
+            }
+        }
+        return 0;
     }
     void insert(byte[] str){
         int i, p = 1, t;
@@ -139,14 +184,14 @@ public class DASTrie {
             base[p] = x_check(ca, p);
         }
         for (i = 0; i < len; ++i) {
-            t = base[p] + hashChar(str[i]);
+            t = base[p] + hashChar(str[i + begin]);
             if (t >= base.length) {
                 extendBaseArrays(t);
             }
             addChild(p, t);
             if (i < len - 1) {
                 byte[] xb = new byte[1];
-                xb[0] = str[i + 1];
+                xb[0] = str[i + begin + 1];
                 base[t] = x_check(xb, t);
                 p = t;
             }
@@ -195,6 +240,7 @@ public class DASTrie {
             childs.add(null);
         }
         pos = 1;
+        base[1] = 1;
     }
     int writeTail(byte[] str, int begin, int sn) {
         int len = pos + sn + 1;
@@ -212,14 +258,17 @@ public class DASTrie {
     }
     void addChild(int parent, int child) {
         check[child] = parent;
-        if (null != childs.get(parent)) {
+        if (null == childs.get(parent)) {
             childs.set(parent, new HashSet<Integer>());
         }
         childs.get(parent).add(child);
     }
     int relocate(int p, byte[] t) {
+        if (null == t) {
+            t = new byte[0];
+        }
         int cnt = t.length;
-        if (null != childs.get(p)) {
+        if (null == childs.get(p)) {
             childs.set(p, new HashSet<Integer>());
         }
         Set<Integer> ss = childs.get(p);
@@ -263,7 +312,7 @@ public class DASTrie {
         base = shrinkIntArray(base, i + 1);
         check = shrinkIntArray(check, i + 1);
     }
-    int[] shrinkIntArray(int[] p, int tl) {
+    int[] shrinkIntArray(int[] p, int tl) {        //收缩数组
         int[] res = new int[tl];
         System.arraycopy(p, 0, res, 0, tl);
         return res;
@@ -277,10 +326,36 @@ public class DASTrie {
             }
         }
     }
+    void dumpBaseCheck() {
+        int i;
+        try {
+            FileWriter fw = new FileWriter(new File("dump.txt"));
+            fw.write("base :\n");
+            for (i = 0; i < base.length; ++i) {
+                fw.write(String.valueOf(base[i] + "\n"));
+            }
+            fw.write("check:\n");
+            for (i = 0; i < check.length; ++i) {
+                fw.write(String.valueOf(check[i] + "\n"));
+            }
+            fw.write("tail :\n");
+            for (i = 0; i < tail.length; ++i) {
+                fw.write(String.valueOf(tail[i] + "\n"));
+            }
+            /*
+            fw.write("childs:\n");
+            for (i = 0; i < childs.size(); ++i) {
+                fw.write(String.valueOf(i + ": "));
+            }*/
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public DASTrie() {
         clear();
     }
-    public int initStrings(List<byte[]> words) {
+    public int initStrings(List<byte[]> words) {                       //初始化
         int has_error = 0;
         initArrays();
         Comparator<byte[]> cmp = new Comparator<byte[]>() {
@@ -298,7 +373,7 @@ public class DASTrie {
         constructionDone();
         return has_error;
     }
-    public boolean hasWord(byte[] text) {
+    public boolean hasWord(byte[] text) {    //检测
         int i, j, p = 1, t;
         int len = text.length;
         for (j = 0; j < len; ++j) {
