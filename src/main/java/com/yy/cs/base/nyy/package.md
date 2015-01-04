@@ -451,4 +451,4 @@ public class NyyAndroidClientUtils {
 ```
 
 [示例的SVN地址]: https://svn.yy.com/web/gh/apachecommons
-[NYY Framework]: http://dev.yypm.com/web/?post=posts/library/nyy-framework/nyy-framework.md
+[NYY Framework]: /?post=posts/library/nyy-framework/nyy-framework.md
