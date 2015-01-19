@@ -1,5 +1,6 @@
 package com.yy.cs.base.http;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,7 +191,9 @@ public class CSHttpClient {
 			log.debug("response status " + status);
 			HttpEntity entity = response.getEntity();
 			if(isInStatusArray(status.getStatusCode(),statusArray)){
-				return entity.getContent();
+			    byte[] array = EntityUtils.toByteArray(entity);
+			    ByteArrayInputStream bytes = new ByteArrayInputStream(array);
+				return bytes;
 			}
 			throw new HttpClientException("get data from url:"+ httpRequestBase.getURI() + " fail, status: " + status);
 		}catch(ClientProtocolException e){
