@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -86,7 +87,7 @@ public class CSHttpClient {
     	
     	try {
 			setDefaultRequestConfig(httpRequestBase);
-			log.debug("executing request " + httpRequestBase.getURI());
+			log.debug("executing request " + decodeUrl(httpRequestBase.getURI().toString()));
 			response = httpClient.execute(httpRequestBase);
 			status = response.getStatusLine(); 
 			log.debug("response status " + status);
@@ -129,7 +130,7 @@ public class CSHttpClient {
         StatusLine status = null;
         try {
             setDefaultRequestConfig(httpRequestBase);
-            log.debug("executing request " + httpRequestBase.getURI());
+            log.debug("executing request " + decodeUrl(httpRequestBase.getURI().toString()));
             response = httpClient.execute(httpRequestBase);
             status = response.getStatusLine(); 
             log.debug("response status " + status);
@@ -185,7 +186,7 @@ public class CSHttpClient {
     	StatusLine status = null;
     	try {
 			setDefaultRequestConfig(httpRequestBase);
-			log.debug("executing request " + httpRequestBase.getURI());
+			log.debug("executing request " + decodeUrl(httpRequestBase.getURI().toString()));
 			response = httpClient.execute(httpRequestBase);
 			status = response.getStatusLine(); 
 			log.debug("response status " + status);
@@ -228,7 +229,7 @@ public class CSHttpClient {
     	StatusLine status = null;
     	try {
 			setDefaultRequestConfig(get);
-			log.debug("executing request " + get.getURI());
+			log.debug("executing request " + decodeUrl(get.getURI().toString()));
 			response = httpClient.execute(get);
 			status = response.getStatusLine(); 
 			log.debug("response status " + status);
@@ -371,5 +372,19 @@ public class CSHttpClient {
      */
     public void shutdown() throws IOException{
         httpClient.close();
+    }
+    
+    /**
+     * 以 utf-8 编码 url，完善日志的输出
+     * @param url
+     * @return
+     */
+    private String decodeUrl(String url){
+        try {
+            return URLDecoder.decode(url, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("cannot use urf-8 to decode url : {}",url);
+            return url;
+        }
     }
 }
