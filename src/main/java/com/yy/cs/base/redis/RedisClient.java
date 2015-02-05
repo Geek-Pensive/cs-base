@@ -117,6 +117,111 @@ public class RedisClient {
 	}
 	
 	/**
+	 * 使用setnx命令探测
+	 * @param dbIndex
+	 * @param key
+	 * @param value
+	 * @param expire 过期秒数,当key设置成功且expire大于0，才会设置key的过期时间
+	 * @return Long, 1-设置成功，0-key已存在
+	 */
+	public long setnx(int dbIndex,String key ,String value ,int expire){
+	    Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try{
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            
+            //如果为0,则不需通信表明select db0
+            if(dbIndex != 0){
+                jedis.select(dbIndex);
+            }
+            long t = jedis.setnx(key, value);
+            if(t == 1 && expire>0){
+                jedis.expire(key, expire);
+            }
+            return t;
+        }catch(Exception e){
+            jedisPool.returnBrokenResource(jedis);
+            jedis = null;
+            factory.init();
+            throw new CsRedisRuntimeException("jedis setnx fail", e);
+        }finally{
+            if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
+        }
+	}
+	
+	/**
+	 * 返回对应key的ttl（Time To Live），
+	 * @param dbIndex
+	 * @param key
+	 * @return Long，-2：key不存在，-1：key不会过期，>0剩余过期秒数
+	 */
+	public long ttl(int dbIndex,String key){
+	    Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try{
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            
+            //如果为0,则不需通信表明select db0
+            if(dbIndex != 0){
+                jedis.select(dbIndex);
+            }
+            long t = jedis.ttl(key);
+            return t;
+        }catch(Exception e){
+            jedisPool.returnBrokenResource(jedis);
+            jedis = null;
+            factory.init();
+            throw new CsRedisRuntimeException("jedis ttl fail", e);
+        }finally{
+            if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
+        }
+	}
+	
+	/**
+	 * 在redis上执行相应的lua脚本
+	 * @param dbIndex
+	 * @param readonly 如果为true并且存在从库设置的情况下，在从库上执行
+	 * @param script lua脚本
+	 * @param keys 
+	 * @param args
+	 * @return Object 根据lua脚本实际返回类型决定
+	 */
+	public Object eval(int dbIndex,boolean readonly,String script,List<String> keys,List<String> args){
+	    Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try{
+            if(readonly && null!=getJedisSlavePool()){
+                jedisPool = getJedisSlavePool();
+            }else{
+                jedisPool = getJedisMasterPool();
+            }
+            jedis = jedisPool.getResource();
+            
+            //如果为0,则不需通信表明select db0
+            if(dbIndex != 0){
+                jedis.select(dbIndex);
+            }
+            Object obj = jedis.eval(script, keys, args);
+            return obj;
+        }catch(Exception e){
+            jedisPool.returnBrokenResource(jedis);
+            jedis = null;
+            factory.init();
+            throw new CsRedisRuntimeException("jedis eval fail", e);
+        }finally{
+            if(jedis != null){
+                jedisPool.returnResource(jedis);
+            }
+        }
+	}
+	
+	/**
 	 * 执行set操作，然后释放client连接
 	 * </br>如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool  getJedisSlavePool 获取pool后，再获取redis连接
 	 * </br>并在调用完成后，需调用pool的returnResource方法释放该连接
