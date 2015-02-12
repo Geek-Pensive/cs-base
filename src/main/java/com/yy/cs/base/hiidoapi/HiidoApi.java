@@ -37,7 +37,7 @@ public class HiidoApi {
             post.addHeader("Authorization", "id=" + loginResult.getMessage() + ",code=" + sign);
             String reqJson = Json.ObjToStr(requestData);
             post.setEntity(EntityBuilder.create().setText(reqJson).build());
-            String respJson = httpClient.executeMethodAndReturnString(post);
+            String respJson = httpClient.executeMethod(post);
             if (null != respJson && !"".equals(respJson)) {
                 resultObject = Json.strToObj(respJson, ResultObject.class);
             }
@@ -63,7 +63,7 @@ public class HiidoApi {
         String reqString = "apiname=" + apiName + ",cname=" + cname + ",code=" + sign;
         HttpRequestBase get = new HttpGet(LOGIN_URL);
         get.addHeader("Authorization", reqString);
-        String result = httpClient.executeMethodAndReturnString(get);
+        String result = httpClient.executeMethod(get);
         if (null != result && !"".equals(result)) {
             resultObject = Json.strToObj(result, ResultObject.class);
         }
