@@ -8,11 +8,12 @@
  */
 package com.yy.cs.base.censor;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.yy.cs.base.censor.impl.CensorWordsImpl;
 import com.yy.cs.base.censor.impl.StandardWordsFilterImpl;
 import com.yy.cs.base.http.CSHttpClient;
+import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.task.thread.NamedThreadFactory;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -110,7 +111,7 @@ public class KeyWordUtil {
             if (ha != null && ha.length > 0) {
                 eTag = ha[0].getValue();
             }
-            byte[] lb = Base64.decode(str);
+            byte[] lb = Base64.decodeBase64(str);
             String ls = new String(lb, "utf-8");
             String[] ws = ls.split("\n");
             for (String t: ws) {
