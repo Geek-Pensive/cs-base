@@ -1,5 +1,7 @@
 package com.yy.cs.base.redis;
 
+import java.lang.reflect.Field;
+
 /*
  * Copyright (c) 2012 duowan.com. 
  * All Rights Reserved.
@@ -17,203 +19,289 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.yy.cs.base.jdk.ReflectUtils;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * 管理redis的连接池工厂类，redis连接的参数设置
- *  
+ * 
  */
-public class RedisClientFactory extends JedisPoolConfig{
+public class RedisClientFactory extends JedisPoolConfig {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(RedisClientFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisClientFactory.class);
 
-	private volatile List<JedisPool> redisMasterPool = new ArrayList<JedisPool>();
-	
-	private volatile List<JedisPool> redisSlavePool = new ArrayList<JedisPool>();
-	
-	private int totalServersSize;
-	
-	private int masterServerSize;
-	
-	private int slaveServerSize;
-	
-	private ReentrantLock lock = new  ReentrantLock();
-	
-	private AtomicInteger atomitMasterCount = new AtomicInteger(0);
-	private AtomicInteger atomitSlaveCount = new AtomicInteger(0);
-	
-	
-	private List<String> redisServers;
-	
-	
-	/**
-	 * 构造器函数
-	 * @param redisServers
-	 * 		redis服务器地址列表   ip:port:username:password
-	 */
-	public RedisClientFactory(List<String> redisServers) {
-		super();
-		if(redisServers == null || redisServers.size() ==0){
-			throw new CsRedisRuntimeException("redisServers couldn't be null");
-		}
-		this.redisServers = redisServers;
-		this.totalServersSize = redisServers.size();
-		init();
-	}
+    private volatile List<JedisPool> redisMasterPool = new ArrayList<JedisPool>();
 
-	public RedisClientFactory() {
-		
-	}
-	/**
-	 * 从redisMasterPool中随机获取pool
-	 * @return 
-	 *	   Master的jedisPool资源池 
-	 */
-	public JedisPool getMasterPool() {
-		
-		if(masterServerSize <= 0){
-			return getSlavePool();
-		}
-		int currentIndex = atomitMasterCount.getAndIncrement();
-		if( masterServerSize > 0 ){
-			currentIndex = currentIndex % masterServerSize;
-		}
-		JedisPool jedisPool = redisMasterPool.get(currentIndex);
-		return jedisPool;
-	}
+    private volatile List<JedisPool> redisSlavePool = new ArrayList<JedisPool>();
 
-	
-	/**
-	 * 从redisSlavePool中随机获取pool,当前pool无法获取jedis连接时，切换到其他的Jedispool
-	 * @return 
-	 * 		Slave的jedisPool资源池 
-	 */
-	public JedisPool getSlavePool() {
-		int currentIndex = atomitSlaveCount.getAndIncrement();
-		currentIndex = currentIndex % slaveServerSize;
-		JedisPool jedisPool = redisSlavePool.get(currentIndex);
-		return jedisPool;
-	}
+    private int totalServersSize;
 
+    private int masterServerSize;
 
-	public void setRedisServers(List<String> redisServers) {
-		if(redisServers == null || redisServers.size() ==0){
-			throw new CsRedisRuntimeException("redisServers couldn't be null");
-		}
-		this.redisServers = redisServers;
-		this.totalServersSize = redisServers.size();
-	}
-	
-	/**
-	 * 初始化
-	 */
-	public void init() {
-		
-		if(this.totalServersSize == 0){
-			throw new IllegalArgumentException("redisServer is invalidly config,please correctly set Redis Servers.");
-		}
-		
-		/**
-		 * 在Master池上操作时,如果异常会重新init.操作master有可能会被并发。
-		 */
-		if(lock.isLocked()){
-			return;
-		}
-		lock.lock();
-		try {
-			JedisPool pool = null;
-			Jedis jedis = null;
-			List<JedisPool> newMasterPool = new ArrayList<JedisPool>();
-			List<JedisPool> newRslavePool = new ArrayList<JedisPool>();
-			for (int i = 0; i < totalServersSize; i++) {
-				String[] strArray = RedisUtils.parseServerInfo(redisServers
-						.get(i));
-				String ip = strArray[0];
-				int port = Integer.valueOf(strArray[1]);
-				String password = strArray[2];
-				int timeout = strArray[3] != null ? Integer
-						.valueOf(strArray[3]) : 10000;// 默认是10秒
-				try {
-				    pool = new JedisPool(this, ip, port, timeout, password);
-					jedis = pool.getResource();
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
-					if (jedis != null) {
-						pool.returnBrokenResource(jedis);
-					}
-					continue;
-				}
-				String info = jedis.info();
-				boolean isMaster = RedisUtils.isMaster(info);
-				// 主实例
-				if (isMaster == true) {
-					newMasterPool.add(pool);
-					// 从实例
-				} else {
-					newRslavePool.add(pool);
-				}
-				// 释放
-				pool.returnResource(jedis);
-			}
-			if (newMasterPool.size() != 0) {
-				List<JedisPool> oldMasterPool = redisMasterPool;
-				redisMasterPool = newMasterPool;
-//				this.masterServerSize = redisMasterPool.size();
-				destroy(oldMasterPool);
-			}
-			if (newRslavePool.size() != 0) {
-				List<JedisPool> oldRslavePool = redisSlavePool;
-				redisSlavePool = newRslavePool;
-//				this.slaveServerSize = redisSlavePool.size();
-				destroy(oldRslavePool);
-			}
-			//如果没有master 避免用户直接获取master进行操作导致错误
-			if(redisMasterPool.size() == 0){
-				redisMasterPool = redisSlavePool;
-			}
-			//如果没有slave 避免用户直接获取slave进行操作导致错误
-			if(redisSlavePool.size() == 0){
-				redisSlavePool = redisMasterPool;
-			}
-			this.masterServerSize = redisMasterPool.size();
-			this.slaveServerSize = redisSlavePool.size();
-		} finally {
-			lock.unlock();
-		}
-	}	
-	
-	/**
-	 * 销毁Jedis资源池
-	 */
-	public void destroy(List<JedisPool> pool){
-		if(pool != null && pool.size() != 0){
-			for(JedisPool p : pool){
-				try {
-					p.destroy();
-		        } catch (Throwable e) {
-		            log.warn(e.getMessage(),e);
-		        }
-			}
-		}
-	}
-	
-	/**
-	 * 销毁操作
-	 */
-	public void destroy(){
-		if(redisMasterPool != null && redisMasterPool.size() != 0){
-			for(JedisPool p : redisMasterPool){
-				p.destroy();
-			}
-		}
-		if(redisSlavePool != null && redisSlavePool.size() != 0){
-			for(JedisPool p : redisSlavePool){
-				p.destroy();
-			}
-		}
-	}
-	
- }
+    private int slaveServerSize;
+
+    private ReentrantLock lock = new ReentrantLock();
+
+    private AtomicInteger atomitMasterCount = new AtomicInteger(0);
+    private AtomicInteger atomitSlaveCount = new AtomicInteger(0);
+
+    private List<String> redisServers;
+
+    /**
+     * 构造器函数
+     * 
+     * @param redisServers
+     *            redis服务器地址列表 ip:port:username:password
+     */
+    public RedisClientFactory(List<String> redisServers) {
+        super();
+        if (redisServers == null || redisServers.size() == 0) {
+            throw new CsRedisRuntimeException("redisServers couldn't be null");
+        }
+        this.redisServers = redisServers;
+        this.totalServersSize = redisServers.size();
+        init();
+    }
+
+    public RedisClientFactory() {
+
+    }
+
+    /**
+     * 从redisMasterPool中随机获取pool
+     * 
+     * @return
+     *         Master的jedisPool资源池
+     */
+    public JedisPool getMasterPool() {
+
+        if (masterServerSize <= 0) {
+            return getSlavePool();
+        }
+        int currentIndex = atomitMasterCount.getAndIncrement();
+        if (masterServerSize > 0) {
+            currentIndex = currentIndex % masterServerSize;
+        }
+        JedisPool jedisPool = redisMasterPool.get(currentIndex);
+        return jedisPool;
+    }
+
+    /**
+     * 从redisSlavePool中随机获取pool,当前pool无法获取jedis连接时，切换到其他的Jedispool
+     * 
+     * @return
+     *         Slave的jedisPool资源池
+     */
+    public JedisPool getSlavePool() {
+        int currentIndex = atomitSlaveCount.getAndIncrement();
+        currentIndex = currentIndex % slaveServerSize;
+        JedisPool jedisPool = redisSlavePool.get(currentIndex);
+        return jedisPool;
+    }
+
+    public void setRedisServers(List<String> redisServers) {
+        if (redisServers == null || redisServers.size() == 0) {
+            throw new CsRedisRuntimeException("redisServers couldn't be null");
+        }
+        this.redisServers = redisServers;
+        this.totalServersSize = redisServers.size();
+    }
+
+    /**
+     * 初始化
+     */
+    public void init() {
+
+        if (this.totalServersSize == 0) {
+            throw new IllegalArgumentException("redisServer is invalidly config,please correctly set Redis Servers.");
+        }
+
+        /**
+         * 在Master池上操作时,如果异常会重新init.操作master有可能会被并发。
+         */
+        if (lock.isLocked()) {
+            return;
+        }
+        lock.lock();
+        try {
+            JedisPool pool = null;
+            Jedis jedis = null;
+            List<JedisPool> newMasterPool = new ArrayList<JedisPool>();
+            List<JedisPool> newRslavePool = new ArrayList<JedisPool>();
+            for (int i = 0; i < totalServersSize; i++) {
+                String[] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
+                String ip = strArray[0];
+                int port = Integer.valueOf(strArray[1]);
+                String password = strArray[2];
+                int timeout = strArray[3] != null ? Integer.valueOf(strArray[3]) : 10000;// 默认是10秒
+                try {
+                    pool = new JedisPool(this, ip, port, timeout, password);
+                    jedis = pool.getResource();
+                } catch (Exception e) {
+                    log.warn(e.getMessage(), e);
+                    if (jedis != null) {
+                        pool.returnBrokenResource(jedis);
+                    }
+                    continue;
+                }
+                try {
+                    String info = jedis.info();
+                    boolean isMaster = RedisUtils.isMaster(info);
+                    // 主实例
+                    if (isMaster == true) {
+                        newMasterPool.add(pool);
+                        // 从实例
+                    } else {
+                        newRslavePool.add(pool);
+                    }
+                } finally {
+                    // 释放
+                    pool.returnResource(jedis);
+                }
+            }
+            if (newMasterPool.size() != 0) {
+                List<JedisPool> oldMasterPool = redisMasterPool;
+                redisMasterPool = newMasterPool;
+                // this.masterServerSize = redisMasterPool.size();
+                destroy(oldMasterPool);
+            }
+            if (newRslavePool.size() != 0) {
+                List<JedisPool> oldRslavePool = redisSlavePool;
+                redisSlavePool = newRslavePool;
+                // this.slaveServerSize = redisSlavePool.size();
+                destroy(oldRslavePool);
+            }
+            // 如果没有master 避免用户直接获取master进行操作导致错误
+            if (redisMasterPool.size() == 0) {
+                redisMasterPool = redisSlavePool;
+            }
+            // 如果没有slave 避免用户直接获取slave进行操作导致错误
+            if (redisSlavePool.size() == 0) {
+                redisSlavePool = redisMasterPool;
+            }
+            this.masterServerSize = redisMasterPool.size();
+            this.slaveServerSize = redisSlavePool.size();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * 销毁Jedis资源池
+     */
+    public void destroy(List<JedisPool> pool) {
+        if (pool != null && pool.size() != 0) {
+            for (JedisPool p : pool) {
+                try {
+                    p.destroy();
+                } catch (Throwable e) {
+                    log.warn(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    /**
+     * 销毁操作
+     */
+    public void destroy() {
+        if (redisMasterPool != null && redisMasterPool.size() != 0) {
+            for (JedisPool p : redisMasterPool) {
+                p.destroy();
+            }
+        }
+        if (redisSlavePool != null && redisSlavePool.size() != 0) {
+            for (JedisPool p : redisSlavePool) {
+                p.destroy();
+            }
+        }
+    }
+
+    private static Field maxTotalField = null;
+    private static Field maxWaitField = null;
+
+    static {
+        try {
+            Class<?> jpc = JedisPoolConfig.class;
+            if (1 == RedisUtils.versionOfCommonsPool()) {
+                maxTotalField = ReflectUtils.getClassField(jpc, "maxActive", true);
+                maxWaitField = ReflectUtils.getClassField(jpc, "maxWait", true);
+            } else {
+                maxTotalField = ReflectUtils.getClassField(jpc, "maxTotal", true);
+                maxWaitField = ReflectUtils.getClassField(jpc, "maxWaitMillis", true);
+            }
+            maxTotalField.setAccessible(true);
+            maxWaitField.setAccessible(true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getMaxTotal() {
+        try {
+            return maxTotalField.getInt(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setMaxTotal(int maxTotal) {
+        try {
+            maxTotalField.setInt(this, maxTotal);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public long getMaxWaitMillis() {
+        try {
+            return maxWaitField.getLong(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setMaxWaitMillis(long maxWaitMillis) {
+        try {
+            maxWaitField.setLong(this, maxWaitMillis);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getMaxActive() {
+        try {
+            return maxTotalField.getInt(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setMaxActive(int maxActive) {
+        try {
+            maxTotalField.setInt(this, maxActive);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public long getMaxWait() {
+        try {
+            return maxWaitField.getLong(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setMaxWait(long maxWait) {
+        try {
+            maxWaitField.setLong(this, maxWait);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+}
