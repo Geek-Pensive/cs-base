@@ -2,6 +2,13 @@ Release 1.0 - 2014-07-11
 
 Backward compatible changes:
 
+#1.0.10
+	1、jedis新老版本配置支持（commons-pool版本的向上兼容)
+	2、反射工具类：获取类定义的字段
+
+#1.0.9 
+	1、主机信息获取工具，依赖运维在机器上的配置信息，返回本机IP地址及网络类型
+
 #1.0.4-SNAPSHOT
 	1、重构 http 包，提过获取 response inputStream 方法
 	2、修正 pom 对 javax.servlet-api 的支持
