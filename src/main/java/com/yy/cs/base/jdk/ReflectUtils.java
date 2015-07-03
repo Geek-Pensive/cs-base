@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.status.StatusCode;
+
 public class ReflectUtils {
 
     /**
@@ -17,7 +20,7 @@ public class ReflectUtils {
      * @return
      * @throws Exception
      */
-    public static Field getClassField(Class<?> clz, String fieldName, boolean recursion) throws Exception {
+    public static Field getClassField(Class<?> clz, String fieldName, boolean recursion) {
         Field[] declaredFields = clz.getDeclaredFields();
         for (Field field : declaredFields) {
             if (field.getName().equals(fieldName)) {
@@ -42,13 +45,13 @@ public class ReflectUtils {
      * @return
      * @throws Exception
      */
-    public static List<Field> getClassFields(Class<?> clz, boolean recursion) throws Exception {
+    public static List<Field> getClassFields(Class<?> clz, boolean recursion) {
         List<Field> fields = new ArrayList<Field>();
         getClassFields(clz, recursion, fields);
         return fields;
     }
 
-    private static void getClassFields(Class<?> clz, boolean recursion, List<Field> fields) throws Exception {
+    private static void getClassFields(Class<?> clz, boolean recursion, List<Field> fields) {
         Field[] declaredFields = clz.getDeclaredFields();
         for (Field f : declaredFields) {
             fields.add(f);
@@ -62,14 +65,40 @@ public class ReflectUtils {
     }
 
     /**
+     * 获取某个字段的值
+     * 
+     * @param obj
+     * @param fieldName
+     * @param recursion
+     * @return
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws Exception
+     */
+    public static Object getFieldValue(Object obj, String fieldName, boolean recursion)
+            throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field f = getClassField(obj.getClass(), fieldName, recursion);
+        if (null != f) {
+            f.setAccessible(true);
+            return f.get(obj);
+        } else {
+            throw new NoSuchFieldException();
+        }
+    }
+
+    /**
      * 获取对象的字段的值，返回map，key为对象字段的名称
      * 
      * @param obj
      * @param recursion
      * @return
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      * @throws Exception
      */
-    public static Map<String, Object> getFieldsValueMap(Object obj, boolean recursion) throws Exception {
+    public static Map<String, Object> getFieldsValueMap(Object obj, boolean recursion)
+            throws IllegalArgumentException, IllegalAccessException {
         Map<String, Object> ret = new HashMap<String, Object>();
         List<Field> fields = getClassFields(obj.getClass(), recursion);
         if (fields.size() > 0) {
@@ -82,4 +111,11 @@ public class ReflectUtils {
         return ret;
     }
 
+    public static void main(String[] args) throws Exception {
+        CsStatus s = new CsStatus();
+        s.setCode(StatusCode.FAIL);
+        s.setMessage("12");
+        System.out.println(getFieldsValueMap(s, true));
+        System.out.println(getFieldValue(s, "failNumber", false));
+    }
 }
