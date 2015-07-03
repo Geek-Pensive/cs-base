@@ -50,6 +50,9 @@ public class RedisClientFactory extends JedisPoolConfig {
 
     private List<String> redisServers;
 
+    private int maxActive;
+
+	private int maxWait;
     /**
      * 构造器函数
      * 
@@ -67,7 +70,6 @@ public class RedisClientFactory extends JedisPoolConfig {
     }
 
     public RedisClientFactory() {
-
     }
 
     /**
@@ -220,88 +222,25 @@ public class RedisClientFactory extends JedisPoolConfig {
         }
     }
 
-    private static Field maxTotalField = null;
-    private static Field maxWaitField = null;
-
-    static {
-        try {
-            Class<?> jpc = JedisPoolConfig.class;
-            if (1 == RedisUtils.versionOfCommonsPool()) {
-                maxTotalField = ReflectUtils.getClassField(jpc, "maxActive", true);
-                maxWaitField = ReflectUtils.getClassField(jpc, "maxWait", true);
-            } else {
-                maxTotalField = ReflectUtils.getClassField(jpc, "maxTotal", true);
-                maxWaitField = ReflectUtils.getClassField(jpc, "maxWaitMillis", true);
-            }
-            maxTotalField.setAccessible(true);
-            maxWaitField.setAccessible(true);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public int getMaxTotal() {
-        try {
-            return maxTotalField.getInt(this);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void setMaxTotal(int maxTotal) {
-        try {
-            maxTotalField.setInt(this, maxTotal);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public long getMaxWaitMillis() {
-        try {
-            return maxWaitField.getLong(this);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void setMaxWaitMillis(long maxWaitMillis) {
-        try {
-            maxWaitField.setLong(this, maxWaitMillis);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    
     public int getMaxActive() {
-        try {
-            return maxTotalField.getInt(this);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+		return maxActive;
+	}
 
-    public void setMaxActive(int maxActive) {
-        try {
-            maxTotalField.setInt(this, maxActive);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public void setMaxActive(int maxActive) {
+		this.maxActive = maxActive;
+		this.setMaxTotal(maxActive);
+	}
 
-    public long getMaxWait() {
-        try {
-            return maxWaitField.getLong(this);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public int getMaxWait() {
+		return maxWait;
+	}
 
-    public void setMaxWait(long maxWait) {
-        try {
-            maxWaitField.setLong(this, maxWait);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public void setMaxWait(int maxWait) {
+		this.maxWait = maxWait;
+		this.setMaxWaitMillis(maxWait);
+	}
+
+
 
 }
