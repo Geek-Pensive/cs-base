@@ -1,5 +1,6 @@
 package com.yy.cs.base.jdk;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,10 +40,42 @@ public class ReflectUtils {
     }
 
     /**
+     * 获取类定义的所有有指定注解的字段
+     * 
+     * @param clz
+     * @param recursion 是否递归获取父类的字段
+     * @return
+     * @throws Exception
+     */
+    public static List<Field> getAnnotationedClassFields(Class<?> clz, boolean recursion,
+            Class<? extends Annotation> annotation) {
+        List<Field> fields = new ArrayList<Field>();
+        getAnnotationedClassFields(clz, recursion, fields, annotation);
+        return fields;
+    }
+
+    private static void getAnnotationedClassFields(Class<?> clz, boolean recursion, List<Field> fields,
+            Class<? extends Annotation> annotation) {
+        Field[] declaredFields = clz.getDeclaredFields();
+        for (Field f : declaredFields) {
+            Annotation anno = f.getAnnotation(annotation);
+            if (null != anno) {
+                fields.add(f);
+            }
+        }
+        if (recursion) {
+            Class<?> superclass = clz.getSuperclass();
+            if (superclass != null) {
+                getAnnotationedClassFields(superclass, recursion, fields, annotation);
+            }
+        }
+    }
+
+    /**
      * 获取类定义的所有字段
      * 
      * @param clz
-     * @param recursion
+     * @param recursion 是否递归获取父类的字段
      * @return
      * @throws Exception
      */
@@ -70,7 +103,7 @@ public class ReflectUtils {
      * 
      * @param obj
      * @param fieldName
-     * @param recursion
+     * @param recursion 是否递归获取父类的字段
      * @return
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
@@ -92,7 +125,7 @@ public class ReflectUtils {
      * 获取对象的字段的值，返回map，key为对象字段的名称
      * 
      * @param obj
-     * @param recursion
+     * @param recursion 是否递归获取父类的字段
      * @return
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
@@ -103,7 +136,7 @@ public class ReflectUtils {
         Map<String, Object> ret = new HashMap<String, Object>();
         List<Field> fields = getClassFields(obj.getClass(), recursion);
         if (fields.size() > 0) {
-            Collections.reverse(fields); //由于递归遍历，父类定义的字段会放后面，为了保证子类覆盖父类，反转list
+            Collections.reverse(fields); // 由于递归遍历，父类定义的字段会放后面，为了保证子类覆盖父类，反转list
             for (Field f : fields) {
                 f.setAccessible(true);
                 Object res = f.get(obj);
