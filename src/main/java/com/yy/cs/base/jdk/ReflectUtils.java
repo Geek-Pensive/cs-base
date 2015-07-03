@@ -2,6 +2,7 @@ package com.yy.cs.base.jdk;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +103,7 @@ public class ReflectUtils {
         Map<String, Object> ret = new HashMap<String, Object>();
         List<Field> fields = getClassFields(obj.getClass(), recursion);
         if (fields.size() > 0) {
+            Collections.reverse(fields); //由于递归遍历，父类定义的字段会放后面，为了保证子类覆盖父类，反转list
             for (Field f : fields) {
                 f.setAccessible(true);
                 Object res = f.get(obj);
