@@ -1,7 +1,5 @@
 package com.yy.cs.base.redis;
 
-import java.lang.reflect.Field;
-
 /*
  * Copyright (c) 2012 duowan.com. 
  * All Rights Reserved.
@@ -19,8 +17,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yy.cs.base.jdk.ReflectUtils;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -29,7 +25,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * 管理redis的连接池工厂类，redis连接的参数设置
  * 
  */
-public class RedisClientFactory extends JedisPoolConfig {
+public class RedisClientFactory extends JedisPoolConfigAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(RedisClientFactory.class);
 
@@ -50,9 +46,6 @@ public class RedisClientFactory extends JedisPoolConfig {
 
     private List<String> redisServers;
 
-    private int maxActive;
-
-	private int maxWait;
     /**
      * 构造器函数
      * 
@@ -70,6 +63,7 @@ public class RedisClientFactory extends JedisPoolConfig {
     }
 
     public RedisClientFactory() {
+
     }
 
     /**
@@ -138,9 +132,10 @@ public class RedisClientFactory extends JedisPoolConfig {
                 String ip = strArray[0];
                 int port = Integer.valueOf(strArray[1]);
                 String password = strArray[2];
-                int timeout = strArray[3] != null ? Integer.valueOf(strArray[3]) : 10000;// 默认是10秒
+                int timeout = strArray[3] != null && !"".equals(strArray[3].trim()) ? Integer.valueOf(strArray[3])
+                        : 10000;// 默认是10秒
                 try {
-                    pool = new JedisPool(this, ip, port, timeout, password);
+                    pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
                     jedis = pool.getResource();
                 } catch (Exception e) {
                     log.warn(e.getMessage(), e);
@@ -221,26 +216,5 @@ public class RedisClientFactory extends JedisPoolConfig {
             }
         }
     }
-
-    
-    public int getMaxActive() {
-		return maxActive;
-	}
-
-	public void setMaxActive(int maxActive) {
-		this.maxActive = maxActive;
-		this.setMaxTotal(maxActive);
-	}
-
-	public int getMaxWait() {
-		return maxWait;
-	}
-
-	public void setMaxWait(int maxWait) {
-		this.maxWait = maxWait;
-		this.setMaxWaitMillis(maxWait);
-	}
-
-
 
 }

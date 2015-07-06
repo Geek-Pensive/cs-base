@@ -1,9 +1,11 @@
 package com.yy.cs.base.redis;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
@@ -106,6 +108,33 @@ public class RedisUtils {
             version = 2;
         }
         return version;
+    }
+
+    /**
+     * 通过反射创建JedisPool实例，用于兼容新老版本的Jedis
+     * 
+     * @param config
+     * @param ip
+     * @param port
+     * @param timeout
+     * @param password
+     * @return
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    public static JedisPool getJedisPool(JedisPoolConfig config, String ip, int port, int timeout, String password)
+            throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        JedisPool pool = null;
+        Class<JedisPool> pClz = JedisPool.class;
+        Constructor<JedisPool> constructor = pClz.getConstructor(JedisPoolConfig.class.getSuperclass(), String.class,
+                int.class, int.class, String.class);
+        pool = constructor.newInstance(config, ip, port, timeout, password);
+        return pool;
     }
 
     public static void main(String[] args) {
