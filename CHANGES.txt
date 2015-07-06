@@ -1,3 +1,10 @@
+Release 1.1 - 2015-07-06
+
+#1.1.1
+	1、通过反射，让创建jedis连接池支持commons-pool和commons-pool2
+
+
+
 Release 1.0 - 2014-07-11
 
 Backward compatible changes:
