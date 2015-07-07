@@ -137,7 +137,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
                     pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
                     jedis = pool.getResource();
                 } catch (Exception e) {
-                    log.warn(e.getMessage(), e);
+                    log.warn("[" + ip + ":" + port + "]" + e.getMessage(), e);
                     if (jedis != null) {
                         pool.returnBrokenResource(jedis);
                     }
