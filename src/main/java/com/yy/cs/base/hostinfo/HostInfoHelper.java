@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class HostInfoHelper {
 
     private static final Logger log = LoggerFactory.getLogger(HostInfoHelper.class);
-    private static final String DEFAULT_FILE_PATH = "/home/dspeak/yyms/hostinfo.ini ";
+    private static final String DEFAULT_FILE_PATH = "/home/dspeak/yyms/hostinfo.ini";
 
     private static Properties properties;
     private static OriginHostInfo origInfo;
