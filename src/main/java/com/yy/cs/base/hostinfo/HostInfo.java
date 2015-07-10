@@ -45,7 +45,11 @@ public class HostInfo {
             String[] ips = ipInfos.split(",");
             for (String ip : ips) {
                 String[] info = ip.split(":");
-                NetType nt = NetType.valueOf(info[1]);
+                NetType nt = null;
+                try {
+                    nt = NetType.valueOf(info[1]);
+                } catch (Exception e) {
+                }
                 if (null != nt) {
                     hi.getIpList().put(nt, new IpInfo(info[0], nt));
                 }

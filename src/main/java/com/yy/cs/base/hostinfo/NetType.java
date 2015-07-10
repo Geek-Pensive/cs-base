@@ -8,6 +8,7 @@ public enum NetType {
     CNII(5, "CNII", "铁通"), //
     WBN(6, "WBN", "长城"), //
     INTRANET(7, "INTRANET", "内网"), //
+    BMC(8,"BMC","管理网"),
     ;
     private int value;
     private String shortName;
