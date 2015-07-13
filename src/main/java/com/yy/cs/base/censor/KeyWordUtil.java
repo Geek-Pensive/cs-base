@@ -58,6 +58,10 @@ public class KeyWordUtil {
         return keywordUtil;
     }
 
+	public void setCensorUrl(String censorUrl){
+		getInstance().censorUrl = censorUrl;
+	}
+	
     private  KeyWordUtil() {
         scheduledExecutor.scheduleAtFixedRate(new Task(), 1000, interval, TimeUnit.MILLISECONDS) ;
         httpClient = new CSHttpClient();
