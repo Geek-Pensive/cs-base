@@ -27,8 +27,10 @@ public class HostInfoHelper {
             in = new BufferedReader(new FileReader(file));
             properties = new Properties();
             properties.load(in);
-            for (Object s : properties.keySet()) {
-                log.info("property " + s + ":" + properties.getProperty((String) s));
+            if (log.isDebugEnabled()) {
+                for (Object s : properties.keySet()) {
+                    log.debug("property " + s + ":" + properties.getProperty((String) s));
+                }
             }
             parseProperties();
         } catch (Exception e) {
