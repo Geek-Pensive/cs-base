@@ -16,6 +16,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 
+import com.yy.cs.base.hostinfo.HostInfo;
+import com.yy.cs.base.hostinfo.HostInfoHelper;
+import com.yy.cs.base.hostinfo.IpInfo;
+import com.yy.cs.base.hostinfo.NetType;
 import com.yy.cs.base.http.CSHttpClient;
 import com.yy.cs.base.http.HttpClientException;
 import com.yy.cs.base.json.Json;
@@ -53,8 +57,8 @@ public class HiidoApi {
         return access(apiName, cname, secret, null, requestData);
     }
 
-    private static ResultObject login(String apiName, String cname, String secret, String ip) throws SocketException,
-            UnknownHostException, HttpClientException {
+    private static ResultObject login(String apiName, String cname, String secret, String ip)
+            throws SocketException, UnknownHostException, HttpClientException {
         ResultObject resultObject = null;
         if (ip == null) {
             ip = getIp("eth0");
@@ -98,6 +102,18 @@ public class HiidoApi {
     }
 
     private static String getIp(String ethName) throws SocketException, UnknownHostException {
+        HostInfo hostInfo = HostInfoHelper.getHostInfo();
+        if (null != hostInfo) {
+            Map<NetType, IpInfo> ips = hostInfo.getIpList();
+            if (ips.size() > 0) {
+                for (NetType type : NetType.values()) {
+                    if (ips.containsKey(type)) {
+                        return ips.get(type).getIp();
+                    }
+                }
+            }
+        }
+
         Enumeration<NetworkInterface> eiter = NetworkInterface.getNetworkInterfaces();
         String ip = null;
         while (eiter.hasMoreElements()) {
@@ -136,8 +152,8 @@ public class HiidoApi {
         req.put("ed", "2014-11-28");
         req.put("dataType", "DAU");
         try {
-            System.out.println(HiidoApi.access("getJiaoyouData", "product", "product@chinaduo.com", "183.60.177.228",
-                    req));
+            System.out.println(
+                    HiidoApi.access("getJiaoyouData", "product", "product@chinaduo.com", "183.60.177.228", req));
         } catch (Exception e) {
             e.printStackTrace();
         }
