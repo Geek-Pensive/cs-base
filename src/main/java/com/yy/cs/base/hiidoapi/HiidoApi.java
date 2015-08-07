@@ -31,8 +31,8 @@ public class HiidoApi {
 
     private static CSHttpClient httpClient = new CSHttpClient();
 
-    public static ResultObject access(String apiName, String cname, String secret, String localIp,
-            Map<String, Object> requestData) throws SocketException, UnknownHostException, HttpClientException {
+    public static <T> ResultObject access(String apiName, String cname, String secret, String localIp, T requestData)
+            throws SocketException, UnknownHostException, HttpClientException {
         ResultObject resultObject = new ResultObject();
         ResultObject loginResult = login(apiName, cname, secret, localIp);
         if (null != loginResult && loginResult.getResultcode() == 1) {
@@ -52,7 +52,7 @@ public class HiidoApi {
         return resultObject;
     }
 
-    public static ResultObject access(String apiName, String cname, String secret, Map<String, Object> requestData)
+    public static <T> ResultObject access(String apiName, String cname, String secret, T requestData)
             throws SocketException, UnknownHostException, HttpClientException {
         return access(apiName, cname, secret, null, requestData);
     }
