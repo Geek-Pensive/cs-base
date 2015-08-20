@@ -44,7 +44,8 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
             Jedis j = null;
             try {
                 j = jpool.getResource();
-                if (null == j.info()) {
+                String ping = j.ping();
+                if (!"PONG".equals(ping)) {
                     return true;
                 }
                 checkCount++;
