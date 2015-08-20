@@ -11,6 +11,7 @@ package com.yy.cs.base.redis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -44,6 +45,9 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
     private AtomicInteger atomitSlaveCount = new AtomicInteger(0);
 
     private List<String> redisServers;
+
+    private boolean healthCheck;
+    private Timer healthCheckTimer;
 
     /**
      * 构造器函数
@@ -178,6 +182,12 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             }
             this.masterServerSize = redisMasterPool.size();
             this.slaveServerSize = redisSlavePool.size();
+
+            if (healthCheck) {
+                healthCheckTimer = new Timer();
+                healthCheckTimer.scheduleAtFixedRate(new RedisClientFactoryHealthChecker(this),
+                        RedisClientFactoryHealthChecker.CHECK_PERIOD, RedisClientFactoryHealthChecker.CHECK_PERIOD);
+            }
         } finally {
             lock.unlock();
         }
@@ -212,6 +222,41 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
                 p.destroy();
             }
         }
+        if (healthCheck && null != healthCheckTimer) {
+            healthCheckTimer.cancel();
+        }
+    }
+
+    public List<String> getRedisServers() {
+        return redisServers;
+    }
+
+    public List<JedisPool> getRedisMasterPool() {
+        return redisMasterPool;
+    }
+
+    public List<JedisPool> getRedisSlavePool() {
+        return redisSlavePool;
+    }
+
+    public int getTotalServersSize() {
+        return totalServersSize;
+    }
+
+    public int getMasterServerSize() {
+        return masterServerSize;
+    }
+
+    public int getSlaveServerSize() {
+        return slaveServerSize;
+    }
+
+    public boolean isHealthCheck() {
+        return healthCheck;
+    }
+
+    public void setHealthCheck(boolean healthCheck) {
+        this.healthCheck = healthCheck;
     }
 
 }
