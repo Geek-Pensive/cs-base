@@ -22,6 +22,9 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
 
     @Override
     public void run() {
+        if (null == factory) {
+            return;
+        }
         boolean masterStatus = check(factory.getRedisMasterPool(), factory.getMasterServerSize());
         boolean slaveStatus = check(factory.getRedisSlavePool(), factory.getSlaveServerSize());
         if (masterStatus || slaveStatus) {
