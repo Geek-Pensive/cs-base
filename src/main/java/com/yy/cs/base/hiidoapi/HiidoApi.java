@@ -39,7 +39,12 @@ public class HiidoApi {
             String sign = DigestUtils.md5Hex(loginResult.getMessage() + "_" + secret);
             HttpPost post = new HttpPost(API_URL);
             post.addHeader("Authorization", "id=" + loginResult.getMessage() + ",code=" + sign);
-            String reqJson = Json.ObjToStr(requestData);
+            String reqJson = "";
+            if (requestData instanceof String) {
+                reqJson = (String) requestData;
+            } else {
+                reqJson = Json.ObjToStr(requestData);
+            }
             post.setEntity(EntityBuilder.create().setText(reqJson).build());
             String respJson = httpClient.executeMethod(post);
             if (null != respJson && !"".equals(respJson)) {
