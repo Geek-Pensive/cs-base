@@ -83,6 +83,9 @@ public class KeyWordUtil {
     }
 
     public Boolean isCensor(String text) {
+        if(censorWords==null){
+            return false;
+        }
         return censorWords.isCensor(text);
     }
 
