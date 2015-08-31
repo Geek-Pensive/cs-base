@@ -2,6 +2,7 @@ package com.yy.cs.base.jdk;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +13,34 @@ import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.status.StatusCode;
 
 public class ReflectUtils {
+
+    /**
+     * 递归获取指定类的方法
+     * 
+     * @param clz
+     * @param methodName
+     * @param recursion
+     * @param parameterTypes
+     * @return
+     */
+    public static Method getClassMethod(Class<?> clz, String methodName, boolean recursion,
+            Class<?>... parameterTypes) {
+        try {
+            Method m = clz.getDeclaredMethod(methodName, parameterTypes);
+            if (null != m) {
+                return m;
+            }
+        } catch (Exception e) {
+
+        }
+        if (recursion) {
+            Class<?> superclass = clz.getSuperclass();
+            if (superclass != null) {
+                return getClassMethod(superclass, methodName, recursion, parameterTypes);
+            }
+        }
+        return null;
+    }
 
     /**
      * 获取类里面的某个字段，在递归获取的情况下，子类定义的字段优先返回
