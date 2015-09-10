@@ -1100,7 +1100,7 @@ public class RedisClient {
      *         给定域的值。当给定域不存在或是给定 key 不存在时，返回 nil 。
      */
     public String hget(String key, String field) {
-        return hget(key, field);
+        return hget(0,key, field);
     }
 
     /**
