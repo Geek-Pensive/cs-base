@@ -78,6 +78,32 @@ public class RedisTaskLock implements TaskLock {
 		}
 		return result;
 	}
+	@Override
+	public boolean releaseLock(String id, long value){
+		JedisPool pool = null;
+		Jedis	jedis  = null;
+		boolean result = false;
+		try{
+			pool = redisClient.getJedisMasterPool();
+			jedis =	pool.getResource();
+			String key = defaultPrefix + id + defaultSplit + value;
+			long del = jedis.del(key);
+			//删除锁
+			result = del == 1 ? true : false;
+	        if(result) {
+	        	return result;
+	        }
+		}catch(Throwable t){
+			//防御性容错，如果异常直接返回false
+			logger.error(" task id:" + id + " value:" +value , t);
+		}
+		finally{
+			if(pool != null && jedis != null){
+				pool.returnResource(jedis);
+			}
+		}
+		return result;
+	}
 
 	 
 	@Override

@@ -29,6 +29,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	 * 任务
 	 */
 	protected final Task task;
+
 	/**
 	 * 触发器
 	 */
@@ -36,11 +37,11 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	/**
 	 * 任务上下文
 	 */
-	protected final TaskContext context = new TaskContext();
+	protected  TaskContext context = new TaskContext();
 	/**
 	 * 任务上下文监听对象
 	 */
-	protected final TaskContext contextMonitor = new TaskContext();
+	protected  TaskContext contextMonitor = new TaskContext();
 	/**
 	 * 锁
 	 */
@@ -203,5 +204,12 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 			nexdDate = trigger.nextExecutionTime(contextMonitor);
 		}
 		return System.currentTimeMillis() > nexdDate.getTime() ? true : false;
+	}
+	
+	public Task getTask() {
+		return task;
+	}
+	public Trigger getTrigger(){
+		return this.trigger;
 	}
 }

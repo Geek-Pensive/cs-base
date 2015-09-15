@@ -13,7 +13,7 @@ public class ClusterConfig {
 	
 //	private RedisPoolManager redisPoolManager;
 	
-//	private int expireLockTime = -1;	//默认没有设置:-1
+	private int expireLockTime = -1;	//默认没有设置:-1
 	
 	public RedisClient getRedisClient() {
 		return this.redisClient;
@@ -33,13 +33,13 @@ public class ClusterConfig {
 	public ClusterConfig(RedisClient redisClient){
 		this.redisClient = redisClient ; 
 	}
-//	public int getExpireLockTime() {
-//		return expireLockTime;
-//	}
-//
-//	public void setExpireLockTime(int expireLockTime) {
-//		this.expireLockTime = expireLockTime;
-//	}
+	public int getExpireLockTime() {
+		return expireLockTime;
+	}
+
+	public void setExpireLockTime(int expireLockTime) {
+		this.expireLockTime = expireLockTime;
+	}
 	
 //	public RedisPoolManager getRedisPoolManager() {
 //		return redisPoolManager;

@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.execute.HandlingRunnable;
+import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.trigger.Trigger;
  
 public interface TaskScheduler {
@@ -55,4 +56,6 @@ public interface TaskScheduler {
 	 * 关闭当前调度任务
 	 */
 	void shutdown();
+	
+	void setTaskRegister(TimerTaskRegistrar register);
 }

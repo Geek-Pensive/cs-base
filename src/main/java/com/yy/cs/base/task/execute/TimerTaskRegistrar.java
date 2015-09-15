@@ -1,9 +1,10 @@
 package com.yy.cs.base.task.execute;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import com.yy.cs.base.task.context.Constants;
 import com.yy.cs.base.task.context.Constants.MonitorType;
 import com.yy.cs.base.task.context.MonitorTask;
 import com.yy.cs.base.task.context.TaskContext;
+import com.yy.cs.base.task.thread.NamedThreadFactory;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.trigger.CronTrigger;
 import com.yy.cs.base.task.trigger.Trigger;
@@ -31,37 +33,14 @@ public class TimerTaskRegistrar {
 	
 	private TaskScheduler taskScheduler;
 
-	Map<String, TimerTask> cronTaskMap = new HashMap<String, TimerTask>();
+	private final ConcurrentHashMap<String , HandlingRunnable> handlings = new ConcurrentHashMap<String , HandlingRunnable>();
 	
-	Map<String, TimerTask> clusterTaskMap = new HashMap<String, TimerTask>();
-
-	private final Map<String , HandlingRunnable> handlings = new HashMap<String , HandlingRunnable>();
+	private LinkedBlockingQueue<TimerTask> taskQueue = new LinkedBlockingQueue<>();
+     
+    private Executor executor = Executors.newFixedThreadPool(1, new NamedThreadFactory("cs-base-task-scan", true));
 	
-	public Map<String, HandlingRunnable> getHandlings() {
+	public ConcurrentHashMap<String, HandlingRunnable> getHandlings() {
 		return handlings;
-	}
-	/**
-	 * 将Task解析到cronTaskMap中
-	 * @param timerTasks 
-	 * 		task的Map集合
-	 */
-	public void parse(Map<String,TimerTask> timerTasks) {
-		Set<Entry<String, TimerTask>> tasks = timerTasks.entrySet();
-		for (Entry<String, TimerTask> e : tasks) {
-			TimerTask task =  e.getValue();
-			String id =  e.getKey();
-			if (task == null) {
-				continue;
-			}
-			if(task.getId() == null || "".equals(task.getId())){
-				task.setId(id);
-			}
-			if(task.getCluster() != null){
-				clusterTaskMap.put(id, task);
-				continue;
-			} 
-			cronTaskMap.put(id, task);	
-		}
 	}
 	 
 	public TaskScheduler getScheduler() {
@@ -140,28 +119,54 @@ public class TimerTaskRegistrar {
 	}
 	
 	private void scheduleTasks() {
-		if (this.cronTaskMap != null) {
-			for (Entry<String, TimerTask> entry : cronTaskMap.entrySet()) {
-				TimerTask task = entry.getValue();
-				Trigger trigger = new CronTrigger(task.getCron());
-				handlings.put(entry.getKey(), this.taskScheduler.localSchedule(task, trigger));
-			}
-		}
-		if (this.clusterTaskMap != null) {
-			for (Entry<String, TimerTask> entry : clusterTaskMap.entrySet()) {
-				TimerTask task = entry.getValue();
-				Trigger trigger = new CronTrigger(task.getCron());
-				handlings.put(entry.getKey(), this.taskScheduler.clusterSchedule(task, trigger,task.getCluster()));
-			}
-		}
+		 executor.execute(new Runnable(){
+				@Override
+				public void run() {
+					try{
+						while(!Thread.currentThread().isInterrupted()){
+							try{
+								TimerTask task = taskQueue.take();
+								handler(task);
+							}catch(Exception e){
+								logger.error("shechule task fail ,error message:{},error:",e.getMessage(),e);
+							}
+						}
+					}catch(Exception e){
+						Thread.currentThread().interrupt();
+						logger.error("shechule task fail ,error message:{},error:",e.getMessage(),e);
+						throw new RuntimeException(e);
+					}
+					
+				}
+	   	 });
 	}
+	
+	public void addTimerTask(String id,TimerTask task){
+   	 	task.setId(id);
+   	 	taskQueue.add(task);
+    }
+	
+	
 	/**
 	 * 销毁任务的执行
 	 */
 	public void destroy() {
 		for (Entry<String, HandlingRunnable> entry : this.handlings.entrySet()) {
-			entry.getValue().cancel(true);
+			if(!entry.getValue().isCancelled()){
+				entry.getValue().cancel(false);
+				this.handlings.remove(entry.getKey());
+			}
 		}
 		this.taskScheduler.shutdown();
 	}
+	
+	private void handler(TimerTask task) {
+		Trigger trigger = new CronTrigger(task.getCron());
+		if(task.getCluster() == null){
+			handlings.put(task.getId(), this.taskScheduler.localSchedule(task, trigger));
+		}else{
+			handlings.put(task.getId(), this.taskScheduler.clusterSchedule(task, trigger, task.getCluster()));
+		}
+	}
+	
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
+import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.execute.lock.RedisTaskLock;
 import com.yy.cs.base.task.execute.lock.TaskLock;
 import com.yy.cs.base.task.trigger.Trigger;
@@ -21,11 +22,10 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClusterTriggerRunnable.class);
 	
-	private final Trigger trigger;
-	
 	private final ScheduledExecutorService executor;
 	
 	private final TaskLock taskLock;
+	
 	/**
 	 * 
 	 * @param task
@@ -46,13 +46,12 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 		if(clusterConfig == null || clusterConfig.getRedisClient() == null){
 			throw new IllegalArgumentException("clusterConfig must not be null");
 		}
-		this.trigger = trigger;
 		this.executor = executor;
-//		if(clusterConfig.getExpireLockTime() > 0){
-//			taskLock = new RedisTaskLock(clusterConfig.getRedisPoolManager(),clusterConfig.getExpireLockTime());
-//		}else{
-		taskLock = new RedisTaskLock(clusterConfig.getRedisClient());
-//		}
+		if(clusterConfig.getExpireLockTime() > 0){
+			taskLock = new RedisTaskLock(clusterConfig.getRedisClient(),clusterConfig.getExpireLockTime());
+		}else{
+			taskLock = new RedisTaskLock(clusterConfig.getRedisClient());
+		}
 	}
 
 
@@ -85,6 +84,18 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 			}
 		}
 		logger.info("completion run cluster task id:" + task.getId());
+	}
+	
+	@Override
+	public boolean cancel(boolean mayInterruptIfRunning){
+		//释放原有的锁，保证update操作的任务可以重新获取锁
+		taskLock.releaseLock(task.getId(), this.scheduledExecutionTime.getTime());
+		return super.cancel(mayInterruptIfRunning);
+	}
+	
+	public void reSetContext(){
+		this.context = new TaskContext();
+		this.contextMonitor = new TaskContext();
 	}
 	
 

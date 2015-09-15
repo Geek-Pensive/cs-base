@@ -39,7 +39,6 @@ public class Constants {
 	public final static String  TIMEOUT = "timeout";
 	/**
 	 * 监控器类型日志、HTML方法
-	 * @author duowan-PC
 	 *
 	 */
 	public enum MonitorType{

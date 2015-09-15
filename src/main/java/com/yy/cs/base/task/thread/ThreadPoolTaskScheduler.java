@@ -4,12 +4,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.execute.ClusterTriggerRunnable;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.LocalTriggerRunnable;
+import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.trigger.Trigger;
 
 /**
@@ -18,14 +24,20 @@ import com.yy.cs.base.task.trigger.Trigger;
  */
 public class ThreadPoolTaskScheduler implements TaskScheduler  {
 
-
+	private final static Logger LOG = LoggerFactory.getLogger(ThreadPoolTaskScheduler.class);
+	
+	private TimerTaskRegistrar register;
+	
 	private final ScheduledExecutorService scheduledExecutor;
+	
+	private Lock lock = new ReentrantLock();
 	/**
 	 * 构造器,默认线程池大小为2
 	 */
 	public  ThreadPoolTaskScheduler() {
 		this(2);
 	}
+	
 	/**
 	 * 构造器,默认线程池大小为2。
 	 * @param poolSize
@@ -39,23 +51,74 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 	}
 	
 	public HandlingRunnable localSchedule(Task task, Trigger trigger) {
-		return new LocalTriggerRunnable(task,trigger,scheduledExecutor).schedule();
+		try{
+			lock.lock();
+			LocalTriggerRunnable triggerRunnable = new LocalTriggerRunnable(task,trigger,scheduledExecutor);
+			HandlingRunnable r = this.register.getHandlings().get(task.getId());
+			if( r != null &&  r.getTask().getId().equals(triggerRunnable.getTask().getId())){
+				//停止任务
+				if(r.cancel(false)){
+					this.register.getHandlings().remove(triggerRunnable.getTask().getId());
+					//触发新的任务
+					return triggerRunnable.schedule();
+				}else{
+					LOG.error("fail to update and execute new local TimerTask :{},and new task:{},trigger "
+							+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
+					throw new IllegalStateException("fail to update and execute new TimerTask");
+				}
+				
+			}else{
+				return triggerRunnable.schedule();
+			}
+		}finally{
+			lock.unlock();
+		}
 	}
 	
-	public HandlingRunnable clusterSchedule(Task task, Trigger trigger,ClusterConfig config) {
-		return new ClusterTriggerRunnable(task,trigger,scheduledExecutor,config).schedule();
+	public  HandlingRunnable clusterSchedule(Task task, Trigger trigger,ClusterConfig config) {
+		try{
+			lock.lock();
+			ClusterTriggerRunnable triggerRunnable = new ClusterTriggerRunnable(task,trigger,scheduledExecutor,config);
+			HandlingRunnable r = this.register.getHandlings().get(task.getId());
+			if( r != null &&  r.getTask().getId().equals(triggerRunnable.getTask().getId())){
+				//停止任务
+				if(r.cancel(false)){
+					this.register.getHandlings().remove(triggerRunnable.getTask().getId());
+					//触发新的任务
+					return triggerRunnable.schedule();
+				}else{
+					LOG.error("fail to update and execute new cluster TimerTask :{},and new task:{},trigger "
+							+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
+					throw new IllegalStateException("fail to update and execute new TimerTask");
+				}
+				
+			}else{
+				return triggerRunnable.schedule();
+			}
+		}finally{
+			lock.unlock();
+		}
 	}
 	
 	public void shutdown() {
 		if(!scheduledExecutor.isShutdown()){
 			scheduledExecutor.shutdown();
 		}
-		
 	}
 	
 	public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
 			long initialDelay, long delay, TimeUnit unit) {
 		return scheduledExecutor.scheduleWithFixedDelay(command, initialDelay, delay, unit);
 	}
+	
+	public TimerTaskRegistrar getRegister() {
+		return register;
+	}
+
+	@Override
+	public void setTaskRegister(TimerTaskRegistrar register) {
+		this.register = register;
+	}
+
 
 }

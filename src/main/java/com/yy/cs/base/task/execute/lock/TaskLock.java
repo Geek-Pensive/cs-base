@@ -29,6 +29,8 @@ public interface TaskLock {
      * 		ip地址
      */
     String getExecuteAddress(String id,long value);
+    
+    boolean releaseLock(String id, long executeTime);
 //    /**
 //     * 
 //     * @param key
