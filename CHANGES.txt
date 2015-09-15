@@ -1,3 +1,9 @@
+Release 1.1.8-SNAPSHOT 2015-09-15
+
+Backward compatible changes:
+	1.task包，增强功能，支持调度任务的增，删，改	
+
+
 Release 1.1 - 2015-07-06
 
 #1.1.1
