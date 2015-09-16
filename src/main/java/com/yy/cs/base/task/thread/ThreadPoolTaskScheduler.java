@@ -57,14 +57,14 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
 			if( r != null &&  r.getTask().getId().equals(triggerRunnable.getTask().getId())){
 				//停止任务
-				if(r.cancel(false)){
+				if(r.isCancelled() || r.cancel(false)){
 					this.register.getHandlings().remove(triggerRunnable.getTask().getId());
 					//触发新的任务
 					return triggerRunnable.schedule();
 				}else{
 					LOG.error("fail to update and execute new local TimerTask :{},and new task:{},trigger "
 							+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
-					throw new IllegalStateException("fail to update and execute new TimerTask");
+					return r;
 				}
 				
 			}else{
@@ -82,14 +82,14 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
 			if( r != null &&  r.getTask().getId().equals(triggerRunnable.getTask().getId())){
 				//停止任务
-				if(r.cancel(false)){
+				if(r.isCancelled() || r.cancel(false)){
 					this.register.getHandlings().remove(triggerRunnable.getTask().getId());
 					//触发新的任务
 					return triggerRunnable.schedule();
 				}else{
 					LOG.error("fail to update and execute new cluster TimerTask :{},and new task:{},trigger "
 							+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
-					throw new IllegalStateException("fail to update and execute new TimerTask");
+					return r;
 				}
 				
 			}else{
