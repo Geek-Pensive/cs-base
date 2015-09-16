@@ -67,11 +67,17 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 					//停止任务
 					if(r.isCancelled() || r.cancel(false)){
 						this.register.getHandlings().remove(triggerRunnable.getTask().getId());
+						LOG.info(
+								"update and execute new Local TimerTask :{}, new trigger:{} "
+										+ "/ old task:{}, old trigger ", task, trigger,
+								r.getTask(), r.getTrigger());
 						//触发新的任务
 						return triggerRunnable.schedule();
 					}else{
-						LOG.error("fail to update and execute new local TimerTask :{},and new task:{},trigger "
-								+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
+						LOG.error(
+								"fail to update and execute new Local TimerTask :{}, new trigger:{} "
+										+ "/ old task :{} old trigger ", task, trigger,
+								r.getTask(), r.getTrigger());
 						return r.schedule();
 					}
 				}	
@@ -103,12 +109,16 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 					if (r.isCancelled() || r.cancel(false)) {
 						this.register.getHandlings().remove(
 								triggerRunnable.getTask().getId());
+						LOG.info(
+								"update and execute new cluster TimerTask :{}, new trigger:{} "
+										+ "/ old task:{}, old trigger ", task, trigger,
+								r.getTask(), r.getTrigger());
 						// 触发新的任务
 						return triggerRunnable.schedule();
 					} else {
 						LOG.error(
-								"fail to update and execute new cluster TimerTask :{},and new task:{},trigger "
-										+ "/ old: task ", task, trigger,
+								"fail to update and execute new cluster TimerTask :{}, new trigger:{} "
+										+ "/ old task :{} old trigger ", task, trigger,
 								r.getTask(), r.getTrigger());
 						return r.schedule();
 					}

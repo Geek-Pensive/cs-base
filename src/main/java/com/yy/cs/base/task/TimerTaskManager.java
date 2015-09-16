@@ -69,6 +69,7 @@ public class TimerTaskManager {
 	 public void addTimerTask(String id,TimerTask task){
     	 registrar.addTimerTask(id, task);
     	 timerTasks.put(id, task);
+    	 LOG.info("addTimerTask id:{},timerTask task :{}",id,task);
      }
      
      public void addTimerTask(TimerTask task){
@@ -158,14 +159,15 @@ public class TimerTaskManager {
 			HandlingRunnable runingTask = this.registrar.getHandlings().get(taskId);
 			if(runingTask.isCancelled()){
 				this.registrar.getHandlings().remove(taskId);
-				
 				timerTasks.remove(taskId);
+				LOG.info("stopTask task : {}",runingTask);
 				return true;
 			}else{
 				boolean b = runingTask.cancel(mayInterrupted);
 				if(b){
 					this.registrar.getHandlings().remove(taskId);
 					timerTasks.remove(taskId);
+					LOG.info("stopTask task : {}",runingTask);
 				}
 				return b;
 		   }

@@ -8,7 +8,7 @@ import com.yy.cs.base.status.CsStatus;
  *
  */
 public abstract class TimerTask implements Task{
-	
+
 	private String id;						//任务Id标识
 	
 	private CsStatus   csStatus; 			// 任务调度执行状态
@@ -54,4 +54,11 @@ public abstract class TimerTask implements Task{
 	public void setCluster(ClusterConfig cluster) {
 		this.cluster = cluster;
 	}
+	
+	@Override
+	public String toString() {
+		return "TimerTask [id=" + id + ", csStatus=" + csStatus + ", cron="
+				+ cron + ", cluster=" + cluster + "]";
+	}
+
 }
