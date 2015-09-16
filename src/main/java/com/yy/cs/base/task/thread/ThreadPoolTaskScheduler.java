@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
+import com.yy.cs.base.task.TimerTask;
 import com.yy.cs.base.task.execute.ClusterTriggerRunnable;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.LocalTriggerRunnable;
@@ -55,18 +56,25 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 			lock.lock();
 			LocalTriggerRunnable triggerRunnable = new LocalTriggerRunnable(task,trigger,scheduledExecutor);
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
-			if( r != null &&  r.getTask().getId().equals(triggerRunnable.getTask().getId())){
-				//停止任务
-				if(r.isCancelled() || r.cancel(false)){
-					this.register.getHandlings().remove(triggerRunnable.getTask().getId());
-					//触发新的任务
-					return triggerRunnable.schedule();
-				}else{
-					LOG.error("fail to update and execute new local TimerTask :{},and new task:{},trigger "
-							+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
+			if( r != null ){
+				TimerTask newTimerTask = (TimerTask) task;
+				TimerTask oldTimerTask = (TimerTask) r.getTask();
+				if (newTimerTask.getId().equals(oldTimerTask.getId())
+						&& oldTimerTask.getCron().equalsIgnoreCase(
+								newTimerTask.getCron())) {
 					return r;
-				}
-				
+				}else{
+					//停止任务
+					if(r.isCancelled() || r.cancel(false)){
+						this.register.getHandlings().remove(triggerRunnable.getTask().getId());
+						//触发新的任务
+						return triggerRunnable.schedule();
+					}else{
+						LOG.error("fail to update and execute new local TimerTask :{},and new task:{},trigger "
+								+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
+						return r;
+					}
+				}	
 			}else{
 				return triggerRunnable.schedule();
 			}
@@ -75,27 +83,40 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 		}
 	}
 	
-	public  HandlingRunnable clusterSchedule(Task task, Trigger trigger,ClusterConfig config) {
-		try{
+	public HandlingRunnable clusterSchedule(Task task, Trigger trigger,
+			ClusterConfig config) {
+		try {
 			lock.lock();
-			ClusterTriggerRunnable triggerRunnable = new ClusterTriggerRunnable(task,trigger,scheduledExecutor,config);
+			ClusterTriggerRunnable triggerRunnable = new ClusterTriggerRunnable(
+					task, trigger, scheduledExecutor, config);
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
-			if( r != null &&  r.getTask().getId().equals(triggerRunnable.getTask().getId())){
-				//停止任务
-				if(r.isCancelled() || r.cancel(false)){
-					this.register.getHandlings().remove(triggerRunnable.getTask().getId());
-					//触发新的任务
-					return triggerRunnable.schedule();
-				}else{
-					LOG.error("fail to update and execute new cluster TimerTask :{},and new task:{},trigger "
-							+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
+			if (r != null) {
+				TimerTask newTimerTask = (TimerTask) task;
+				TimerTask oldTimerTask = (TimerTask) r.getTask();
+				//如果task id 和 cron表达式相同则表明时同一个任务，则不需要重新起任务
+				if (newTimerTask.getId().equals(oldTimerTask.getId())
+						&& oldTimerTask.getCron().equalsIgnoreCase(
+								newTimerTask.getCron())) {
 					return r;
+				} else {
+					// 停止任务
+					if (r.isCancelled() || r.cancel(false)) {
+						this.register.getHandlings().remove(
+								triggerRunnable.getTask().getId());
+						// 触发新的任务
+						return triggerRunnable.schedule();
+					} else {
+						LOG.error(
+								"fail to update and execute new cluster TimerTask :{},and new task:{},trigger "
+										+ "/ old: task ", task, trigger,
+								r.getTask(), r.getTrigger());
+						return r;
+					}
 				}
-				
-			}else{
+			} else {
 				return triggerRunnable.schedule();
 			}
-		}finally{
+		} finally {
 			lock.unlock();
 		}
 	}
