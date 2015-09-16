@@ -62,7 +62,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 				if (newTimerTask.getId().equals(oldTimerTask.getId())
 						&& oldTimerTask.getCron().equalsIgnoreCase(
 								newTimerTask.getCron())) {
-					return r;
+					return r.schedule();
 				}else{
 					//停止任务
 					if(r.isCancelled() || r.cancel(false)){
@@ -72,7 +72,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 					}else{
 						LOG.error("fail to update and execute new local TimerTask :{},and new task:{},trigger "
 								+ "/ old: task ",task,trigger,r.getTask(),r.getTrigger());
-						return r;
+						return r.schedule();
 					}
 				}	
 			}else{
@@ -97,7 +97,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 				if (newTimerTask.getId().equals(oldTimerTask.getId())
 						&& oldTimerTask.getCron().equalsIgnoreCase(
 								newTimerTask.getCron())) {
-					return r;
+					return r.schedule();
 				} else {
 					// 停止任务
 					if (r.isCancelled() || r.cancel(false)) {
@@ -110,7 +110,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 								"fail to update and execute new cluster TimerTask :{},and new task:{},trigger "
 										+ "/ old: task ", task, trigger,
 								r.getTask(), r.getTrigger());
-						return r;
+						return r.schedule();
 					}
 				}
 			} else {

@@ -117,7 +117,11 @@ public class RedisTaskLock implements TaskLock {
 			jedis =	pool.getResource();
 			String key = defaultPrefix + id + defaultSplit + value;
 			String s = jedis.get(key);
-			result = s.substring(0,s.lastIndexOf(defaultSplit));
+			//bug: s may be null if task execute time over the expired time
+			//result = s.substring(0,s.lastIndexOf(defaultSplit));
+			if(s != null){
+				result = s.substring(0,s.lastIndexOf(defaultSplit));
+			}
 		}catch(Throwable t){
 			//防御性容错，如果异常直接返回false
 			logger.error(" task id:" + id + " value:" +value , t);
