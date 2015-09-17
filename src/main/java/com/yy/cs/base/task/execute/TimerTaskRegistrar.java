@@ -3,6 +3,7 @@ package com.yy.cs.base.task.execute;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +38,7 @@ public class TimerTaskRegistrar {
 	
 	private LinkedBlockingQueue<TimerTask> taskQueue = new LinkedBlockingQueue<>();
      
-    private Executor executor = Executors.newFixedThreadPool(1, new NamedThreadFactory("cs-base-task-scan", true));
+    private ExecutorService executor = Executors.newFixedThreadPool(1, new NamedThreadFactory("cs-base-task-scan", true));
 	
 	public ConcurrentHashMap<String, HandlingRunnable> getHandlings() {
 		return handlings;
@@ -134,7 +135,8 @@ public class TimerTaskRegistrar {
 					}catch(Exception e){
 						Thread.currentThread().interrupt();
 						logger.error("shechule task fail ,error message:{},error:",e.getMessage(),e);
-						throw new RuntimeException(e);
+						//don't need throw exception when the executor  shutdown normally(such as destroy method is called)
+						//throw new RuntimeException(e);
 					}
 					
 				}
@@ -158,6 +160,7 @@ public class TimerTaskRegistrar {
 			}
 		}
 		this.taskScheduler.shutdown();
+		executor.shutdown();
 	}
 	
 	private void handler(TimerTask task) {
