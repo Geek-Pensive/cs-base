@@ -71,14 +71,20 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 	
 	@Override
 	public void run() {
-		
 		//取task的锁
+		if(logger.isInfoEnabled()){
+			logger.info("task {} is start to trigger",task.getId());
+		}
 		if(taskLock.lock(task.getId(), this.scheduledExecutionTime.getTime())){
 			super.run();
-			logger.info("completion run cluster task id:" + task.getId());
 		}
+		
 		this.context.updateExecuteAddress(taskLock.getExecuteAddress(task.getId(),this.scheduledExecutionTime.getTime()));
-		logger.info("task {} is triggered and execute address:{}",task.getId(),this.context.executeAddress());
+		
+		if(logger.isInfoEnabled()){
+			logger.info("completion run cluster task id:{},and execute "
+					+ "address:{}",task.getId(),this.context.executeAddress());
+		}
 		//完成当前任务后,调度下一次任务的执行
 		synchronized (this.triggerContextMonitor) {
 			if (!this.currentFuture.isCancelled()) {
@@ -92,6 +98,9 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 	public boolean cancel(boolean mayInterruptIfRunning){
 		//释放原有的锁，保证update操作的任务可以重新获取锁
 		taskLock.releaseLock(task.getId(), this.scheduledExecutionTime.getTime());
+		if(logger.isDebugEnabled()){
+			logger.debug("task :{} release / address:{}",task.getId(),this.context.executeAddress());
+		}
 		return super.cancel(mayInterruptIfRunning);
 	}
 	
