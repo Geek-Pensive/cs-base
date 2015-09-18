@@ -73,7 +73,7 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 	public void run() {
 		//取task的锁
 		if(logger.isInfoEnabled()){
-			logger.info("task {} is start to trigger",task.getId());
+			logger.info("task {} start to trigger",task.getId());
 		}
 		if(taskLock.lock(task.getId(), this.scheduledExecutionTime.getTime())){
 			super.run();
