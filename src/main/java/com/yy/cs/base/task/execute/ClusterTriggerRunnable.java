@@ -78,6 +78,7 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 			logger.info("completion run cluster task id:" + task.getId());
 		}
 		this.context.updateExecuteAddress(taskLock.getExecuteAddress(task.getId(),this.scheduledExecutionTime.getTime()));
+		logger.info("task {} is triggered and execute address:{}",task.getId(),this.context.executeAddress());
 		//完成当前任务后,调度下一次任务的执行
 		synchronized (this.triggerContextMonitor) {
 			if (!this.currentFuture.isCancelled()) {

@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import com.yy.cs.base.hostinfo.HostInfoHelper;
+import com.yy.cs.base.hostinfo.IpInfo;
+import com.yy.cs.base.hostinfo.NetType;
 import com.yy.cs.base.redis.RedisClient;
 
 /**
@@ -140,6 +143,13 @@ public class RedisTaskLock implements TaskLock {
 	 */
 	public static String getLocalAddress() {
     	try {
+    		IpInfo ipInfo = HostInfoHelper.getHostInfo().getIpList().get(NetType.CTL);
+    		if(ipInfo == null){
+    			ipInfo = HostInfoHelper.getHostInfo().getIpList().get(NetType.CNII);
+    		}
+    		if(ipInfo != null ){
+    			return ipInfo.getIp();
+    		}
 			return InetAddress.getLocalHost().toString();
 		} catch (UnknownHostException e) {
 			logger.error("",e);
