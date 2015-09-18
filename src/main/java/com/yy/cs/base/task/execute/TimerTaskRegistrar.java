@@ -38,7 +38,9 @@ public class TimerTaskRegistrar {
 	
 	private LinkedBlockingQueue<TimerTask> taskQueue = new LinkedBlockingQueue<>();
      
-    private ExecutorService executor = Executors.newFixedThreadPool(1, new NamedThreadFactory("cs-base-task-scan", true));
+    private ExecutorService executor = Executors.newSingleThreadExecutor(new NamedThreadFactory("task-scan", true));
+    
+    private ExecutorService dispatcherExecutor = Executors.newCachedThreadPool(new NamedThreadFactory("task-dispatch", true));
 	
 	public ConcurrentHashMap<String, HandlingRunnable> getHandlings() {
 		return handlings;
@@ -126,8 +128,12 @@ public class TimerTaskRegistrar {
 					try{
 						while(!Thread.currentThread().isInterrupted()){
 							try{
-								TimerTask task = taskQueue.take();
-								handler(task);
+								final TimerTask task = taskQueue.take();
+								dispatcherExecutor.execute(new Runnable(){
+									public void run() {
+										handler(task);
+									};
+								});
 							}catch(Exception e){
 								logger.error("shechule task fail ,error message:{},error:",e.getMessage(),e);
 							}
@@ -160,7 +166,12 @@ public class TimerTaskRegistrar {
 			}
 		}
 		this.taskScheduler.shutdown();
-		executor.shutdown();
+		if(!executor.isShutdown()){
+			executor.shutdown();
+		}
+		if(!dispatcherExecutor.isShutdown()){
+			dispatcherExecutor.shutdown();
+		}
 	}
 	
 	private void handler(TimerTask task) {
