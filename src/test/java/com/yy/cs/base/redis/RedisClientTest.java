@@ -39,8 +39,9 @@ public class RedisClientTest {
 //		list.add("172.19.103.105:6330::");
 //		list.add("172.19.103.105:6379:fdfs123:");
 		
-		list.add("127.0.0.1:6380::");
-		list.add("127.0.0.1:6381::");
+		list.add("58.215.180.218:6380::");
+		list.add("58.215.180.218:6381::");
+		list.add("58.215.180.218:6382::");
 		
 		redisClientFactory.setRedisServers(list);
 		redisClientFactory.init();
@@ -108,9 +109,9 @@ public class RedisClientTest {
 		System.out.println("对比RedisClient与Jedis的数据  开始");
 		//配置要与 JedisPoolManagerTest一致,连接同一台机器
 		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxActive(300);
+		//config.setMaxActive(300);
 		config.setMaxIdle(100);
-		config.setMaxWait(50);
+		//config.setMaxWait(50);
 		JedisPool pool;
 		pool = new JedisPool(config, "172.19.103.105", 6379,10000, "fdfs123");
 		Jedis jedis = null;
