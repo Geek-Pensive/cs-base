@@ -27,11 +27,11 @@ public class RedisTaskLock implements TaskLock {
 	
 	private static final int defaultExpire = 7 * 24 * 60 * 60;   //失效时间7天
 	
-	private static final String defaultPrefix = "cs-base-task-";   //默认锁5 * 60秒
+	private static final String defaultPrefix = "cs-base-task-";   //
 	
 	private static final String defaultSplit = "&";
 	
-	private final int expire;   //失效时间3 * 60秒
+	private final int expire;   //
 	/**
 	 * 构造器函数
 	 * @param redisClient
