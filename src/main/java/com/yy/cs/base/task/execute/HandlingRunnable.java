@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,8 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	 */
 	protected ScheduledFuture<?> currentFuture;
 	
+	
+	protected volatile AtomicBoolean isCanceled = new AtomicBoolean(false);
 	/**
 	 * 构造器函数
 	 * @param task
@@ -130,6 +133,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 
 	@Override
 	public boolean cancel(boolean mayInterruptIfRunning) {
+		isCanceled.set(true);
 		synchronized (this.triggerContextMonitor) {
 			return this.currentFuture.cancel(mayInterruptIfRunning);
 		}

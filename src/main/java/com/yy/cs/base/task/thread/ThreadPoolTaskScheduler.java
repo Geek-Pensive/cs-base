@@ -65,21 +65,14 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 					return r.schedule();
 				}else{
 					//停止任务
-					if(r.isCancelled() || r.cancel(false)){
+					if(!r.isCancelled()) r.cancel(false);
+					if(r.isCancelled()){
 						this.register.getHandlings().remove(triggerRunnable.getTask().getId());
-						LOG.info(
-								"update and execute new Local TimerTask :{}, new trigger:{} "
-										+ "/ old task:{}, old trigger ", task, trigger,
-								r.getTask(), r.getTrigger());
-						//触发新的任务
-						return triggerRunnable.schedule();
-					}else{
-						LOG.error(
-								"fail to update and execute new Local TimerTask :{}, new trigger:{} "
-										+ "/ old task :{} old trigger ", task, trigger,
-								r.getTask(), r.getTrigger());
-						return r.schedule();
 					}
+					LOG.info("update and execute new Local TimerTask :{}, new trigger:{} "+ "/ old task:{}, old trigger ", task, trigger,
+							r.getTask(), r.getTrigger());
+					//触发新的任务
+					return triggerRunnable.schedule();
 				}	
 			}else{
 				return triggerRunnable.schedule();
@@ -106,22 +99,15 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 					return r.schedule();
 				} else {
 					// 停止任务
-					if (r.isCancelled() || r.cancel(false)) {
-						this.register.getHandlings().remove(
-								triggerRunnable.getTask().getId());
-						LOG.info(
-								"update and execute new cluster TimerTask :{}, new trigger:{} "
-										+ "/ old task:{}, old trigger ", task, trigger,
-								r.getTask(), r.getTrigger());
-						// 触发新的任务
-						return triggerRunnable.schedule();
-					} else {
-						LOG.error(
-								"fail to update and execute new cluster TimerTask :{}, new trigger:{} "
-										+ "/ old task :{} old trigger ", task, trigger,
-								r.getTask(), r.getTrigger());
-						return r.schedule();
-					}
+					if(!r.isCancelled()) r.cancel(false);
+					if (r.isCancelled()) {
+						this.register.getHandlings().remove(triggerRunnable.getTask().getId());
+					} 
+					LOG.info("update and execute new cluster TimerTask :{}, new trigger:{} "
+									+ "/ old task:{}, old trigger ", task, trigger,
+							r.getTask(), r.getTrigger());
+					// 触发新的任务
+					return triggerRunnable.schedule();
 				}
 			} else {
 				return triggerRunnable.schedule();

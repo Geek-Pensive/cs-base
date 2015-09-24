@@ -87,7 +87,7 @@ public class ClusterTriggerRunnable extends HandlingRunnable {
 		}
 		//完成当前任务后,调度下一次任务的执行
 		synchronized (this.triggerContextMonitor) {
-			if (!this.currentFuture.isCancelled()) {
+			if (!this.currentFuture.isCancelled() && !isCanceled.get()) {
 				logger.info("start next task schedule / task id:" + task.getId());
 				schedule();
 			}
