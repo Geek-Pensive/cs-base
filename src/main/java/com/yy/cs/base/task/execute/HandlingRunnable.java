@@ -59,6 +59,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	
 	
 	protected volatile AtomicBoolean isCanceled = new AtomicBoolean(false);
+	
 	/**
 	 * 构造器函数
 	 * @param task

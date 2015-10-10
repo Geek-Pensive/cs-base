@@ -2,7 +2,6 @@ package com.yy.cs.base.task;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public class TimerTaskManager {
 	
 	 private int poolSize = 2;
 	 
-	 private ConcurrentMap<String,TimerTask> timerTasks = new ConcurrentHashMap<String,TimerTask>();
+	 private Map<String,TimerTask> timerTasks = new ConcurrentHashMap<String,TimerTask>();
      
      private TimerTaskRegistrar registrar = new TimerTaskRegistrar();
      
@@ -130,7 +129,7 @@ public class TimerTaskManager {
 	 * 增加Task任务集合
 	 * @param timerTasks <taskid TimerTask>的集合关系映射
 	 */
-	public void setTimerTasks(ConcurrentMap<String, TimerTask> timerTasks) {
+	public void setTimerTasks(Map<String, TimerTask> timerTasks) {
 		this.timerTasks = timerTasks;
 	}
 	
