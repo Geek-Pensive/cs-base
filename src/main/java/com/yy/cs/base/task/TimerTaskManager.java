@@ -131,6 +131,11 @@ public class TimerTaskManager {
 	 */
 	public void setTimerTasks(Map<String, TimerTask> timerTasks) {
 		this.timerTasks = timerTasks;
+		if(timerTasks != null ){
+			for(Map.Entry<String, TimerTask> taskEntry : timerTasks.entrySet()){
+				this.addTimerTask(taskEntry.getKey(), taskEntry.getValue());
+			}
+		}
 	}
 	
 	
