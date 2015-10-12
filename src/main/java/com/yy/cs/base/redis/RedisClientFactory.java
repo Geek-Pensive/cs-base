@@ -132,34 +132,49 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             List<JedisPool> newRslavePool = new ArrayList<JedisPool>();
             for (int i = 0; i < totalServersSize; i++) {
                 String[] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
-                String ip = strArray[0];
+                String[] ips = RedisUtils.parseServerIp(strArray[0]);
                 int port = Integer.valueOf(strArray[1]);
                 String password = strArray[2];
                 int timeout = strArray[3] != null && !"".equals(strArray[3].trim()) ? Integer.valueOf(strArray[3])
                         : 10000;// 默认是10秒
-                try {
-                    pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
-                    jedis = pool.getResource();
-                } catch (Exception e) {
-                    log.warn("[" + ip + ":" + port + "]" + e.getMessage(), e);
-                    if (jedis != null) {
-                        pool.returnBrokenResource(jedis);
+
+                password = "".equals(password) ? null : password;
+
+                String ip = null;
+                for (int j = 0; j < ips.length; j++) {
+                    ip = ips[j];
+                    try {
+                        jedis = new Jedis(ip, port, timeout);
+                        jedis.connect();
+                        if (null != password) {
+                            jedis.auth(password);
+                        }
+                        
+                        String info = jedis.info();
+                        boolean isMaster = RedisUtils.isMaster(info);
+                        
+                        pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
+                        // 主实例
+                        if (isMaster == true) {
+                            newMasterPool.add(pool);
+                            // 从实例
+                        } else {
+                            newRslavePool.add(pool);
+                        }
+                        break;
+                    } catch (Exception e) {
+                        log.warn("[" + ip + ":" + port + "]" + e.getMessage(), e);
+                        continue;
+                    } finally {
+                        try {
+                            if (null != jedis && jedis.isConnected()) {
+                                jedis.disconnect();
+                            }
+                        } catch (Exception e) {
+
+                        }
+                        jedis = null;
                     }
-                    continue;
-                }
-                try {
-                    String info = jedis.info();
-                    boolean isMaster = RedisUtils.isMaster(info);
-                    // 主实例
-                    if (isMaster == true) {
-                        newMasterPool.add(pool);
-                        // 从实例
-                    } else {
-                        newRslavePool.add(pool);
-                    }
-                } finally {
-                    // 释放
-                    pool.returnResource(jedis);
                 }
             }
             List<JedisPool> oldMasterPool = redisMasterPool;

@@ -92,6 +92,22 @@ public class RedisUtils {
         }
         return result;
     }
+    
+    /**
+     * ip支持用 "|" 分割多个。对于多IDC接入的服务器，填写不同网络类型的IP，按顺序去尝试可用的网络
+     * 
+     * @param ip
+     * @return
+     */
+    public static String[] parseServerIp(String ip){
+        String[] str = null;
+        if(ip.contains("|")){
+            str =ip.split("\\|");
+        }else{
+            str= new String[]{ip};
+        }
+        return str;
+    }
 
     /**
      * 判断jedis依赖的commons-pool版本。
@@ -136,9 +152,4 @@ public class RedisUtils {
         pool = constructor.newInstance(config, ip, port, timeout, password);
         return pool;
     }
-
-    public static void main(String[] args) {
-        System.out.println(versionOfCommonsPool());
-    }
-
 }
