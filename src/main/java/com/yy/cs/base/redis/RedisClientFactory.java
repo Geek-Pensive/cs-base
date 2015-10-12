@@ -184,7 +184,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             this.slaveServerSize = redisSlavePool.size();
 
             if (healthCheck) {
-                healthCheckTimer = new Timer();
+                healthCheckTimer = new Timer(true);
                 healthCheckTimer.scheduleAtFixedRate(new RedisClientFactoryHealthChecker(this),
                         RedisClientFactoryHealthChecker.CHECK_PERIOD, RedisClientFactoryHealthChecker.CHECK_PERIOD);
             }
