@@ -22,25 +22,27 @@ public class HostInfoHelper {
 
     private static void readFileData() {
         File file = new File(DEFAULT_FILE_PATH);
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(file));
-            properties = new Properties();
-            properties.load(in);
-            if (log.isDebugEnabled()) {
-                for (Object s : properties.keySet()) {
-                    log.debug("property " + s + ":" + properties.getProperty((String) s));
+        if(file.exists() && file.isFile() && file.canRead()){
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(new FileReader(file));
+                properties = new Properties();
+                properties.load(in);
+                if (log.isDebugEnabled()) {
+                    for (Object s : properties.keySet()) {
+                        log.debug("property " + s + ":" + properties.getProperty((String) s));
+                    }
                 }
-            }
-            parseProperties();
-        } catch (Exception e) {
-            log.error("read data info error:", e);
-        } finally {
-            if (null != in) {
-                try {
-                    in.close();
-                } catch (Exception e) {
+                parseProperties();
+            } catch (Exception e) {
+                log.error("read data info error:", e);
+            } finally {
+                if (null != in) {
+                    try {
+                        in.close();
+                    } catch (Exception e) {
 
+                    }
                 }
             }
         }
