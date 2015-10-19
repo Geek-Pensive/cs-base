@@ -1,3 +1,8 @@
+Release 1.1.8 2015-10-19
+
+Backward compatible changes:
+	1. RedisClientFactory host配置支持多线多个IP，配置格式:ip1|ip2|...|ipn:port:password:timeout，优先级按从左到右的顺序尝试建立链接 
+
 Release 1.1.8-SNAPSHOT 2015-09-15
 
 Backward compatible changes:
