@@ -17,6 +17,14 @@ public class JedisPoolConfigAdapter {
         config.setMaxIdle(maxIdle);
     }
 
+    public void setWhenExhaustedAction(byte whenExhaustedAction){
+        config.setWhenExhaustedAction(whenExhaustedAction);
+    }
+
+    public byte getWhenExhaustedAction(){
+        return config.getWhenExhaustedAction();
+    }
+
     public int getMinIdle() {
         return config.getMinIdle();
     }

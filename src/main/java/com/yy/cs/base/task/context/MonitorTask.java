@@ -2,10 +2,16 @@ package com.yy.cs.base.task.context;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.yy.cs.base.task.trigger.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +23,8 @@ public class MonitorTask {
 			.getLogger(MonitorTask.class);
 	private static final SimpleDateFormat sdf = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss");
+	private static final SimpleDateFormat dateSdf = new SimpleDateFormat(
+			"yyyy-MM-dd");
 
 	private static final String html = "<html>";
 	private static final String htmlEnd = "</html>";
@@ -92,10 +100,11 @@ public class MonitorTask {
     	if(!parent.endsWith(File.separator)){
     		parent += File.separator;
     	}
+		String date = dateSdf.format(new Date());
 		if (MonitorType.LOG == this.monitorType) {
-			this.monitorfile = parent + "monitortask.log";
+			this.monitorfile = parent + "monitortask_" + date + ".log";
 		}else{
-			this.monitorfile = parent + "monitortask.html";
+			this.monitorfile = parent + "monitortask_" + date + ".html";
 		}
 		return monitorfile;
 	}
@@ -128,13 +137,71 @@ public class MonitorTask {
 			} else {
 				addHtmlInfo(strBuffer, csStatus);
 			}
-			FileOutputStream fileOut = new FileOutputStream(f);
-			fileOut.write(strBuffer.toString().getBytes("UTF-8"));
-			fileOut.flush();
-			fileOut.close();
+
+//			FileOutputStream fileOut = new FileOutputStream(f);
+//			fileOut.write(strBuffer.toString().getBytes("UTF-8"));
+//			fileOut.flush();
+//			fileOut.close();
+
+			// 在文件的末尾追加文本信息
+			FileWriter writer = new FileWriter(path,true);
+			writer.append(strBuffer.toString());
+			writer.flush();
+			writer.close();
+
 		} catch (Exception e) {
 			log.error("write file path:"+ path +" error:" + e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * 删除不再需要保存的 log 文件
+	 * @param logSaveDays 保存最近多少天的 log 文件
+	 */
+	public void deleteTaskLogFiles(Integer logSaveDays) {
+		String path = getWebPath();
+		if (StringUtils.isEmpty(path)){
+			return;
+		}
+
+		File file = new File(path);
+		File directory = file.getParentFile();
+		if (!directory.exists()){
+			return;
+		}
+
+		Date today = new Date();
+		final Calendar c = Calendar.getInstance();
+		c.setTime(today);
+		c.add(Calendar.DATE,0 - logSaveDays);
+		String[] logDeleteFiles = directory.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				int index = name.indexOf("monitortask_");
+				if (index > -1){
+					int start = "monitortask_".length();
+					String date = name.substring(start,name.lastIndexOf("."));
+					Date logFileDate ;
+					try {
+						logFileDate = dateSdf.parse(date);
+					}catch (Exception e){
+						e.printStackTrace();
+						return false;
+					}
+
+					if (logFileDate.before(c.getTime())){
+						return true;
+					}
+				}
+				return false;
+			}
+		});
+
+		for(String logDeleteFile : logDeleteFiles){
+			File deleteFile = new File(logDeleteFile);
+			deleteFile.delete();
+		}
+
 	}
 
 	private void addBodyValue(StringBuffer strBuffer, CsStatus csStatus) {
@@ -281,6 +348,21 @@ public class MonitorTask {
 				strBuffer.append(c.getMessage());
 				strBuffer.append(";");
 			}
+			strBuffer.append("下次执行时间");
+			strBuffer.append(":");
+			strBuffer.append(dateToString(c.getAdditionInfo(Constants.NEXT_EXECUTE_TIME)));
+			strBuffer.append(";");
+
+			strBuffer.append("上次执行开始时间点");
+			strBuffer.append(":");
+			strBuffer.append(dateToString(c.getAdditionInfo(Constants.LAST_START_TIME)));
+			strBuffer.append(";");
+
+			strBuffer.append("上次执行完成时间点");
+			strBuffer.append(":");
+			strBuffer.append(dateToString(c.getAdditionInfo(Constants.LAST_COMPLETION_TIME)));
+			strBuffer.append(";");
+
 			strBuffer.append(lastExceptionDate);
 			strBuffer.append(":");
 			strBuffer.append(dateToString(c

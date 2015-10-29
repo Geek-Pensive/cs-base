@@ -1,7 +1,14 @@
 package com.yy.cs.base.task.context;
 
 import java.io.File;
+import java.io.FilenameFilter;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
+import com.yy.cs.base.censor.impl.EmptyWordsFilterImpl;
+import com.yy.cs.base.task.trigger.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,7 +22,7 @@ public class MonitorTaskTest {
 
 	private static final String monitorFile = "D:\\workspace\\monitortask.txt";
 	
-	private static final String monitorFileLog = "D:\\workspace\\monitortask.log";
+	private static final String monitorFileLog = "/data/monitortask.log";
 	
 	private static final MonitorType monitorType = MonitorType.LOG;
 	
@@ -67,11 +74,23 @@ public class MonitorTaskTest {
 	@Test
 	public void testWriteTaskFile(){
 		initCsStatus();
-    	MonitorTask monitorFT = new MonitorTask(monitorFileLog, monitorType);
+    	MonitorTask monitorFT = new MonitorTask(null, monitorType);
     	MonitorTask monitorF = new MonitorTask(monitorFile);
     	monitorFT.writeTaskFile(csStatus);
     	monitorF.writeTaskFile(csStatus);
     	Assert.assertTrue(new File(monitorFile).exists());
     	Assert.assertTrue(new File(monitorFileLog).exists());
+	}
+
+	@Test
+	public void testDeleteTaskFiles() throws Exception {
+		initCsStatus();
+		MonitorTask monitorFT = new MonitorTask(null, monitorType);
+		monitorFT.writeTaskFile(csStatus);
+		String logFilePath = monitorFT.getWebPath();
+		File logFile = new File(logFilePath);
+		Assert.assertTrue(logFile.exists());
+		monitorFT.deleteTaskLogFiles(-1);
+		Assert.assertFalse(logFile.exists());
 	}
 }
