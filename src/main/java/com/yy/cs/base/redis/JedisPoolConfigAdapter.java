@@ -17,14 +17,6 @@ public class JedisPoolConfigAdapter {
         config.setMaxIdle(maxIdle);
     }
 
-    public void setWhenExhaustedAction(byte whenExhaustedAction){
-        config.setWhenExhaustedAction(whenExhaustedAction);
-    }
-
-    public byte getWhenExhaustedAction(){
-        return config.getWhenExhaustedAction();
-    }
-
     public int getMinIdle() {
         return config.getMinIdle();
     }
@@ -82,6 +74,8 @@ public class JedisPoolConfigAdapter {
     private static Field testOnBorrowField = null;
     private static Field testOnReturnField = null;
     private static Field testWhileIdleField = null;
+    private static Field whenExhaustedActionField = null;
+    private static Field blockWhenExhaustedField = null;
 
     static {
         try {
@@ -89,9 +83,13 @@ public class JedisPoolConfigAdapter {
             if (1 == RedisUtils.versionOfCommonsPool()) {
                 maxTotalField = ReflectUtils.getClassField(jpc, "maxActive", true);
                 maxWaitField = ReflectUtils.getClassField(jpc, "maxWait", true);
+                whenExhaustedActionField = ReflectUtils.getClassField(jpc, "whenExhaustedAction", true);
+                whenExhaustedActionField.setAccessible(true);
             } else {
                 maxTotalField = ReflectUtils.getClassField(jpc, "maxTotal", true);
                 maxWaitField = ReflectUtils.getClassField(jpc, "maxWaitMillis", true);
+                blockWhenExhaustedField = ReflectUtils.getClassField(jpc, "blockWhenExhausted", true);
+                blockWhenExhaustedField.setAccessible(true);
             }
             testOnBorrowField = ReflectUtils.getClassField(jpc, "testOnBorrow", true);
             testOnReturnField = ReflectUtils.getClassField(jpc, "testOnReturn", true);
@@ -106,6 +104,56 @@ public class JedisPoolConfigAdapter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setWhenExhaustedAction(byte whenExhaustedAction) {
+        try {
+            if (null != whenExhaustedActionField) {
+                whenExhaustedActionField.setByte(config, whenExhaustedAction);
+            } else if (null != blockWhenExhaustedField) {
+                blockWhenExhaustedField.setBoolean(config, 1 == whenExhaustedAction ? true : false);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setBlockWhenExhausted(boolean blockWhenExhausted) {
+        try {
+            if (null != whenExhaustedActionField) {
+                whenExhaustedActionField.setByte(config, (byte) (blockWhenExhausted ? 1 : 0));
+            } else if (null != blockWhenExhaustedField) {
+                blockWhenExhaustedField.setBoolean(config, blockWhenExhausted);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public byte getWhenExhaustedAction() {
+        try {
+            if (null != whenExhaustedActionField) {
+                return whenExhaustedActionField.getByte(config);
+            } else if (null != blockWhenExhaustedField) {
+                return (byte) (blockWhenExhaustedField.getBoolean(config) == true ? 1 : 0);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return 1;
+    }
+
+    public boolean getBlockWhenExhausted() {
+        try {
+            if (null != whenExhaustedActionField) {
+                return whenExhaustedActionField.getByte(config) == 1 ? true : false;
+            } else if (null != blockWhenExhaustedField) {
+                return blockWhenExhaustedField.getBoolean(config);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 
     public boolean isTestWhileIdle() {
