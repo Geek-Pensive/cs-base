@@ -38,8 +38,8 @@ public class TimerTaskManager {
      
      private TaskScheduler taskScheduler;
 
-	 /** 保存最近多少天的日志,默认是 15 */
-	 private Integer logSaveDays = 15;
+	 /** 保存最近多少天的日志,默认是 5 */
+	 private Integer logSaveDays = 5;
 
 	public Integer getLogSaveDays() {
 		return logSaveDays;

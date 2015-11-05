@@ -82,9 +82,10 @@ public class MonitorTask {
 	 * 		获取监控数据存储的文件名
 	 */
 	protected String getWebPath() {
-		if (monitorfile != null && !"".equals(monitorfile)) {
-			return monitorfile;
-		}
+		// 需要按天记录日志文件，所以每一次在写之前都需要进行判断 ？？ 能否做成每天只判断一次
+//		if (monitorfile != null && !"".equals(monitorfile)) {
+//			return monitorfile;
+//		}
 		String dragonProjName = System.getProperty("dragon.bizName.projName");
     	String parent = null;
     	if(dragonProjName != null && !"".equals(dragonProjName)){
