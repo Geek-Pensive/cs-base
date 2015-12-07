@@ -151,7 +151,7 @@ public class TimerTaskRegistrar {
 					logger.error("deleteTaskLogFiles  expection: " + t.getMessage(), t);
 				}
 			}
-		}, 5 * 1000, 1, TimeUnit.DAYS);
+		}, 0,1,TimeUnit.DAYS);
 	}
 
 	private void scheduleTasks() {
