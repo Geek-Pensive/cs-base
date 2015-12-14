@@ -1,3 +1,8 @@
+1.1.13-SNAPSHOT 2015-12-14
+changes:
+	1. IP匹配:IP段、IP范围、普通IP直接匹配
+
+
 Release 1.1.8 2015-10-19
 
 Backward compatible changes:
