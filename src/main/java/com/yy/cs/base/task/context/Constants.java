@@ -49,7 +49,11 @@ public class Constants {
 		/**
 		 * HTML文档
 		 */
-		HTML
+		HTML,
+		/**
+		 * 不输出
+		 */
+		NONE
 	}
 
 }
