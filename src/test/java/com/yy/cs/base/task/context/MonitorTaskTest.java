@@ -90,7 +90,7 @@ public class MonitorTaskTest {
 		String logFilePath = monitorFT.getWebPath();
 		File logFile = new File(logFilePath);
 		Assert.assertTrue(logFile.exists());
-		monitorFT.deleteTaskLogFiles(-1);
+//		monitorFT.deleteTaskLogFiles(-1);
 		Assert.assertFalse(logFile.exists());
 	}
 }

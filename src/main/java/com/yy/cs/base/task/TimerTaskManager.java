@@ -38,16 +38,6 @@ public class TimerTaskManager {
      
      private TaskScheduler taskScheduler;
 
-	 /** 保存最近多少天的日志,默认是 5 */
-	 private Integer logSaveDays = 5;
-
-	public Integer getLogSaveDays() {
-		return logSaveDays;
-	}
-
-	public void setLogSaveDays(Integer logSaveDays) {
-		this.logSaveDays = logSaveDays;
-	}
 
 	public String getMonitorfile() {
 		return monitorfile;
@@ -97,7 +87,7 @@ public class TimerTaskManager {
     		 taskScheduler = new ThreadPoolTaskScheduler(poolSize);
     		 taskScheduler.setTaskRegister(registrar);
     		 registrar.start(taskScheduler);
-    		 registrar.addMonitorTask(monitorfile, monitorType,logSaveDays);
+    		 registrar.addMonitorTask(monitorfile, monitorType);
     	 }else{
     		 LOG.warn("the same TimerTaskManager instance should not start twice");
     	 }

@@ -130,45 +130,6 @@ public class TimerTaskRegistrar {
         }, 5 * 1000, 3 * 1000, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * 添加任务执行监听，并将任务执行日志信息写入文件.且定期清理生成的日志文件
-     * 
-     * @param monitorfile
-     *            文件路径
-     * @param type
-     *            记录监听信息方式{@link MonitorType}，将信息记录到日志或者 HTML文件中
-     * @param logSaveDays
-     *            保存最近多少天的日志
-     */
-    public void addMonitorTask(final String monitorfile, final MonitorType type, final Integer logSaveDays) {
-        if (MonitorType.NONE == type) {
-            return;
-        }
-        this.taskScheduler.scheduleWithFixedDelay(new Runnable() {
-            MonitorTask monitor = new MonitorTask(monitorfile, type);
-
-            public void run() {
-                try {
-                    monitor.writeTaskFile(getCsStatus());
-                } catch (Throwable t) { // 防御性容错
-                    logger.error("monitorTask  expection: " + t.getMessage(), t);
-                }
-            }
-        }, 5 * 1000, 3 * 1000, TimeUnit.MILLISECONDS);
-
-        this.taskScheduler.scheduleWithFixedDelay(new Runnable() {
-            MonitorTask monitor = new MonitorTask(monitorfile, type);
-
-            public void run() {
-                try {
-                    monitor.deleteTaskLogFiles(logSaveDays);
-                } catch (Throwable t) { // 防御性容错
-                    logger.error("deleteTaskLogFiles  expection: " + t.getMessage(), t);
-                }
-            }
-        }, 0, 1, TimeUnit.DAYS);
-    }
-
     private void scheduleTasks() {
         executor.execute(new Runnable() {
             @Override

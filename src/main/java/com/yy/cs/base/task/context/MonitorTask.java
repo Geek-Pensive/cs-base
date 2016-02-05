@@ -1,30 +1,25 @@
 package com.yy.cs.base.task.context;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
+import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.task.context.Constants.MonitorType;
 import com.yy.cs.base.task.trigger.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yy.cs.base.status.CsStatus;
-import com.yy.cs.base.task.context.Constants.MonitorType;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class MonitorTask {
 	private static final Logger log = LoggerFactory
 			.getLogger(MonitorTask.class);
 	private static final SimpleDateFormat sdf = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss");
-	private static final SimpleDateFormat dateSdf = new SimpleDateFormat(
-			"yyyy-MM-dd");
 
 	private static final String html = "<html>";
 	private static final String htmlEnd = "</html>";
@@ -82,10 +77,9 @@ public class MonitorTask {
 	 * 		获取监控数据存储的文件名
 	 */
 	protected String getWebPath() {
-		// 需要按天记录日志文件，所以每一次在写之前都需要进行判断 ？？ 能否做成每天只判断一次
-//		if (monitorfile != null && !"".equals(monitorfile)) {
-//			return monitorfile;
-//		}
+		if (monitorfile != null && !"".equals(monitorfile)) {
+			return monitorfile;
+		}
 		String dragonProjName = System.getProperty("dragon.bizName.projName");
     	String parent = null;
     	if(dragonProjName != null && !"".equals(dragonProjName)){
@@ -101,11 +95,10 @@ public class MonitorTask {
     	if(!parent.endsWith(File.separator)){
     		parent += File.separator;
     	}
-		String date = dateSdf.format(new Date());
 		if (MonitorType.LOG == this.monitorType) {
-			this.monitorfile = parent + "monitortask_" + date + ".log";
+			this.monitorfile = parent + "monitortask.log";
 		}else{
-			this.monitorfile = parent + "monitortask_" + date + ".html";
+			this.monitorfile = parent + "monitortask.html";
 		}
 		return monitorfile;
 	}
@@ -139,70 +132,20 @@ public class MonitorTask {
 				addHtmlInfo(strBuffer, csStatus);
 			}
 
-//			FileOutputStream fileOut = new FileOutputStream(f);
-//			fileOut.write(strBuffer.toString().getBytes("UTF-8"));
-//			fileOut.flush();
-//			fileOut.close();
+			FileOutputStream fileOut = new FileOutputStream(f);
+			fileOut.write(strBuffer.toString().getBytes("UTF-8"));
+			fileOut.flush();
+			fileOut.close();
 
 			// 在文件的末尾追加文本信息
-			FileWriter writer = new FileWriter(path,true);
-			writer.append(strBuffer.toString());
-			writer.flush();
-			writer.close();
+//			FileWriter writer = new FileWriter(path,true);
+//			writer.append(strBuffer.toString());
+//			writer.flush();
+//			writer.close();
 
 		} catch (Exception e) {
 			log.error("write file path:"+ path +" error:" + e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * 删除不再需要保存的 log 文件
-	 * @param logSaveDays 保存最近多少天的 log 文件
-	 */
-	public void deleteTaskLogFiles(Integer logSaveDays) {
-		String path = getWebPath();
-		if (StringUtils.isEmpty(path)){
-			return;
-		}
-
-		File file = new File(path);
-		File directory = file.getParentFile();
-		if (!directory.exists()){
-			return;
-		}
-
-		Date today = new Date();
-		final Calendar c = Calendar.getInstance();
-		c.setTime(today);
-		c.add(Calendar.DATE,0 - logSaveDays);
-		String[] logDeleteFiles = directory.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				int index = name.indexOf("monitortask_");
-				if (index > -1){
-					int start = "monitortask_".length();
-					String date = name.substring(start,name.lastIndexOf("."));
-					Date logFileDate ;
-					try {
-						logFileDate = dateSdf.parse(date);
-					}catch (Exception e){
-						e.printStackTrace();
-						return false;
-					}
-
-					if (logFileDate.before(c.getTime())){
-						return true;
-					}
-				}
-				return false;
-			}
-		});
-
-		for(String logDeleteFile : logDeleteFiles){
-			File deleteFile = new File(logDeleteFile);
-			deleteFile.delete();
-		}
-
 	}
 
 	private void addBodyValue(StringBuffer strBuffer, CsStatus csStatus) {
