@@ -1,5 +1,6 @@
 package com.yy.cs.base.redis;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1486,4 +1487,33 @@ public class RedisClient {
         void execute(Transaction transaction);
     }
 
+    /**
+     * 查找所有符合给定模式 pattern 的 key
+     *
+     * @param dbIndex
+     * @param pattern 正则表达式
+     * @return
+     */
+    public Set<String> keys(int dbIndex, String pattern) {
+        Set<String> result = new HashSet<>();
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.keys(pattern);
+        } catch (Exception e) {
+            jedisPool.returnBrokenResource(jedis);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis keys fail", e);
+        } finally {
+            if (jedis != null) {
+                jedisPool.returnResource(jedis);
+            }
+        }
+        return result;
+    }
 }
