@@ -1,3 +1,9 @@
+1.1.20-SNAPSHOT 2016-4-11
+changes:
+	1. 运维告警脚本调用方法
+	2. RedisClientFactory在不可用情况下，如果配置了告警信息，则调用运维脚本进行告警
+
+
 1.1.13-SNAPSHOT 2015-12-14
 changes:
 	1. IP匹配:IP段、IP范围、普通IP直接匹配
