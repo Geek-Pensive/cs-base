@@ -15,8 +15,12 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.swing.plaf.ListUI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.yy.cs.base.alarm.OperationAlarm;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -48,6 +52,9 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
 
     private boolean healthCheck;
     private Timer healthCheckTimer;
+
+    private String alarmReportId;
+    private String alarmProgressName;
 
     /**
      * 构造器函数
@@ -130,6 +137,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             Jedis jedis = null;
             List<JedisPool> newMasterPool = new ArrayList<JedisPool>();
             List<JedisPool> newRslavePool = new ArrayList<JedisPool>();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < totalServersSize; i++) {
                 String[] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
                 String[] ips = RedisUtils.parseServerIp(strArray[0]);
@@ -137,7 +145,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
                 String password = strArray[2];
                 int timeout = strArray[3] != null && !"".equals(strArray[3].trim()) ? Integer.valueOf(strArray[3])
                         : 10000;// 默认是10秒
-
+                sb.append(strArray[0]).append(":").append(port).append(",");
                 password = "".equals(password) ? null : password;
 
                 String ip = null;
@@ -149,10 +157,10 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
                         if (null != password) {
                             jedis.auth(password);
                         }
-                        
+
                         String info = jedis.info();
                         boolean isMaster = RedisUtils.isMaster(info);
-                        
+
                         pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
                         // 主实例
                         if (isMaster == true) {
@@ -198,11 +206,22 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             this.masterServerSize = redisMasterPool.size();
             this.slaveServerSize = redisSlavePool.size();
 
-            if (healthCheck) {
+            if (healthCheck && null == healthCheckTimer) {
                 healthCheckTimer = new Timer(true);
                 healthCheckTimer.scheduleAtFixedRate(new RedisClientFactoryHealthChecker(this),
                         RedisClientFactoryHealthChecker.CHECK_PERIOD, RedisClientFactoryHealthChecker.CHECK_PERIOD);
             }
+
+            if (null != alarmProgressName && null != alarmReportId) {
+                if (masterServerSize == 0 && slaveServerSize == 0) {
+                    try {
+                        OperationAlarm.callAlarm(alarmReportId, alarmProgressName, sb.toString() + "不可用");
+                    } catch (Exception e) {
+                        log.error("call alarm for " + redisServers + " error:", e);
+                    }
+                }
+            }
+
         } finally {
             lock.unlock();
         }
@@ -272,6 +291,22 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
 
     public void setHealthCheck(boolean healthCheck) {
         this.healthCheck = healthCheck;
+    }
+
+    public String getAlarmReportId() {
+        return alarmReportId;
+    }
+
+    public String getAlarmProgressName() {
+        return alarmProgressName;
+    }
+
+    public void setAlarmReportId(String alarmReportId) {
+        this.alarmReportId = alarmReportId;
+    }
+
+    public void setAlarmProgressName(String alarmProgressName) {
+        this.alarmProgressName = alarmProgressName;
     }
 
 }
