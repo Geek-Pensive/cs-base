@@ -10,12 +10,12 @@ package com.yy.cs.base.redis;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.swing.plaf.ListUI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +138,8 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             List<JedisPool> newMasterPool = new ArrayList<JedisPool>();
             List<JedisPool> newRslavePool = new ArrayList<JedisPool>();
             StringBuilder sb = new StringBuilder();
+
+            Map<String, Integer> initialPools = new HashMap<String, Integer>();
             for (int i = 0; i < totalServersSize; i++) {
                 String[] strArray = RedisUtils.parseServerInfo(redisServers.get(i));
                 String[] ips = RedisUtils.parseServerIp(strArray[0]);
@@ -148,7 +150,21 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
                 sb.append(strArray[0]).append(":").append(port).append(",");
                 password = "".equals(password) ? null : password;
 
+                if (ips.length < 1) {
+                    log.warn("config wrong " + redisServers.get(i));
+                    continue;
+                }
+
                 String ip = null;
+                String key = ips[0] + ":" + port;
+
+                // 减少多个ip:port重复配置引起的重复初始化生成poolObject
+                if (initialPools.containsKey(key)) {
+                    log.warn("skip duplicate config for " + redisServers.get(i));
+                    continue;
+                }
+                initialPools.put(key, 1);
+
                 for (int j = 0; j < ips.length; j++) {
                     ip = ips[j];
                     try {
