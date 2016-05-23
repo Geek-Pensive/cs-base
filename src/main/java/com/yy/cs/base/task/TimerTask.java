@@ -1,6 +1,8 @@
 package com.yy.cs.base.task;
 
 import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.task.log.TaskBizLog;
+import com.yy.cs.base.task.log.TaskBizLogCollect;
 
 /**
  * 
@@ -16,6 +18,13 @@ public abstract class TimerTask implements Task{
 	private String cron;  					//quartz表达式
 	
 	private ClusterConfig cluster;  		//任务集成配置中心
+
+	/** task 的业务日志 */
+	private TaskBizLogCollect taskBizLogCollect = new TaskBizLogCollect();
+
+	public TaskBizLogCollect getBizLogger() {
+		return taskBizLogCollect;
+	}
 	
 	public String getId() {
 		return id;

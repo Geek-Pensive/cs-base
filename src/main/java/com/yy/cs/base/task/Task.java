@@ -1,6 +1,8 @@
 package com.yy.cs.base.task;
 
 import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.task.log.TaskBizLogCollect;
+
 /**
  * 
  * 任务接口
@@ -32,4 +34,6 @@ public interface Task {
       *     任务状态 {@link CsStatus}
       */
 	 void setCsStatus(CsStatus csStatus);
+
+	TaskBizLogCollect getBizLogger();
 }

@@ -5,6 +5,7 @@ import com.yy.cs.base.status.StatusCode;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.context.Constants;
 import com.yy.cs.base.task.context.TaskContext;
+import com.yy.cs.base.task.log.TaskBizLog;
 import com.yy.cs.base.task.log.TaskLog;
 import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.trigger.Trigger;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -138,8 +140,10 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 			// 自定义日志处理
 			if (getTaskLogHandle() != null) {
 				TaskLog taskLog = createTaskLog();
-				taskLogHandle.dealWithTaskLog(taskLog);
+				List<TaskBizLog> taskBizLogs = task.getBizLogger().getLogs();
+				taskLogHandle.dealWithTaskLog(taskLog,taskBizLogs);
 			}
+			task.getBizLogger().getLogs().clear();
             task.setCsStatus(status);
 		}
 	}
