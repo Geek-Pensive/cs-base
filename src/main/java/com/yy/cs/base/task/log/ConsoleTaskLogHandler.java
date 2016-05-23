@@ -1,5 +1,7 @@
 package com.yy.cs.base.task.log;
 
+import com.yy.cs.base.task.Task;
+
 import java.util.List;
 
 /**
@@ -8,8 +10,8 @@ import java.util.List;
 public class ConsoleTaskLogHandler implements TaskLogHandler {
 
     @Override
-    public void dealWithTaskLog(TaskLog log, List<TaskBizLog> taskBizLogs) {
-        System.out.println(log);
+    public void dealWithTaskLog(Task task,TaskLog log, List<TaskBizLog> taskBizLogs) {
+        System.out.println(task.getId() + log);
         System.out.println(taskBizLogs);
     }
 }

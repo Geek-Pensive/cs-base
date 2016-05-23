@@ -1,7 +1,6 @@
 package com.yy.cs.base.task;
 
 import com.yy.cs.base.status.CsStatus;
-import com.yy.cs.base.task.log.TaskBizLog;
 import com.yy.cs.base.task.log.TaskBizLogCollect;
 
 /**

@@ -21,6 +21,13 @@ public interface Task {
 	 * 		任务Id
 	 */
 	 String getId();
+
+	/**
+	 * 获取 quatz 表达式
+	 * @return
+     */
+	 String getCron();
+
 	 /**
 	  * 获取当前task的运行状态
 	  * @return

@@ -9,9 +9,11 @@ import com.yy.cs.base.task.log.TaskBizLog;
 import com.yy.cs.base.task.log.TaskLog;
 import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.trigger.Trigger;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
@@ -140,8 +142,11 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 			// 自定义日志处理
 			if (getTaskLogHandle() != null) {
 				TaskLog taskLog = createTaskLog();
-				List<TaskBizLog> taskBizLogs = task.getBizLogger().getLogs();
-				taskLogHandle.dealWithTaskLog(taskLog,taskBizLogs);
+				List<TaskBizLog> taskBizLogs = new ArrayList<>(task.getBizLogger().getLogs());
+				if(context.getT() != null){
+					taskBizLogs.add(new TaskBizLog(TaskBizLog.TaskBizLogLevel.ERROR, ExceptionUtils.getStackTrace(context.getT())));
+				}
+				taskLogHandle.dealWithTaskLog(task,taskLog,taskBizLogs);
 			}
 			task.getBizLogger().getLogs().clear();
             task.setCsStatus(status);
