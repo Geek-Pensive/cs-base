@@ -1,19 +1,19 @@
 package com.yy.cs.base.task;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.task.context.Constants.MonitorType;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
+import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 import com.yy.cs.base.task.trigger.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -38,6 +38,7 @@ public class TimerTaskManager {
      
      private TaskScheduler taskScheduler;
 
+	private TaskLogHandler taskLogHandle;
 
 	public String getMonitorfile() {
 		return monitorfile;
@@ -49,8 +50,16 @@ public class TimerTaskManager {
 	 public void setMonitorfile(String monitorfile) {
 		 this.monitorfile = monitorfile;
 	 }
-	
-	 public MonitorType getMonitorType() {
+
+	public TaskLogHandler getTaskLogHandle() {
+		return taskLogHandle;
+	}
+
+	public void setTaskLogHandle(TaskLogHandler taskLogHandle) {
+		this.taskLogHandle = taskLogHandle;
+	}
+
+	public MonitorType getMonitorType() {
 		 return monitorType;
 	 }
 	 /**
@@ -86,6 +95,7 @@ public class TimerTaskManager {
     	 if(isStart.compareAndSet(false, true)){
     		 taskScheduler = new ThreadPoolTaskScheduler(poolSize);
     		 taskScheduler.setTaskRegister(registrar);
+			 taskScheduler.setTaskLogHandler(taskLogHandle);
     		 registrar.start(taskScheduler);
     		 registrar.addMonitorTask(monitorfile, monitorType);
     	 }else{

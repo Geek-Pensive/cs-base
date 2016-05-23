@@ -1,14 +1,15 @@
 package com.yy.cs.base.task.thread;
 
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
+import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.trigger.Trigger;
+
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
  
 public interface TaskScheduler {
 
@@ -58,4 +59,6 @@ public interface TaskScheduler {
 	void shutdown();
 	
 	void setTaskRegister(TimerTaskRegistrar register);
+
+	void setTaskLogHandler(TaskLogHandler taskLogHandler);
 }

@@ -1,22 +1,19 @@
 package com.yy.cs.base.task.execute;
 
-import java.util.Date;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.status.StatusCode;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.context.Constants;
 import com.yy.cs.base.task.context.TaskContext;
+import com.yy.cs.base.task.log.TaskLog;
+import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.trigger.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 任务处理的Handling 抽象类，实现了{@link Runnable},{@link ScheduledFuture}接口
@@ -57,7 +54,8 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	 */
 	protected ScheduledFuture<?> currentFuture;
 	
-	
+	private TaskLogHandler taskLogHandle;
+
 	protected volatile AtomicBoolean isCanceled = new AtomicBoolean(false);
 	
 	/**
@@ -74,6 +72,15 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 		this.task = task;
 		this.trigger = trigger;
 	}
+
+	public TaskLogHandler getTaskLogHandle() {
+		return taskLogHandle;
+	}
+
+	public void setTaskLogHandle(TaskLogHandler taskLogHandle) {
+		this.taskLogHandle = taskLogHandle;
+	}
+
 	/**
 	 * 获取任务上下文对象
 	 * @return
@@ -128,8 +135,33 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
             if(context.getT() != null){
                 status.setCode(StatusCode.FAIL);
             }
+			// 自定义日志处理
+			if (getTaskLogHandle() != null) {
+				TaskLog taskLog = createTaskLog();
+				taskLogHandle.dealWithTaskLog(taskLog);
+			}
             task.setCsStatus(status);
 		}
+	}
+
+	protected TaskLog createTaskLog() {
+		TaskLog taskLog = TaskLog.newBuilder()
+				.taskKey(task.getId())
+				.statusCode(StatusCode.SUCCCESS)
+				.nextScheduledExecutionTime(context.nextScheduledExecutionTime())
+				.lastStartTime(context.lastStartTime())
+				.lastCompletionTime(context.lastCompletionTime())
+				.exceptionTime(context.getExceptionTime())
+				.throwable(context.getT())
+				.isTimeOut(this.isTimeout())
+				.build();
+		if (this.isTimeout()) {
+			taskLog.setStatusCode(StatusCode.WRONG);
+		}
+		if (context.getT() != null) {
+			taskLog.setStatusCode(StatusCode.FAIL);
+		}
+		return taskLog;
 	}
 
 	@Override
