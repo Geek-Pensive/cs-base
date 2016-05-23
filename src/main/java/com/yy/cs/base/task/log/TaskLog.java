@@ -6,25 +6,32 @@ import java.util.Date;
 
 public class TaskLog {
 
+    /**
+     * task 标识
+     */
     private String taskKey;
-    private Date nextScheduledExecutionTime;
-    private Date lastStartTime;
-    private Date lastCompletionTime;
-    private Date exceptionTime;
-    private Throwable throwable;
+    /**
+     * 本地 task 计划开始执行的时间
+     */
+    private Date scheduledExecutionTime;
+    /** task 实际开始执行的时间 */
+    private Date startTime;
+    /** task 实际结束执行的时间 */
+    private Date completionTime;
+    /** 是否超时 */
     private Boolean isTimeOut;
+    /** task 状态码 */
     private StatusCode statusCode;
 
     public TaskLog() {
 
     }
+
     private TaskLog(Builder builder) {
         setTaskKey(builder.taskKey);
-        setNextScheduledExecutionTime(builder.nextScheduledExecutionTime);
-        setLastStartTime(builder.lastStartTime);
-        setLastCompletionTime(builder.lastCompletionTime);
-        setExceptionTime(builder.exceptionTime);
-        setThrowable(builder.throwable);
+        setScheduledExecutionTime(builder.scheduledExecutionTime);
+        setStartTime(builder.startTime);
+        setCompletionTime(builder.completionTime);
         isTimeOut = builder.isTimeOut;
         setStatusCode(builder.statusCode);
     }
@@ -36,11 +43,9 @@ public class TaskLog {
     public static Builder newBuilder(TaskLog copy) {
         Builder builder = new Builder();
         builder.taskKey = copy.taskKey;
-        builder.nextScheduledExecutionTime = copy.nextScheduledExecutionTime;
-        builder.lastStartTime = copy.lastStartTime;
-        builder.lastCompletionTime = copy.lastCompletionTime;
-        builder.exceptionTime = copy.exceptionTime;
-        builder.throwable = copy.throwable;
+        builder.scheduledExecutionTime = copy.scheduledExecutionTime;
+        builder.startTime = copy.startTime;
+        builder.completionTime = copy.completionTime;
         builder.isTimeOut = copy.isTimeOut;
         builder.statusCode = copy.statusCode;
         return builder;
@@ -54,44 +59,28 @@ public class TaskLog {
         this.taskKey = taskKey;
     }
 
-    public Date getNextScheduledExecutionTime() {
-        return nextScheduledExecutionTime;
+    public Date getScheduledExecutionTime() {
+        return scheduledExecutionTime;
     }
 
-    public void setNextScheduledExecutionTime(Date nextScheduledExecutionTime) {
-        this.nextScheduledExecutionTime = nextScheduledExecutionTime;
+    public void setScheduledExecutionTime(Date scheduledExecutionTime) {
+        this.scheduledExecutionTime = scheduledExecutionTime;
     }
 
-    public Date getLastStartTime() {
-        return lastStartTime;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setLastStartTime(Date lastStartTime) {
-        this.lastStartTime = lastStartTime;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public Date getLastCompletionTime() {
-        return lastCompletionTime;
+    public Date getCompletionTime() {
+        return completionTime;
     }
 
-    public void setLastCompletionTime(Date lastCompletionTime) {
-        this.lastCompletionTime = lastCompletionTime;
-    }
-
-    public Date getExceptionTime() {
-        return exceptionTime;
-    }
-
-    public void setExceptionTime(Date exceptionTime) {
-        this.exceptionTime = exceptionTime;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
-    public void setThrowable(Throwable throwable) {
-        this.throwable = throwable;
+    public void setCompletionTime(Date completionTime) {
+        this.completionTime = completionTime;
     }
 
     public Boolean getTimeOut() {
@@ -110,27 +99,12 @@ public class TaskLog {
         this.statusCode = statusCode;
     }
 
-    @Override
-    public String toString() {
-        return "TaskLog{" +
-                "taskKey='" + taskKey + '\'' +
-                ", nextScheduledExecutionTime=" + nextScheduledExecutionTime +
-                ", lastStartTime=" + lastStartTime +
-                ", lastCompletionTime=" + lastCompletionTime +
-                ", exceptionTime=" + exceptionTime +
-                ", throwable=" + throwable +
-                ", isTimeOut=" + isTimeOut +
-                ", statusCode=" + statusCode +
-                '}';
-    }
 
     public static final class Builder {
         private String taskKey;
-        private Date nextScheduledExecutionTime;
-        private Date lastStartTime;
-        private Date lastCompletionTime;
-        private Date exceptionTime;
-        private Throwable throwable;
+        private Date scheduledExecutionTime;
+        private Date startTime;
+        private Date completionTime;
         private Boolean isTimeOut;
         private StatusCode statusCode;
 
@@ -142,28 +116,18 @@ public class TaskLog {
             return this;
         }
 
-        public Builder nextScheduledExecutionTime(Date val) {
-            nextScheduledExecutionTime = val;
+        public Builder scheduledExecutionTime(Date val) {
+            scheduledExecutionTime = val;
             return this;
         }
 
-        public Builder lastStartTime(Date val) {
-            lastStartTime = val;
+        public Builder startTime(Date val) {
+            startTime = val;
             return this;
         }
 
-        public Builder lastCompletionTime(Date val) {
-            lastCompletionTime = val;
-            return this;
-        }
-
-        public Builder exceptionTime(Date val) {
-            exceptionTime = val;
-            return this;
-        }
-
-        public Builder throwable(Throwable val) {
-            throwable = val;
+        public Builder completionTime(Date val) {
+            completionTime = val;
             return this;
         }
 

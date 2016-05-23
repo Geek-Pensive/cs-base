@@ -157,11 +157,9 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 		TaskLog taskLog = TaskLog.newBuilder()
 				.taskKey(task.getId())
 				.statusCode(StatusCode.SUCCCESS)
-				.nextScheduledExecutionTime(context.nextScheduledExecutionTime())
-				.lastStartTime(context.lastStartTime())
-				.lastCompletionTime(context.lastCompletionTime())
-				.exceptionTime(context.getExceptionTime())
-				.throwable(context.getT())
+				.scheduledExecutionTime(context.nextScheduledExecutionTime())
+				.startTime(context.lastStartTime())
+				.completionTime(context.lastCompletionTime())
 				.isTimeOut(this.isTimeout())
 				.build();
 		if (this.isTimeout()) {
