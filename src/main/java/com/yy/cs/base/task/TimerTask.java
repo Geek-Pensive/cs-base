@@ -18,8 +18,22 @@ public abstract class TimerTask implements Task{
 	
 	private ClusterConfig cluster;  		//任务集成配置中心
 
+	/**
+	 * 是否需要运行。
+	 * 程序可通过 isNeedRun 来设置某台机器的 task 是否需要执行
+	 */
+	private Boolean isNeedRun = true;
 	/** task 的业务日志 */
 	private TaskBizLogCollect taskBizLogCollect = new TaskBizLogCollect();
+
+
+	public Boolean getIsNeedRun() {
+		return isNeedRun;
+	}
+
+	public void setIsNeedRun(Boolean needRun) {
+		isNeedRun = needRun;
+	}
 
 	public TaskBizLogCollect getBizLogger() {
 		return taskBizLogCollect;
