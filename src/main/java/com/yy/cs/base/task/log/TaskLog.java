@@ -99,6 +99,17 @@ public class TaskLog {
         this.statusCode = statusCode;
     }
 
+    @Override
+    public String toString() {
+        return "TaskLog{" +
+                "taskKey='" + taskKey + '\'' +
+                ", scheduledExecutionTime=" + scheduledExecutionTime +
+                ", startTime=" + startTime +
+                ", completionTime=" + completionTime +
+                ", isTimeOut=" + isTimeOut +
+                ", statusCode=" + statusCode +
+                '}';
+    }
 
     public static final class Builder {
         private String taskKey;
