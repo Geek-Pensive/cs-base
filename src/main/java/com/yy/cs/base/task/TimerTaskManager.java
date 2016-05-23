@@ -147,7 +147,7 @@ public class TimerTaskManager {
 				if (taskEntry.getValue().getIsNeedRun()) {
 					this.addTimerTask(taskEntry.getKey(), taskEntry.getValue());
 				} else {
-					LOG.info("{} not run on this machine");
+					LOG.info("{} not run on this machine",taskEntry.getKey());
 				}
 			}
 		}
