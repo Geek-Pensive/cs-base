@@ -10,8 +10,10 @@ import java.util.List;
 public class ConsoleTaskLogHandler implements TaskLogHandler {
 
     @Override
-    public void dealWithTaskLog(Task task,TaskLog log, List<TaskBizLog> taskBizLogs) {
-        System.out.println(task.getId() + log);
+    public void dealWithTaskLog(TaskManagerInfo taskManagerInfo,Task task,TaskLog log, List<TaskBizLog> taskBizLogs){
+        System.out.println(taskManagerInfo);
+        System.out.println(task);
+        System.out.println(log);
         System.out.println(taskBizLogs);
     }
 }

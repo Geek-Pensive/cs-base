@@ -8,6 +8,7 @@ import com.yy.cs.base.task.context.TaskContext;
 import com.yy.cs.base.task.log.TaskBizLog;
 import com.yy.cs.base.task.log.TaskLog;
 import com.yy.cs.base.task.log.TaskLogHandler;
+import com.yy.cs.base.task.log.TaskManagerInfo;
 import com.yy.cs.base.task.trigger.Trigger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -60,6 +61,12 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	
 	private TaskLogHandler taskLogHandle;
 
+	/**
+	 * TaskManagerInfo
+	 * 因为一开始的设计方式不友好，只能通过这种蹩脚的方式注入 taskManagerInfo
+	 */
+	private TaskManagerInfo taskManagerInfo;
+
 	protected volatile AtomicBoolean isCanceled = new AtomicBoolean(false);
 	
 	/**
@@ -75,6 +82,10 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 		}
 		this.task = task;
 		this.trigger = trigger;
+	}
+
+	public void setTaskManagerInfo(TaskManagerInfo taskManagerInfo) {
+		this.taskManagerInfo = taskManagerInfo;
 	}
 
 	public TaskLogHandler getTaskLogHandle() {
@@ -146,7 +157,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 				if(context.getT() != null){
 					taskBizLogs.add(new TaskBizLog(TaskBizLog.TaskBizLogLevel.ERROR, ExceptionUtils.getStackTrace(context.getT())));
 				}
-				taskLogHandle.dealWithTaskLog(task,taskLog,taskBizLogs);
+				taskLogHandle.dealWithTaskLog(taskManagerInfo,task,taskLog,taskBizLogs);
 			}
 			task.getBizLogger().getLogs().clear();
             task.setCsStatus(status);

@@ -5,12 +5,15 @@ import com.yy.cs.base.task.context.Constants.MonitorType;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.log.TaskLogHandler;
+import com.yy.cs.base.task.log.TaskManagerInfo;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 import com.yy.cs.base.task.trigger.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TimerTaskManager {
 
     private static Logger LOG = LoggerFactory.getLogger(TimerTaskManager.class);
-
+    private String appId = "default";
     private int poolSize = 2;
 
     private Map<String, TimerTask> timerTasks = new ConcurrentHashMap<String, TimerTask>();
@@ -39,6 +42,16 @@ public class TimerTaskManager {
 
     private TaskLogHandler taskLogHandle;
 
+    private TaskManagerInfo taskManagerInfo;
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
     public String getMonitorfile() {
         return monitorfile;
     }
@@ -50,6 +63,14 @@ public class TimerTaskManager {
      */
     public void setMonitorfile(String monitorfile) {
         this.monitorfile = monitorfile;
+    }
+
+    public TaskManagerInfo getTaskManagerInfo() {
+        if (taskManagerInfo == null) {
+            List<Task> list = new ArrayList<Task>(timerTasks.values());
+            taskManagerInfo = new TaskManagerInfo(appId,poolSize,list);
+        }
+        return taskManagerInfo;
     }
 
     public TaskLogHandler getTaskLogHandle() {
@@ -98,7 +119,9 @@ public class TimerTaskManager {
      */
     public void start() {
         if (isStart.compareAndSet(false, true)) {
-            taskScheduler = new ThreadPoolTaskScheduler(poolSize);
+            ThreadPoolTaskScheduler tempThreadPoolTaskScheduler = new ThreadPoolTaskScheduler(poolSize);
+            tempThreadPoolTaskScheduler.setTimerTaskManager(this);
+            taskScheduler = tempThreadPoolTaskScheduler;
             taskScheduler.setTaskRegister(registrar);
             taskScheduler.setTaskLogHandler(taskLogHandle);
             registrar.start(taskScheduler);

@@ -14,5 +14,5 @@ public interface TaskLogHandler {
      * @param log task log 的相关信息
      * @param taskBizLogs  本次 task 产生的业务日志
      */
-    void dealWithTaskLog(Task task,TaskLog log, List<TaskBizLog> taskBizLogs);
+    void dealWithTaskLog(TaskManagerInfo taskManagerInfo,Task task,TaskLog log, List<TaskBizLog> taskBizLogs);
 }

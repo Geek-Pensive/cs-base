@@ -3,6 +3,7 @@ package com.yy.cs.base.task.thread;
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.TimerTask;
+import com.yy.cs.base.task.TimerTaskManager;
 import com.yy.cs.base.task.execute.ClusterTriggerRunnable;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.LocalTriggerRunnable;
@@ -28,7 +29,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 	private final static Logger LOG = LoggerFactory.getLogger(ThreadPoolTaskScheduler.class);
 	
 	private TimerTaskRegistrar register;
-	
+	private TimerTaskManager timerTaskManager;
 	private final ScheduledExecutorService scheduledExecutor;
 
 	private TaskLogHandler taskLogHandle;
@@ -37,7 +38,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 	/**
 	 * 构造器,默认线程池大小为2
 	 */
-	public  ThreadPoolTaskScheduler() {
+	public  ThreadPoolTaskScheduler(TimerTaskManager timerTaskManager) {
 		this(2);
 	}
 	
@@ -53,6 +54,15 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 		this.scheduledExecutor =  new ScheduledThreadPoolExecutor(poolSize, new NamedThreadFactory("cs-taks-pool"));
 	}
 
+	@Override
+	public TimerTaskManager getTimerTaskManager() {
+		return timerTaskManager;
+	}
+
+	public void setTimerTaskManager(TimerTaskManager timerTaskManager) {
+		this.timerTaskManager = timerTaskManager;
+	}
+
 	public TaskLogHandler getTaskLogHandle() {
 		return taskLogHandle;
 	}
@@ -65,9 +75,8 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 		try{
 			lock.lock();
 			LocalTriggerRunnable triggerRunnable = new LocalTriggerRunnable(task,trigger,scheduledExecutor);
-			if(taskLogHandle != null) {
-				triggerRunnable.setTaskLogHandle(taskLogHandle);
-			}
+			triggerRunnable.setTaskLogHandle(taskLogHandle);
+			triggerRunnable.setTaskManagerInfo(getTimerTaskManager().getTaskManagerInfo());
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
 			if( r != null ){
 				TimerTask newTimerTask = (TimerTask) task;
@@ -101,9 +110,8 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 			lock.lock();
 			ClusterTriggerRunnable triggerRunnable = new ClusterTriggerRunnable(
 					task, trigger, scheduledExecutor, config);
-			if(taskLogHandle != null) {
-				triggerRunnable.setTaskLogHandle(taskLogHandle);
-			}
+			triggerRunnable.setTaskLogHandle(taskLogHandle);
+			triggerRunnable.setTaskManagerInfo(getTimerTaskManager().getTaskManagerInfo());
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
 			if (r != null) {
 				TimerTask newTimerTask = (TimerTask) task;
