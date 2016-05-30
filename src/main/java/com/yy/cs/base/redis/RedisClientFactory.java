@@ -184,6 +184,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
 							String info = jedis.info();
 							isMaster = RedisUtils.isMaster(info);
 						}catch(Throwable e){
+							log.warn("can not support info function.",e);
 						}
 						pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
 						// 主实例
