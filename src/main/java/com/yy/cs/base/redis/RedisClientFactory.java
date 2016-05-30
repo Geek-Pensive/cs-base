@@ -179,10 +179,12 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
 						if (null != password) {
 							jedis.auth(password);
 						}
-
-						String info = jedis.info();
-						boolean isMaster = RedisUtils.isMaster(info);
-
+						boolean isMaster = false;
+						try{
+							String info = jedis.info();
+							isMaster = RedisUtils.isMaster(info);
+						}catch(Throwable e){
+						}
 						pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
 						// 主实例
 						if (isMaster == true) {
