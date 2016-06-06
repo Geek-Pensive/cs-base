@@ -18,7 +18,7 @@ public class OperationAlarm {
         if (null == reportId || null == progressName || null == message) {
             throw new IllegalArgumentException("argument[reportId,progressName,message] cannot be null");
         }
-        message = message.replaceAll(" ", "").replaceAll("\t", "_");
+        message = message.replaceAll(" ", "_").replaceAll("\t", "_");
         String command = PYTHON + " " + reportId + " " + progressName + " " + " \"" + message + "\" ";
         try {
             Process p = Runtime.getRuntime().exec(command);
