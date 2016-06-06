@@ -7,7 +7,7 @@ import com.yy.cs.base.ip.IpUtil;
 public class RangeIpMatcher extends AbstractIpMatcher {
 
     private static Pattern pattern = Pattern
-            .compile("\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}~\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}");
+            .compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}~\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
 
     protected long start = 0;
     protected long end = 0;

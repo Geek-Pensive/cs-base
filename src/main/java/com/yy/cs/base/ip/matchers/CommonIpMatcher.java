@@ -7,7 +7,7 @@ import com.yy.cs.base.ip.IpUtil;
 public class CommonIpMatcher extends AbstractIpMatcher {
 
     private long ip;
-    private static Pattern pattern = Pattern.compile("\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}");
+    private static Pattern pattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
 
     @Override
     public boolean isMatch(String ip) {

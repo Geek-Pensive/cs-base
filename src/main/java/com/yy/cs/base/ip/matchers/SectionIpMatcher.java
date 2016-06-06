@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import com.yy.cs.base.ip.IpUtil;
 
 public class SectionIpMatcher extends RangeIpMatcher {
-    private static Pattern pattern = Pattern.compile("\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}/\\d{1,2}");
+    private static Pattern pattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}");
 
     @Override
     protected IpMatcher doBuild(String ipMatch) {
