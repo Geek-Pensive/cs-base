@@ -1,5 +1,6 @@
 package com.yy.cs.base.ip;
 
+import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,7 +10,7 @@ import com.yy.cs.base.ip.matchers.IpMatcher;
 public class IpMatcherManager {
 
     private List<IpMatcher> matchers;
-    private Map<String, Boolean> matchCache = new ConcurrentHashMap<>();
+    private Map<String, SoftReference<Boolean>> matchCache = new ConcurrentHashMap<>();
 
     public IpMatcherManager(List<IpMatcher> matchers) {
         this.matchers = matchers;
@@ -19,8 +20,8 @@ public class IpMatcherManager {
         if (null == matchers || matchers.size() < 1) {
             return false;
         }
-        if (matchCache.containsKey(ip)) {
-            return matchCache.get(ip);
+        if (matchCache.get(ip) !=null) {
+            return matchCache.get(ip).get();
         }
         boolean m = false;
         try {
@@ -31,7 +32,7 @@ public class IpMatcherManager {
                 }
             }
         } finally {
-            matchCache.put(ip, m);
+            matchCache.put(ip, new SoftReference<Boolean>(m));
         }
         return m;
     }
