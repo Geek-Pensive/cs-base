@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -51,7 +53,8 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
     private List<String> redisServers;
 
     private boolean healthCheck;
-    private Timer healthCheckTimer;
+    private static final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(2);
+    private volatile ScheduledFuture<?> healthCheckFuture = null;
 
     private String alarmReportId;
     private String alarmProgressName;
@@ -243,24 +246,45 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             this.masterServerSize = redisMasterPool.size();
             this.slaveServerSize = redisSlavePool.size();
 
-            if (healthCheck && null == healthCheckTimer) {
-                healthCheckTimer = new Timer(true);
-                healthCheckTimer.scheduleAtFixedRate(new RedisClientFactoryHealthChecker(this),
-                        RedisClientFactoryHealthChecker.CHECK_PERIOD, RedisClientFactoryHealthChecker.CHECK_PERIOD);
-            }
-
-            if (null != alarmProgressName && null != alarmReportId) {
-                if (masterServerSize == 0 && slaveServerSize == 0) {
-                    try {
-                        OperationAlarm.callAlarm(alarmReportId, alarmProgressName, sb.toString() + "不可用");
-                    } catch (Exception e) {
-                        log.error("call alarm for " + redisServers + " error:", e);
-                    }
-                }
-            }
+            startHealthCheck();
+            unavailableAlarm(sb.toString());
 
         } finally {
             lock.unlock();
+        }
+    }
+
+    private void unavailableAlarm(String info) {
+        if (null != alarmProgressName && null != alarmReportId) {
+            if (masterServerSize == 0 && slaveServerSize == 0) {
+                try {
+                    OperationAlarm.callAlarm(alarmReportId, alarmProgressName, info + "不可用");
+                } catch (Exception e) {
+                    log.error("call alarm for " + redisServers + " error:", e);
+                }
+            }
+        }
+    }
+
+    private void startHealthCheck() {
+        if (!healthCheck) {
+            stopHealthCheck();
+            return;
+        }
+        if (null == healthCheckFuture || healthCheckFuture.isCancelled()) {
+            healthCheckFuture = timer.scheduleWithFixedDelay(new RedisClientFactoryHealthChecker(this),
+                    RedisClientFactoryHealthChecker.CHECK_PERIOD, RedisClientFactoryHealthChecker.CHECK_PERIOD,
+                    TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void stopHealthCheck() {
+        if (null != healthCheckFuture) {
+            if (!healthCheckFuture.isCancelled()) {
+                healthCheckFuture.cancel(true);
+                timer.purge();
+                healthCheckFuture = null;
+            }
         }
     }
 
@@ -293,9 +317,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
                 p.destroy();
             }
         }
-        if (healthCheck && null != healthCheckTimer) {
-            healthCheckTimer.cancel();
-        }
+        stopHealthCheck();
     }
 
     public List<String> getRedisServers() {
