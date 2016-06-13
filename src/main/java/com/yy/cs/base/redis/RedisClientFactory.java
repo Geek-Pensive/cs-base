@@ -111,7 +111,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
     private JedisPool getSlavePool(boolean fromMaster) {
         if (slaveServerSize <= 0) {
             if (fromMaster) {
-                throw new RuntimeException("no avalible jedisPool");
+                throw new CsRedisRuntimeException("no avalible jedisPool");
             } else {
                 return getMasterPool();
             }
