@@ -255,7 +255,7 @@ public class RedisClient {
      * @param seconds
      *            有效时间
      * @return
-     *         设置成功则返回被设置值value
+     *         设置成功则返回 OK
      */
     public String setAndReturn(int dbIndex, final String key, String value, int seconds) {
         Jedis jedis = null;
@@ -294,7 +294,7 @@ public class RedisClient {
      * @param seconds
      *            有效时间
      * @return
-     *         设置成功则返回被设置值value
+     *         设置成功则 "OK"
      */
     public String setAndReturn(final String key, String value, int seconds) {
         return setAndReturn(0, key, value, seconds);
@@ -1780,6 +1780,59 @@ public class RedisClient {
 			exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis ltrim fail", e);
+		}finally{
+			if(jedis != null && jedisPool != null ){
+				jedisPool.returnResource(jedis);
+			}
+		}
+    	return result;
+    }
+    /**
+     * 设置指定KEY的生存时间，如果KEY的生存时间被用完，服务器会自动将KEY删除。带有过期时间的KEY在Redis术语中被称为易失的KEY。
+     * <p>
+     * 从redis 2.1.3开始，你可以更新已经设置了生存时间的KEY。你也可以通过使用 persist 命令让一个设置了生存时间的KEY
+     * 变成一个正常的KEY，取消生存时间限制。
+     * <p>
+     * 时间复杂度: O(1)
+     * 
+     * @see <ahref="http://code.google.com/p/redis/wiki/ExpireCommand">ExpireCommand</a>
+     * 
+     * @param key
+     * @param seconds
+     * @return 成功返回: 1. 设置失败 ｜ KEY不存在返回：0.
+     */
+    public Long expire(final String key, final int seconds){
+    	return expire(key, seconds);
+    }
+    /**
+     * 设置指定KEY的生存时间，如果KEY的生存时间被用完，服务器会自动将KEY删除。带有过期时间的KEY在Redis术语中被称为易失的KEY。
+     * <p>
+     * 从redis 2.1.3开始，你可以更新已经设置了生存时间的KEY。你也可以通过使用 persist 命令让一个设置了生存时间的KEY
+     * 变成一个正常的KEY，取消生存时间限制。
+     * <p>
+     * 时间复杂度: O(1)
+     * 
+     * @see <ahref="http://code.google.com/p/redis/wiki/ExpireCommand">ExpireCommand</a>
+     * 
+     * @param key
+     * @param seconds
+     * @return 成功返回: 1. 设置失败 ｜ KEY不存在返回：0.
+     */
+    public Long expire(final int dbIndex,final String key, final int seconds){
+    	Long result = 0L;
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+			jedisPool = getJedisMasterPool();
+			jedis = jedisPool.getResource();
+			if( 0 != dbIndex){
+				jedis.select(dbIndex);
+			}
+			result = jedis.expire(key, seconds);
+		} catch (Exception e) {
+			exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis expire fail", e);
 		}finally{
 			if(jedis != null && jedisPool != null ){
 				jedisPool.returnResource(jedis);
