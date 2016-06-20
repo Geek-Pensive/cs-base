@@ -19,6 +19,7 @@ public class PackageUtilTest {
                 });
         System.out.println(classes);
         Assert.assertTrue("listPackage not Contain PackageUtil", classes.contains(PackageUtil.class));
+        Assert.assertTrue("listPackage not Contain PackageUtil", classes.contains(PackageUtil.ClassFilter.class));
     }
 
 }
