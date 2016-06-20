@@ -108,8 +108,9 @@ public class PackageUtil {
         String[] jarInfo = jarPath.split("!");
         String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"));
         String packagePath = jarInfo[1].substring(1);
+        JarFile jarFile = null;
         try {
-            JarFile jarFile = new JarFile(jarFilePath);
+            jarFile = new JarFile(jarFilePath);
             Enumeration<JarEntry> entrys = jarFile.entries();
             while (entrys.hasMoreElements()) {
                 JarEntry jarEntry = entrys.nextElement();
@@ -136,7 +137,14 @@ public class PackageUtil {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("JarFile[" + jarFilePath + "] read error:", e);
+        } finally {
+            if (null != jarFile) {
+                try {
+                    jarFile.close();
+                } catch (Exception e) {
+                }
+            }
         }
         return myClassName;
     }
