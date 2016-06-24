@@ -52,7 +52,7 @@ public class PackageUtil {
         if (url != null) {
             String type = url.getProtocol();
             if (type.equals("file")) {
-                fileNames = getClassNameByFile(url.getPath(), null, childPackage);
+                fileNames = getClassNameByFile(url.getPath(), null, childPackage, packageName);
             } else if (type.equals("jar")) {
                 fileNames = getClassNameByJar(url.getPath(), childPackage);
             }
@@ -70,7 +70,8 @@ public class PackageUtil {
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    private static List<String> getClassNameByFile(String filePath, List<String> className, boolean childPackage) {
+    private static List<String> getClassNameByFile(String filePath, List<String> className, boolean childPackage,
+            String basePackage) {
         List<String> myClassName = new ArrayList<String>();
         if (filePath.indexOf("target/test-classes") >= 0) {
             filePath = filePath.replace("target/test-classes", "target/classes");// 不扫描test-classes下的类
@@ -80,15 +81,16 @@ public class PackageUtil {
         for (File childFile : childFiles) {
             if (childFile.isDirectory()) {
                 if (childPackage) {
-                    myClassName.addAll(getClassNameByFile(childFile.getPath(), myClassName, childPackage));
+                    String childFilePath = childFile.getName();
+                    myClassName.addAll(getClassNameByFile(childFile.getPath(), myClassName, childPackage,
+                            basePackage + "." + childFilePath));
                 }
             } else {
                 String childFilePath = childFile.getPath();
                 if (childFilePath.endsWith(".class")) {
-                    childFilePath = childFilePath.substring(childFilePath.indexOf(File.separator + "classes") + 9,
-                            childFilePath.lastIndexOf("."));
-                    childFilePath = childFilePath.replace(File.separator, ".");
-                    myClassName.add(childFilePath);
+                    String childFileName = childFile.getName();
+                    childFileName = childFileName.substring(0, childFileName.lastIndexOf(".class"));
+                    myClassName.add(basePackage + "." + childFileName);
                 }
             }
         }
