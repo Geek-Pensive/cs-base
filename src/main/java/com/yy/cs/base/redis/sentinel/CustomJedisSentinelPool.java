@@ -102,13 +102,24 @@ public class CustomJedisSentinelPool extends Pool<Jedis> {
 		initSentinels(sentinels, masterName,timeout);
     }
 
+    @Override
+    public Jedis getResource() {
+        Jedis jedis = super.getResource();
+        jedis.setDataSource(this);
+        return jedis;
+    }
+    
     public void returnBrokenResource(final Jedis resource) {
-    	returnBrokenResourceObject(resource);
+        if(resource != null){
+            returnBrokenResourceObject(resource);
+        }
     }
 
     public void returnResource(final Jedis resource) {
-    	resource.resetState();
-    	returnResourceObject(resource);
+        if(resource != null){
+            resource.resetState();
+            returnResourceObject(resource);
+        }
     }
 
     public void destroy() {

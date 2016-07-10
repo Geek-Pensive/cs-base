@@ -7,6 +7,10 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.Jedis;
 
+/**
+ * 复制jedis源码中的JedisFactory，因为 jedis的jar包中 JedisFactory 不是public的
+ *
+ */
 public class JedisFactory implements PooledObjectFactory<Jedis> {
     private final String host;
     private final int port;
