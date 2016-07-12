@@ -1,15 +1,11 @@
 package com.yy.cs.base.redis;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Transaction;
+
+import java.util.*;
 
 /**
  * 基于jedis封装了,redis的一些常用工具类。
@@ -1136,6 +1132,39 @@ public class RedisClient {
             }
         }
     }
+    public Map<String,String> hgetAll(String key) {
+        return hgetAll(0,key);
+    }
+
+    /**
+     * 返回哈希表 key 中所有域 field 的值。
+     *
+     * @param dbIndex
+     * @param key
+     *            hash表的标记key
+     * @return
+     *         给定域的值。当给定域不存在或是给定 key 不存在时，返回 空 map 。
+     */
+    public Map<String,String> hgetAll(int dbIndex, String key) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.hgetAll(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis get hgetAll " + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedisPool.returnResource(jedis);
+            }
+        }
+    }
 
     /**
      * 返回哈希表 key 中，一个或多个给定域的值。
@@ -1839,5 +1868,30 @@ public class RedisClient {
 			}
 		}
     	return result;
+    }
+
+    public Long del(int dbIndex, String key) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.del(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ "+ dbIndex + "] key:" + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedisPool.returnResource(jedis);
+            }
+        }
+    }
+
+    public Long del(String key) {
+       return del(0,key);
     }
 }
