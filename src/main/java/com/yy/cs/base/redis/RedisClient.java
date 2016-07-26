@@ -1591,7 +1591,7 @@ public class RedisClient {
      * @return 列表的长度
      */
     public Long rpush(final String key, final String... values){
-    	return lpush(0, key, values);
+    	return rpush(0, key, values);
     }
     /**
      * 往列表尾插入元素
