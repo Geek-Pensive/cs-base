@@ -21,10 +21,21 @@ public class IpUtil {
         return ipNumbers;
     }
 
+    public static long atoiR(String ip) {
+        String[] t = ip.split("\\.");
+        long ipNumbers = 0;
+        for (int i = 0; i < 4; i++) {
+            ipNumbers += Integer.valueOf(t[i]) << (8 * i);
+        }
+        return ipNumbers | (1l << 32);
+    }
+
     public static String itoa(long ipNumber) {
         StringBuilder sb = new StringBuilder();
+        boolean reverse = (ipNumber >> 32 == 1) ? true : false;
         for (int i = 0; i < 4; i++) {
-            long s = (ipNumber & (0xff << (24 - (8 * i)))) >> (24 - (8 * i));
+            int bit = reverse ? (8 * i) : (24 - 8 * i);
+            long s = (ipNumber & (0xff << bit)) >> bit;
             s = s & 0x00ff;
             sb.append(s).append(".");
         }
@@ -63,5 +74,12 @@ public class IpUtil {
             }
         }
         return ip1 + "/" + section;
+    }
+
+    public static void main(String[] args) {
+        long t = 5447020147l;
+        System.out.println(itoa(t));
+        t = atoiR("115.238.170.68");
+        System.out.println(itoa(t));
     }
 }
