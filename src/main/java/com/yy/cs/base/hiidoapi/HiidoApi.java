@@ -157,9 +157,9 @@ public class HiidoApi {
         req.put("ed", "2014-11-28");
         req.put("dataType", "DAU");
         try {
-            System.out.println(HiidoApi.access("getJiaoyouData", "product", "product@chinaduo.com", req));
+            System.out.println(HiidoApi.access("getJiaoyouData", "product", "product@chinaduo.com", "58.254.172.48", req));
 
-            System.out.println(HiidoApi.access("getJiaoyouData", "product", "product@chinaduo.com",
+            System.out.println(HiidoApi.access("getJiaoyouData", "product", "product@chinaduo.com", "183.56.146.11",
                     "{\"dataType\":\"DAU\",\"sd\":\"2015-8-12\",\"ed\":\"2015-8-25\"}"));
         } catch (Exception e) {
             e.printStackTrace();
