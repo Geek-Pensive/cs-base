@@ -1,40 +1,49 @@
 package com.yy.cs.base.ip;
 
 public class IpUtil {
+
+    private static int getBit(int i, boolean r) {
+        return r ? (8 * i) : (24 - 8 * i);
+    }
+
     public static byte[] atob(String ip) {
+        return atob(ip, false);
+    }
+
+    public static byte[] atob(String ip, boolean reverse) {
         String[] t = ip.split("\\.");
         byte[] b = new byte[] { 0, 0, 0, 0 };
         for (int i = 0; i < 4; i++) {
-            int m = Integer.valueOf(t[i]) << (24 - (8 * i));
+            int bit = getBit(i, reverse);
+            int m = Integer.valueOf(t[i]) << bit;
             m = m >> (24 - (8 * i));
             b[i] = (byte) (m & 0xff);
         }
         return b;
     }
 
-    public static long atoi(String ip) {
+    public static long atoi(String ip, boolean reverse) {
         String[] t = ip.split("\\.");
         long ipNumbers = 0;
         for (int i = 0; i < 4; i++) {
-            ipNumbers += Integer.valueOf(t[i]) << (24 - (8 * i));
+            int bit = getBit(i,reverse);
+            ipNumbers += Integer.valueOf(t[i]) << bit;
         }
         return ipNumbers;
     }
 
-    public static long atoiR(String ip) {
-        String[] t = ip.split("\\.");
-        long ipNumbers = 0;
-        for (int i = 0; i < 4; i++) {
-            ipNumbers += Integer.valueOf(t[i]) << (8 * i);
-        }
-        return ipNumbers | (1l << 32);
+    public static long atoi(String ip) {
+        return atoi(ip, false);
     }
 
     public static String itoa(long ipNumber) {
+        return itoa(ipNumber, false);
+    }
+
+    public static String itoa(long ipNumber, boolean reverse) {
         StringBuilder sb = new StringBuilder();
-        boolean reverse = (ipNumber >> 32 == 1) ? true : false;
         for (int i = 0; i < 4; i++) {
-            int bit = reverse ? (8 * i) : (24 - 8 * i);
+            int bit = getBit(i,reverse);
             long s = (ipNumber & (0xff << bit)) >> bit;
             s = s & 0x00ff;
             sb.append(s).append(".");
@@ -78,8 +87,8 @@ public class IpUtil {
 
     public static void main(String[] args) {
         long t = 5447020147l;
-        System.out.println(itoa(t));
-        t = atoiR("115.238.170.68");
-        System.out.println(itoa(t));
+        System.out.println(itoa(t, true));
+        t = atoi("115.238.170.68", true);
+        System.out.println(itoa(t, true));
     }
 }
