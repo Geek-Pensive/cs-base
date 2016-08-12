@@ -229,10 +229,6 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             List<JedisPool> oldRslavePool = redisSlavePool;
             redisMasterPool = newMasterPool;
             redisSlavePool = newRslavePool;
-            // 如果没有master 避免用户直接获取master进行操作导致错误
-            if (redisMasterPool.size() == 0) {
-                redisMasterPool = redisSlavePool;
-            }
             // 如果没有slave 避免用户直接获取slave进行操作导致错误
             if (redisSlavePool.size() == 0) {
                 redisSlavePool = redisMasterPool;
