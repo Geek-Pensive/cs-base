@@ -54,14 +54,16 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
                 checkCount++;
             } catch (Exception e) {
                 try {
-                    j = null;
-                    jpool.returnBrokenResource(j);
+                    if(null != j){
+                        j.close();
+                        j=null;
+                    }
                 } catch (Exception e1) {
                     return true;
                 }
             } finally {
                 if (j != null) {
-                    jpool.returnResource(j);
+                    j.close();
                 }
             }
         }
