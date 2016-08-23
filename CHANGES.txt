@@ -3,6 +3,15 @@ charnges:
 	1. RedisClientFactoryHealthChecker bug修复
 	2. RedisClientFactory   init时，不会把从库的列表设置为主库列表
 
+1.1.23-SNAPSHOT 2016-07-11
+charnges:
+	1、cs-base 增加redis sentinel支持
+		1）复制to-rank类
+		2）RedisSentinelFactory 继承 JedisPoolConfigAdapter
+		3）支持配置中心，要增加属性变量
+	2、升级jedis版本
+	3、升级cs-base版本
+
 1.1.22-SNAPSHOT 2016-6-20
 changes:
 	1. PackageUtil 列出指定包下的所有类
