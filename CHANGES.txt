@@ -1,3 +1,8 @@
+1.1.25-SNAPSHOT 2016-08-11
+charnges:
+	1. RedisClientFactoryHealthChecker bug修复
+	2. RedisClientFactory   init时，不会把从库的列表设置为主库列表
+
 1.1.22-SNAPSHOT 2016-6-20
 changes:
 	1. PackageUtil 列出指定包下的所有类
