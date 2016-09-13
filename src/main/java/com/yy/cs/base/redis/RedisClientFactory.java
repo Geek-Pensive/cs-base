@@ -372,4 +372,20 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
         this.alarmProgressName = alarmProgressName;
     }
 
+    public long getCheckPeriod() {
+        return checkPeriod;
+    }
+
+    public long getFullCheckPeriod() {
+        return fullCheckPeriod;
+    }
+
+    public void setCheckPeriod(long checkPeriod) {
+        this.checkPeriod = checkPeriod;
+    }
+
+    public void setFullCheckPeriod(long fullCheckPeriod) {
+        this.fullCheckPeriod = fullCheckPeriod;
+    }
+
 }
