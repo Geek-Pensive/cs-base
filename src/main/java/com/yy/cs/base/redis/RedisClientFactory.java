@@ -53,6 +53,8 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
     private List<String> redisServers;
 
     private boolean healthCheck;
+    private long checkPeriod = RedisClientFactoryHealthChecker.CHECK_PERIOD;
+    private long fullCheckPeriod = RedisClientFactoryHealthChecker.CHECK_PERIOD * 4;
     private static final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(2);
     private volatile ScheduledFuture<?> healthCheckFuture = null;
 
@@ -268,8 +270,14 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             return;
         }
         if (null == healthCheckFuture || healthCheckFuture.isCancelled()) {
-            healthCheckFuture = timer.scheduleWithFixedDelay(new RedisClientFactoryHealthChecker(this),
-                    RedisClientFactoryHealthChecker.CHECK_PERIOD, RedisClientFactoryHealthChecker.CHECK_PERIOD,
+            if (checkPeriod <= 0) {
+                checkPeriod = RedisClientFactoryHealthChecker.CHECK_PERIOD;
+            }
+            if (fullCheckPeriod <= 0) {
+                fullCheckPeriod = 4 * checkPeriod;
+            }
+            healthCheckFuture = timer.scheduleWithFixedDelay(
+                    new RedisClientFactoryHealthChecker(this, checkPeriod, fullCheckPeriod), checkPeriod, checkPeriod,
                     TimeUnit.MILLISECONDS);
         }
     }

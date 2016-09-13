@@ -1,3 +1,7 @@
+1.1.26-SNAPSHOT 2016-09-13
+charnges:
+	1. RedisClientFactory  增加checkPeriod和fullCheckPeriod，可以设置RedisClientFactoryHealthCheckerd的检查周期，单位毫秒
+
 1.1.25-SNAPSHOT 2016-08-11
 charnges:
 	1. RedisClientFactoryHealthChecker bug修复

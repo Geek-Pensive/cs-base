@@ -11,12 +11,10 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
     private RedisClientFactory factory;
     private long lastReInitTime = 0;
     public static final long CHECK_PERIOD = 30 * 1000;
+    private long checkPeriod = CHECK_PERIOD;
+    private long fullCheckPeriod = CHECK_PERIOD * 4;
 
-    public RedisClientFactoryHealthChecker() {
-
-    }
-
-    public RedisClientFactoryHealthChecker(RedisClientFactory factory) {
+    public RedisClientFactoryHealthChecker(RedisClientFactory factory, long checkPeriod, long fullCheckPeriod) {
         this.factory = factory;
     }
 
@@ -31,7 +29,7 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
             factory.init();
             lastReInitTime = System.currentTimeMillis();
         } else {
-            if ((System.currentTimeMillis() - lastReInitTime) > 4 * CHECK_PERIOD
+            if ((System.currentTimeMillis() - lastReInitTime) >= fullCheckPeriod
                     && (factory.getMasterServerSize() + factory.getSlaveServerSize()) != factory.getRedisServers()
                             .size()) {// 从库或者主库down了,上次重新初始化的时候，没有成功初始化从库的情况下，需要再次检查并初始化
                 factory.init();
@@ -54,9 +52,9 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
                 checkCount++;
             } catch (Exception e) {
                 try {
-                    if(null != j){
+                    if (null != j) {
                         j.close();
-                        j=null;
+                        j = null;
                     }
                 } catch (Exception e1) {
                     return true;
@@ -79,6 +77,22 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
 
     public void setFactory(RedisClientFactory factory) {
         this.factory = factory;
+    }
+
+    public long getCheckPeriod() {
+        return checkPeriod;
+    }
+
+    public long getFullCheckPeriod() {
+        return fullCheckPeriod;
+    }
+
+    public void setCheckPeriod(long checkPeriod) {
+        this.checkPeriod = checkPeriod;
+    }
+
+    public void setFullCheckPeriod(long fullCheckPeriod) {
+        this.fullCheckPeriod = fullCheckPeriod;
     }
 
 }
