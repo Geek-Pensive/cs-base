@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,11 +40,15 @@ public class RedisClientTest {
 //		list.add("172.19.103.105:6330::");
 //		list.add("172.19.103.105:6379:fdfs123:");
 		
-		list.add("58.215.180.218:6380::");
-		list.add("58.215.180.218:6381::");
-		list.add("58.215.180.218:6382::");
+		list.add("127.0.0.1:6380::");
+		list.add("127.0.0.1:6379::");
 		
 		redisClientFactory.setRedisServers(list);
+		
+		redisClientFactory.setHealthCheck(true);
+		redisClientFactory.setCheckPeriod(1000);
+		redisClientFactory.setFullCheckPeriod(1000);
+		
 		redisClientFactory.init();
 		redisClient = new RedisClient(redisClientFactory);
 		//redisClient.setFactory(redisClientFactory);
@@ -356,12 +361,12 @@ public class RedisClientTest {
 	@Test 
 	public void testGet() throws InterruptedException{
 		int i = 0 ; 
-		while(++i<2){
+		while(++i<20000){
 			List<String> str2 = null ; 
 			try {
 				 str2 = redisClient.mgetAndReturn("hello","world");
+				 TimeUnit.MILLISECONDS.sleep(500);
 			} catch (Exception e) {
-				Thread.currentThread().sleep(1000);
 				e.printStackTrace();
 				System.out.println("execute time = "+i+" seconds !");
 				continue ;
