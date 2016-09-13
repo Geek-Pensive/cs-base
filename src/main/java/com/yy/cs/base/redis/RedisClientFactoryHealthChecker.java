@@ -1,6 +1,5 @@
 package com.yy.cs.base.redis;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -24,6 +23,9 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
 
     public RedisClientFactoryHealthChecker(RedisClientFactory factory, long checkPeriod, long fullCheckPeriod) {
         this.factory = factory;
+        this.checkPeriod = checkPeriod;
+        this.fullCheckPeriod = fullCheckPeriod;
+        this.lastReInitTime = System.currentTimeMillis();// 初始化时间
     }
 
     @Override
@@ -31,29 +33,49 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
         if (null == factory) {
             return;
         }
-        boolean masterStatus = check(factory.getRedisMasterPool(), factory.getMasterServerSize());
-        boolean slaveStatus = check(factory.getRedisSlavePool(), factory.getSlaveServerSize());
-        if (masterStatus || slaveStatus) {
-            log.warn(Json.ObjToStr(factory.getRedisServers()) + " going to reinit ,cause by [masterFailed="
-                    + masterStatus + ",slavesFailed=" + slaveStatus + "]");
-            factory.init();
-            lastReInitTime = System.currentTimeMillis();
-        } else {
-            if ((System.currentTimeMillis() - lastReInitTime) >= fullCheckPeriod
-                    && (factory.getMasterServerSize() + factory.getSlaveServerSize()) != factory.getRedisServers()
-                            .size()) {// 从库或者主库down了,上次重新初始化的时候，没有成功初始化从库的情况下，需要再次检查并初始化
+        try {
+            boolean masterStatus = check(factory.getRedisMasterPool(), factory.getMasterServerSize());
+            boolean slaveStatus = check(factory.getRedisSlavePool(), factory.getSlaveServerSize());
+            if (masterStatus || slaveStatus) {
+                log.warn(Json.ObjToStr(factory.getRedisServers()) + " going to reinit ,cause by [masterFailed="
+                        + masterStatus + ",slavesFailed=" + slaveStatus + "]");
+                factory.init();
+                lastReInitTime = System.currentTimeMillis();
+                return;
+            }
+            if ((System.currentTimeMillis() - lastReInitTime) < fullCheckPeriod) {
+                return;
+            }
+
+            int masterCount = factory.getMasterServerSize();
+            int slaveCount = factory.getSlaveServerSize();
+
+            int serverCount = masterCount;
+            if (factory.getRedisMasterPool() == factory.getRedisSlavePool()) {
+                // 没有设置从库的时候，会把主库当做从库，这里判断下引用是否一样
+                slaveCount = 0;
+            }
+            serverCount += slaveCount;
+            if (serverCount != factory.getRedisServers().size()) {// 从库或者主库down了,上次重新初始化的时候，没有成功初始化从库的情况下，需要再次检查并初始化
                 log.warn(Json.ObjToStr(factory.getRedisServers()) + " going to reinit ,cause by [SUM (masterCount="
-                        + factory.getMasterServerSize() + ",slaveCount=" + factory.getSlaveServerSize() + ") != "
-                        + factory.getRedisServers().size() + "]");
+                        + masterCount + ",slaveCount=" + slaveCount + ") != " + factory.getRedisServers().size() + "]");
 
                 factory.init();
                 lastReInitTime = System.currentTimeMillis();
             }
+        } catch (Throwable e) {
+            log.error("RedisHealthChecking error for " + Json.ObjToStr(factory.getRedisServers()), e);
         }
     }
 
     private boolean check(List<JedisPool> pools, int size) {
         boolean reInit = false;
+        if (null == pools && size == 0) {
+            return reInit;
+        }
+        if (pools.size() == 0 && size == 0) {
+            return reInit;
+        }
         int checkCount = 0;
         for (JedisPool jpool : pools) {
             Jedis j = null;
