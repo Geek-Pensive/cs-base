@@ -44,6 +44,8 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
     private int masterServerSize;
 
     private int slaveServerSize;
+    
+    private volatile int realServersCount = 0;
 
     private ReentrantLock lock = new ReentrantLock();
 
@@ -227,6 +229,7 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
                     }
                 }
             }
+            realServersCount = initialPools.size();
             List<JedisPool> oldMasterPool = redisMasterPool;
             List<JedisPool> oldRslavePool = redisSlavePool;
             redisMasterPool = newMasterPool;
@@ -322,6 +325,10 @@ public class RedisClientFactory extends JedisPoolConfigAdapter {
             }
         }
         stopHealthCheck();
+    }
+
+    public int getRealServersCount() {
+        return realServersCount;
     }
 
     public List<String> getRedisServers() {

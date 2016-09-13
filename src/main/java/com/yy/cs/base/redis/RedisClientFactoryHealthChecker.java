@@ -56,9 +56,9 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
                 slaveCount = 0;
             }
             serverCount += slaveCount;
-            if (serverCount != factory.getRedisServers().size()) {// 从库或者主库down了,上次重新初始化的时候，没有成功初始化从库的情况下，需要再次检查并初始化
+            if (serverCount != factory.getRealServersCount()) {// 从库或者主库down了,上次重新初始化的时候，没有成功初始化从库的情况下，需要再次检查并初始化
                 log.warn(Json.ObjToStr(factory.getRedisServers()) + " going to reinit ,cause by [SUM (masterCount="
-                        + masterCount + ",slaveCount=" + slaveCount + ") != " + factory.getRedisServers().size() + "]");
+                        + masterCount + ",slaveCount=" + slaveCount + ") != " + factory.getRealServersCount() + "]");
 
                 factory.init();
                 lastReInitTime = System.currentTimeMillis();
