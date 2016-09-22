@@ -22,7 +22,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -40,6 +42,28 @@ public class CSHttpClient {
     private final  RequestConfig defaultRequestConfig;
     
     private final  CloseableHttpClient httpClient;
+
+	/**
+	 * 带参数的构造函数，通过工厂类{@link CSHttpClientFactory}生成指定的CSHttpClient,设置post请求方式是否自动跳转302地址
+	 * @param
+	 * 	    factory 生成CSHttpClient的工厂类
+	 */
+	public CSHttpClient(CSHttpClientFactory factory,Boolean isPostRedirect) {
+		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+		this.defaultRequestConfig = RequestConfig.custom()
+				.setConnectTimeout(factory.getConnectionTimeout())
+				.setConnectionRequestTimeout(factory.getConnectionRequestTimeout())
+				.setSocketTimeout(factory.getSocketTimeOut())
+				.build();
+		cm.setMaxTotal(factory.getMaxTotal());
+		cm.setDefaultMaxPerRoute(factory.getDefaultMaxPerRoute());
+		HttpClientBuilder builder = HttpClients.custom();
+		if (isPostRedirect != null && isPostRedirect.booleanValue()){
+			builder.setRedirectStrategy(new LaxRedirectStrategy());
+		}
+		this.httpClient = builder.setConnectionManager(cm).build();
+
+	}
     
     /**
      * 带参数的构造函数，通过工厂类{@link CSHttpClientFactory}生成指定的CSHttpClient,
@@ -56,6 +80,7 @@ public class CSHttpClient {
         cm.setMaxTotal(factory.getMaxTotal());
         cm.setDefaultMaxPerRoute(factory.getDefaultMaxPerRoute());
         this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
+
     }
 
     /**
@@ -64,7 +89,7 @@ public class CSHttpClient {
     public CSHttpClient() {
     	this(new CSHttpClientFactory());
     }
-    
+
     /**
      * 获取池化的原生httpClient
      * @return 
