@@ -71,16 +71,7 @@ public class CSHttpClient {
      * 	    factory 生成CSHttpClient的工厂类
      */
     public CSHttpClient(CSHttpClientFactory factory) {
-    	PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-    	this.defaultRequestConfig = RequestConfig.custom()
-    	        .setConnectTimeout(factory.getConnectionTimeout())				
-    	        .setConnectionRequestTimeout(factory.getConnectionRequestTimeout())
-    			 .setSocketTimeout(factory.getSocketTimeOut())
-    	        .build();
-        cm.setMaxTotal(factory.getMaxTotal());
-        cm.setDefaultMaxPerRoute(factory.getDefaultMaxPerRoute());
-        this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
-
+    	this(factory,false);
     }
 
     /**
