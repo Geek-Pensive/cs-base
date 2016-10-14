@@ -40,7 +40,7 @@ public class RedisClient {
 
     private void exceptionHandler(JedisPool jedisPool, Jedis jedis, Exception e) {
         if (null != jedisPool) {
-            jedisPool.returnBrokenResource(jedis);
+            jedis.close();
         }
         factory.init();
     }
@@ -107,7 +107,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -161,7 +161,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis setnx fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -192,7 +192,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis ttl fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -230,7 +230,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis eval fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -271,7 +271,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -331,7 +331,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -376,7 +376,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis info fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -412,7 +412,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -466,7 +466,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -520,7 +520,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -571,7 +571,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException(e.getMessage(), e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -623,7 +623,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis mget fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -675,7 +675,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis mset fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -727,7 +727,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis mget fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -788,7 +788,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -834,7 +834,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -880,7 +880,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -926,7 +926,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -976,7 +976,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1032,7 +1032,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1082,7 +1082,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1098,7 +1098,7 @@ public class RedisClient {
      *         给定域的值。当给定域不存在或是给定 key 不存在时，返回 nil 。
      */
     public String hget(String key, String field) {
-        return hget(0,key, field);
+        return hget(0, key, field);
     }
 
     /**
@@ -1128,12 +1128,13 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
-    public Map<String,String> hgetAll(String key) {
-        return hgetAll(0,key);
+
+    public Map<String, String> hgetAll(String key) {
+        return hgetAll(0, key);
     }
 
     /**
@@ -1145,7 +1146,7 @@ public class RedisClient {
      * @return
      *         给定域的值。当给定域不存在或是给定 key 不存在时，返回 空 map 。
      */
-    public Map<String,String> hgetAll(int dbIndex, String key) {
+    public Map<String, String> hgetAll(int dbIndex, String key) {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
@@ -1161,7 +1162,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get hgetAll " + key, e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1211,7 +1212,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1253,7 +1254,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1302,7 +1303,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1344,7 +1345,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1369,7 +1370,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1408,7 +1409,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1437,7 +1438,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1464,7 +1465,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1492,7 +1493,7 @@ public class RedisClient {
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
@@ -1536,166 +1537,177 @@ public class RedisClient {
             }
             result = jedis.keys(pattern);
         } catch (Exception e) {
-            jedisPool.returnBrokenResource(jedis);
+            exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis keys fail", e);
         } finally {
             if (jedis != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
         return result;
     }
+
     /**
      * 往列表头插入元素
+     * 
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
      * @return 列表的长度
      */
-    public Long lpush(final String key, final String... values){
-    	return lpush(0, key, values);
+    public Long lpush(final String key, final String... values) {
+        return lpush(0, key, values);
     }
+
     /**
      * 往列表头插入元素
-     * @param dbIndex 一般都是 0 
+     * 
+     * @param dbIndex 一般都是 0
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
      * @return 列表的长度
      */
-    public Long lpush(final int dbIndex,final String key, final String... values){
-    	Long result = 0L;
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-			if( 0 != dbIndex){
-				jedis.select(dbIndex);
-			}
-			result = jedis.lpush(key, values);
-		} catch (Exception e) {
-			exceptionHandler(jedisPool, jedis, e);
+    public Long lpush(final int dbIndex, final String key, final String... values) {
+        Long result = 0L;
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.lpush(key, values);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis lpush fail", e);
-		}finally{
-			if(jedis != null && jedisPool != null ){
-				jedisPool.returnResource(jedis);
-			}
-		}
-    	return result;
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+        return result;
     }
+
     /**
      * 往列表尾插入元素
+     * 
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
      * @return 列表的长度
      */
-    public Long rpush(final String key, final String... values){
-    	return rpush(0, key, values);
+    public Long rpush(final String key, final String... values) {
+        return rpush(0, key, values);
     }
+
     /**
      * 往列表尾插入元素
-     * @param dbIndex 一般都是 0 
+     * 
+     * @param dbIndex 一般都是 0
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
      * @return 列表的长度
      */
-    public Long rpush(final int dbIndex,final String key, final String... values){
-    	Long result = 0L;
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-			if( 0 != dbIndex){
-				jedis.select(dbIndex);
-			}
-			result = jedis.rpush(key, values);
-		} catch (Exception e) {
-			exceptionHandler(jedisPool, jedis, e);
+    public Long rpush(final int dbIndex, final String key, final String... values) {
+        Long result = 0L;
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.rpush(key, values);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis lpush fail", e);
-		}finally{
-			if(jedis != null && jedisPool != null ){
-				jedisPool.returnResource(jedis);
-			}
-		}
-    	return result;
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+        return result;
     }
+
     /**
-	 * 返回存储在 KEY 中的列表元素，开始和结束索引都是从 0 开始的。 索引为0 代表列表的第一个元素，1 代表第二个元素 以此类推。
+     * 返回存储在 KEY 中的列表元素，开始和结束索引都是从 0 开始的。 索引为0 代表列表的第一个元素，1 代表第二个元素 以此类推。
      * <p>
      * 例如：LRANGE foobar 0 2 就会返回列表名为：foobar的前3个元素。
      * <p>
-	 * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
+     * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
      * <p>
      * <b>RANG函数在多种语言中的一致性</b>
      * <p>
-	 * 注意：如果你有一个列表，它存储的值是从 0 到 100，LRANGE 0 10 会返回 11 个元素，也就是说最右边的索引元素会被包含进来。
-	 * 这可能与你选择的编程语言中与范围选择相关的函数不一致。(想一下 Ruby,Python中的range())
+     * 注意：如果你有一个列表，它存储的值是从 0 到 100，LRANGE 0 10 会返回 11 个元素，也就是说最右边的索引元素会被包含进来。
+     * 这可能与你选择的编程语言中与范围选择相关的函数不一致。(想一下 Ruby,Python中的range())
      * <p>
      * <b>超出索引</b>
      * <p>
-	 * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
-	 * Redis会把它当做列表的最后一个元素的索引来对待。
+     * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
+     * Redis会把它当做列表的最后一个元素的索引来对待。
      * <p>
-	 * 时间复杂度：O(start+n) n为要查询的范围 即 end - start。
+     * 时间复杂度：O(start+n) n为要查询的范围 即 end - start。
+     * 
      * @param key 列表名称
      * @param start 查询起始索引
      * @param end 查询结束索引
      * @return 返回列表从start到end索引之间的元素，包含两端
      */
-    public List<String> lrange(final String key, final long start,
-    	    final long end){
-    	return lrange(0, key, start, end);
+    public List<String> lrange(final String key, final long start, final long end) {
+        return lrange(0, key, start, end);
     }
+
     /**
-	 * 返回存储在 KEY 中的列表元素，开始和结束索引都是从 0 开始的。 索引为0 代表列表的第一个元素，1 代表第二个元素 以此类推。
+     * 返回存储在 KEY 中的列表元素，开始和结束索引都是从 0 开始的。 索引为0 代表列表的第一个元素，1 代表第二个元素 以此类推。
      * <p>
      * 例如：LRANGE foobar 0 2 就会返回列表名为：foobar的前3个元素。
      * <p>
-	 * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
+     * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
      * <p>
      * <b>RANG函数在多种语言中的一致性</b>
      * <p>
-	 * 注意：如果你有一个列表，它存储的值是从 0 到 100，LRANGE 0 10 会返回 11 个元素，也就是说最右边的索引元素会被包含进来。
-	 * 这可能与你选择的编程语言中与范围选择相关的函数不一致。(想一下 Ruby,Python中的range())
+     * 注意：如果你有一个列表，它存储的值是从 0 到 100，LRANGE 0 10 会返回 11 个元素，也就是说最右边的索引元素会被包含进来。
+     * 这可能与你选择的编程语言中与范围选择相关的函数不一致。(想一下 Ruby,Python中的range())
      * <p>
      * <b>超出索引</b>
      * <p>
-	 * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
-	 * Redis会把它当做列表的最后一个元素的索引来对待。
+     * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
+     * Redis会把它当做列表的最后一个元素的索引来对待。
      * <p>
-	 * 时间复杂度：O(start+n) n为要查询的范围 即 end - start。
-	 * @param dbIndex 
+     * 时间复杂度：O(start+n) n为要查询的范围 即 end - start。
+     * 
+     * @param dbIndex
      * @param key 列表名称
      * @param start 查询起始索引
      * @param end 查询结束索引
      * @return 返回列表从start到end索引之间的元素，包含两端
      */
-    public List<String> lrange(final int dbIndex,final String key, final long start,
-    	    final long end){
-    	List<String> result = new ArrayList<>();
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-			jedisPool = getJedisSlavePool();
-			jedis = jedisPool.getResource();
-			if( 0 != dbIndex){
-				jedis.select(dbIndex);
-			}
-			result = jedis.lrange(key, start, end);
-		} catch (Exception e) {
-			exceptionHandler(jedisPool, jedis, e);
+    public List<String> lrange(final int dbIndex, final String key, final long start, final long end) {
+        List<String> result = new ArrayList<>();
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.lrange(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis lrange fail", e);
-		}finally{
-			if(jedis != null && jedisPool != null ){
-				jedisPool.returnResource(jedis);
-			}
-		}
-    	return result;
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+        return result;
     }
+
     /**
      * 设置 KEY为 @key 的列表在索引@index处的值为@value
      * <p>
@@ -1706,14 +1718,16 @@ public class RedisClient {
      * <b>时间复杂度:</b>
      * <p>
      * O(N) (N为列表的长度), 设置表头或表尾元素的时间复杂度为：O(1).
+     * 
      * @param key 列表的KEY值
      * @param index 列表索引
      * @param value 要设置的新值
      * @return 操作结果
      */
-    public String lset(final String key, final long index, final String value){
-    	return lset(0, key, index, value);
+    public String lset(final String key, final long index, final String value) {
+        return lset(0, key, index, value);
     }
+
     /**
      * 设置 KEY为 @key 的列表在索引@index处的值为@value
      * <p>
@@ -1724,44 +1738,46 @@ public class RedisClient {
      * <b>时间复杂度:</b>
      * <p>
      * O(N) (N为列表的长度), 设置表头或表尾元素的时间复杂度为：O(1).
+     * 
      * @param key 列表的KEY值
      * @param index 列表索引
      * @param value 要设置的新值
      * @return 操作结果
      */
-    public String lset(final int dbIndex,final String key, final long index, final String value){
-    	String result = "";
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-			if( 0 != dbIndex){
-				jedis.select(dbIndex);
-			}
-			result = jedis.lset(key, index, value);
-		} catch (Exception e) {
-			exceptionHandler(jedisPool, jedis, e);
+    public String lset(final int dbIndex, final String key, final long index, final String value) {
+        String result = "";
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.lset(key, index, value);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis lpush fail", e);
-		}finally{
-			if(jedis != null && jedisPool != null ){
-				jedisPool.returnResource(jedis);
-			}
-		}
-    	return result;
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+        return result;
     }
+
     /**
      * 修剪一个已经存在的列表 它只会保留指定范围内的元素。开始和结束索引都是从0开始的。0是列表的第一个元素的索引，1是第二个，以此类推
      * <p>
      * 例如：LTRIM foobar 0 2 会修改存储KEY为 foobar 列表中的元素，使其只保留列表的前3个元素
      * <p>
-	 * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
+     * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
      * <p>
      * <b>超出索引</b>
      * <p>
-	 * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
-	 * Redis会把它当做列表的最后一个元素的索引来对待。
+     * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
+     * Redis会把它当做列表的最后一个元素的索引来对待。
      * <p>
      * <p>
      * Time complexity: O(n) (列表长度 - 修剪范围)
@@ -1769,53 +1785,56 @@ public class RedisClient {
      * @param key 列表的KEY值
      * @param start 开始索引
      * @param end 结束索引
-     * @return 成功返回 "OK" 
+     * @return 成功返回 "OK"
      */
-    public String ltrim(final String key, final long start, final long end){
-    	return ltrim(0,key, start, end);
+    public String ltrim(final String key, final long start, final long end) {
+        return ltrim(0, key, start, end);
     }
+
     /**
      * 修剪一个已经存在的列表 它只会保留指定范围内的元素。开始和结束索引都是从0开始的。0是列表的第一个元素的索引，1是第二个，以此类推
      * <p>
      * 例如：LTRIM foobar 0 2 会修改存储KEY为 foobar 列表中的元素，使其只保留列表的前3个元素
      * <p>
-	 * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
+     * 开始 和 结束索引也可以为负数，负数的值表明与列表结尾的距离。例如： -1 表示列表的最后一个元素 -2表示倒数第2个元素 以此类推。
      * <p>
      * <b>超出索引</b>
      * <p>
-	 * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
-	 * Redis会把它当做列表的最后一个元素的索引来对待。
+     * 索引超出列表范围并不会产生错误：如果start的值超出了列表的最后一个元素索引值 或者 start > end ，会返回一个空列表。如果end 的值超出了列表的结尾。
+     * Redis会把它当做列表的最后一个元素的索引来对待。
      * <p>
      * <p>
      * Time complexity: O(n) (列表长度 - 修剪范围)
+     * 
      * @param dbIndex 默认为 0
      * @param key 列表的KEY值
      * @param start 开始索引
      * @param end 结束索引
-     * @return 成功返回 "OK" 
+     * @return 成功返回 "OK"
      */
-    public String ltrim(final int dbIndex,final String key, final long start, final long end) {
-    	String result = "";
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-			if( 0 != dbIndex){
-				jedis.select(dbIndex);
-			}
-			result = jedis.ltrim(key, start, end);
-		} catch (Exception e) {
-			exceptionHandler(jedisPool, jedis, e);
+    public String ltrim(final int dbIndex, final String key, final long start, final long end) {
+        String result = "";
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.ltrim(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis ltrim fail", e);
-		}finally{
-			if(jedis != null && jedisPool != null ){
-				jedisPool.returnResource(jedis);
-			}
-		}
-    	return result;
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+        return result;
     }
+
     /**
      * 设置指定KEY的生存时间，如果KEY的生存时间被用完，服务器会自动将KEY删除。带有过期时间的KEY在Redis术语中被称为易失的KEY。
      * <p>
@@ -1830,9 +1849,10 @@ public class RedisClient {
      * @param seconds
      * @return 成功返回: 1. 设置失败 ｜ KEY不存在返回：0.
      */
-    public Long expire(final String key, final int seconds){
-    	return expire(key, seconds);
+    public Long expire(final String key, final int seconds) {
+        return expire(key, seconds);
     }
+
     /**
      * 设置指定KEY的生存时间，如果KEY的生存时间被用完，服务器会自动将KEY删除。带有过期时间的KEY在Redis术语中被称为易失的KEY。
      * <p>
@@ -1847,27 +1867,27 @@ public class RedisClient {
      * @param seconds
      * @return 成功返回: 1. 设置失败 ｜ KEY不存在返回：0.
      */
-    public Long expire(final int dbIndex,final String key, final int seconds){
-    	Long result = 0L;
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-			jedisPool = getJedisMasterPool();
-			jedis = jedisPool.getResource();
-			if( 0 != dbIndex){
-				jedis.select(dbIndex);
-			}
-			result = jedis.expire(key, seconds);
-		} catch (Exception e) {
-			exceptionHandler(jedisPool, jedis, e);
+    public Long expire(final int dbIndex, final String key, final int seconds) {
+        Long result = 0L;
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.expire(key, seconds);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
             jedis = null;
             throw new CsRedisRuntimeException("jedis expire fail", e);
-		}finally{
-			if(jedis != null && jedisPool != null ){
-				jedisPool.returnResource(jedis);
-			}
-		}
-    	return result;
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+        return result;
     }
 
     public Long del(int dbIndex, String key) {
@@ -1883,15 +1903,15 @@ public class RedisClient {
         } catch (Exception e) {
             exceptionHandler(jedisPool, jedis, e);
             jedis = null;
-            throw new CsRedisRuntimeException("jedis del db[ "+ dbIndex + "] key:" + key, e);
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
         } finally {
             if (jedis != null && jedisPool != null) {
-                jedisPool.returnResource(jedis);
+                jedis.close();
             }
         }
     }
 
     public Long del(String key) {
-       return del(0,key);
+        return del(0, key);
     }
 }
