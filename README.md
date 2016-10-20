@@ -22,7 +22,7 @@
 > | 稳定易用							 | 1.业务使用1年多以来没有出现过较大的bug，相对稳定<br/>2.只需添加pom依赖，参考dev文档和api文档的说明，即可上手使用 |
 > | 技术难度     						 | 1.薄封装json工具，简化使用<br/>2.redis的主从自动发现，读写分离与异常恢复<br/>3.定时任务可配置与监控<br/>4.薄封装httpclient，简化使用<br/>5.敏感词检查算法优化<br/>6.xml工具等|
 > | 代码风格							 | 项目根据功能分包模块化，统一用团队的code fomatter，必要的方法注释等 |
-
+> | ChangeList| https://svn.yy.com/web/gh/cs/trunk/cs-base/CHANGES.txt|
 
 * 建议大家踊跃使用，共同建设
 </br>
