@@ -1,6 +1,7 @@
 1.1.27-SNAPSHOT 2016-09-22
 charnges:
 	1. CSHttpClient  增加isPostRedirect可选属性构造对象，配置POST请求自动跳转302返回地址策略
+	2. CSHttpClientFactory 增加connectionTimeToLive,配置连接池中连接的存活时间，单位毫秒，默认-1，不限制
 
 1.1.26-SNAPSHOT 2016-09-13
 charnges:
