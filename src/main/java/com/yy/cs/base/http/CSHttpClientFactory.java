@@ -19,7 +19,7 @@ public class CSHttpClientFactory {
     private int connectionTimeout = 5000;
     private int socketTimeOut = 5000;
     private int connectionRequestTimeout = 5000;
-    private int connectionTimeToLive = 60000;
+    private int connectionTimeToLive = -1;
 
     /**
      * 连接池的长链接最大存活时间
@@ -34,7 +34,7 @@ public class CSHttpClientFactory {
     /**
      * 连接池的长链接最大存活时间
      * 
-     * @param connectionTimeToLive 单位：毫秒
+     * @param connectionTimeToLive 单位：毫秒 , -1表示不限制
      */
     public void setConnectionTimeToLive(int connectionTimeToLive) {
         this.connectionTimeToLive = connectionTimeToLive;
