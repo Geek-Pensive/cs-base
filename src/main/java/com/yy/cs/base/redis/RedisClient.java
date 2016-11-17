@@ -2243,7 +2243,7 @@ public class RedisClient {
      * @param member
      * @return 
      */
-    public void subscribe(String channel,JedisPubSub jedisPubSub, String... channels) {
+    public void subscribe(JedisPubSub jedisPubSub, String... channels) {
     	subscribe(0,  jedisPubSub, channels);
     }
     
