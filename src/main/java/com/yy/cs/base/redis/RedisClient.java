@@ -2,8 +2,10 @@ package com.yy.cs.base.redis;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Transaction;
+import redis.clients.jedis.Tuple;
 
 import java.util.*;
 
@@ -1914,4 +1916,335 @@ public class RedisClient {
     public Long del(String key) {
         return del(0, key);
     }
+    /**************************************增加 SortSet 相关支持 *******************************************/
+    public Long zadd(int dbIndex, String key,double score,String member) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zadd(key, score, member);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+    }
+
+    public Long zadd(String key,double score,String member) {
+        return zadd(0,  key, score, member);
+    }
+    public Double zincrby(int dbIndex, String key,double score,String member) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zincrby(key, score, member);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 会返回增加后的 score 值
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Double zincrby(String key,double score,String member) {
+    	return zincrby(0,  key, score, member);
+    }
+    
+    public Set<Tuple> zrangeWithScores(int dbIndex, String key,long start,long end) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zrangeWithScores(key, start, end);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 按分数从小到大排序
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Set<Tuple> zrangeWithScores(String key,long start,long end) {
+    	return zrangeWithScores(0,  key, start, end);
+    }
+    public Set<Tuple> zrevrangeWithScores(int dbIndex, String key,long start,long end) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zrevrangeWithScores(key, start, end);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 按分数逆排 从大到小 
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Set<Tuple> zrevrangeWithScores(String key,long start,long end) {
+    	return zrevrangeWithScores(0,  key, start, end);
+    }
+    
+    public Double zscore(int dbIndex, String key,String member) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zscore(key, member);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 获取指定成员的分数
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Double zscore(String key,String member) {
+    	return zscore(0,  key, member);
+    }
+    public Long zrank(int dbIndex, String key,String member) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zrank(key, member);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 返回指定成员的排名 从小到大排序 
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Long zrank(String key,String member) {
+    	return zrank(0,  key, member);
+    }
+    public Long zrevrank(int dbIndex, String key,String member) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zrevrank(key, member);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 返回指定成员的排名 从大到小排序 
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Long zrevrank(String key,String member) {
+    	return zrevrank(0,  key, member);
+    }
+    public Long zrem(int dbIndex, String key,String...members ) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zrem(key, members);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 批量移除成员
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Long zrem(String key,String...members) {
+    	return zrem(0,  key, members);
+    }
+    
+
+    public Long zremrangeByRank(int dbIndex, String key,long start, long end ) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zremrangeByRank(key, start, end);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 移除指定排名内的成员 排名按分数值从小到大排
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Long zremrangeByRank(String key,long start, long end) {
+    	return zremrangeByRank(0,  key, start,end);
+    }
+    /****************************************** 消息分发 ***************************************************/
+    public Long publish(int dbIndex, String channel,String message ) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.publish(channel, message);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] channel:" + channel, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 发送消息 message 到指定的 channel 
+     * @param key
+     * @param score
+     * @param member
+     * @return
+     */
+    public Long publish(String channel,String message) {
+    	return publish(0,  channel, message);
+    }
+    public void subscribe(int dbIndex, JedisPubSub jedisPubSub, String... channels ) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		jedis.subscribe(jedisPubSub, channels);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] channels:" + channels, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    /**
+     * 订阅频道
+     * @param key
+     * @param score
+     * @param member
+     * @return 
+     */
+    public void subscribe(String channel,JedisPubSub jedisPubSub, String... channels) {
+    	subscribe(0,  jedisPubSub, channels);
+    }
+    
 }
