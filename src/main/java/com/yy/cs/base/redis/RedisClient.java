@@ -1917,7 +1917,7 @@ public class RedisClient {
         return del(0, key);
     }
     /**************************************增加 SortSet 相关支持 *******************************************/
-    public Long zadd(int dbIndex, String key,double score,String member) {
+    public Long zadd(int dbIndex, String key,Map<String, Double> scoreMembers) {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
@@ -1926,7 +1926,7 @@ public class RedisClient {
             if (dbIndex != 0) {
                 jedis.select(dbIndex);
             }
-            return jedis.zadd(key, score, member);
+            return jedis.zadd(key, scoreMembers);
         } catch (Exception e) {
             exceptionHandler(jedisPool, jedis, e);
             jedis = null;
@@ -1937,9 +1937,38 @@ public class RedisClient {
             }
         }
     }
-
+    /**
+     * 批量增加 已经存在的 members 其值会被覆盖为插入的值
+     * @param key
+     * @param scoreMembers
+     * @return
+     */
+    public Long zadd(String key,Map<String, Double> scoreMembers) {
+        return zadd(0,  key, scoreMembers);
+    }
+    public Long zadd(int dbIndex, String key,double score,String member) {
+    	Jedis jedis = null;
+    	JedisPool jedisPool = null;
+    	try {
+    		jedisPool = getJedisMasterPool();
+    		jedis = jedisPool.getResource();
+    		if (dbIndex != 0) {
+    			jedis.select(dbIndex);
+    		}
+    		return jedis.zadd(key, score, member);
+    	} catch (Exception e) {
+    		exceptionHandler(jedisPool, jedis, e);
+    		jedis = null;
+    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+    	} finally {
+    		if (jedis != null && jedisPool != null) {
+    			jedis.close();
+    		}
+    	}
+    }
+    
     public Long zadd(String key,double score,String member) {
-        return zadd(0,  key, score, member);
+    	return zadd(0,  key, score, member);
     }
     public Double zincrby(int dbIndex, String key,double score,String member) {
     	Jedis jedis = null;
