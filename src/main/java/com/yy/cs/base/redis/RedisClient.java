@@ -2005,7 +2005,7 @@ public class RedisClient {
     	Jedis jedis = null;
     	JedisPool jedisPool = null;
     	try {
-    		jedisPool = getJedisMasterPool();
+    		jedisPool = getJedisSlavePool();
     		jedis = jedisPool.getResource();
     		if (dbIndex != 0) {
     			jedis.select(dbIndex);
@@ -2035,7 +2035,7 @@ public class RedisClient {
     	Jedis jedis = null;
     	JedisPool jedisPool = null;
     	try {
-    		jedisPool = getJedisMasterPool();
+    		jedisPool = getJedisSlavePool();
     		jedis = jedisPool.getResource();
     		if (dbIndex != 0) {
     			jedis.select(dbIndex);
@@ -2066,7 +2066,7 @@ public class RedisClient {
     	Jedis jedis = null;
     	JedisPool jedisPool = null;
     	try {
-    		jedisPool = getJedisMasterPool();
+    		jedisPool = getJedisSlavePool();
     		jedis = jedisPool.getResource();
     		if (dbIndex != 0) {
     			jedis.select(dbIndex);
@@ -2096,7 +2096,7 @@ public class RedisClient {
     	Jedis jedis = null;
     	JedisPool jedisPool = null;
     	try {
-    		jedisPool = getJedisMasterPool();
+    		jedisPool = getJedisSlavePool();
     		jedis = jedisPool.getResource();
     		if (dbIndex != 0) {
     			jedis.select(dbIndex);
@@ -2126,7 +2126,7 @@ public class RedisClient {
     	Jedis jedis = null;
     	JedisPool jedisPool = null;
     	try {
-    		jedisPool = getJedisMasterPool();
+    		jedisPool = getJedisSlavePool();
     		jedis = jedisPool.getResource();
     		if (dbIndex != 0) {
     			jedis.select(dbIndex);
