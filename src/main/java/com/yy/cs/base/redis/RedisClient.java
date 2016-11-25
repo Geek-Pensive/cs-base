@@ -6,6 +6,7 @@ import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.Tuple;
+import redis.clients.jedis.ZParams;
 
 import java.util.*;
 
@@ -1916,304 +1917,880 @@ public class RedisClient {
     public Long del(String key) {
         return del(0, key);
     }
-    /**************************************增加 SortSet 相关支持 *******************************************/
-    public Long zadd(int dbIndex, String key,Map<String, Double> scoreMembers) {
-        Jedis jedis = null;
-        JedisPool jedisPool = null;
+    
+    /****************************************** SortSet的封装 ***************************************************/
+    /**
+     * 执行zadd操作，然后释放client连接
+     * </br>
+     * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
+     * </br>
+     * 并在调用完成后，需调用pool的returnResource方法释放该连接
+     * @param dbIndex  
+     *              redis db index
+     * @param key   
+     *              zadd的key值
+     * @param score
+     *              成员的score 
+     * @param member
+     *              成员的value
+     * @return
+     */ 
+    
+    public Long zadd(int dbIndex,final String key,double score,String member){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
         try {
-            jedisPool = getJedisMasterPool();
-            jedis = jedisPool.getResource();
-            if (dbIndex != 0) {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
                 jedis.select(dbIndex);
             }
-            return jedis.zadd(key, scoreMembers);
+            return jedis.zadd(key, score, member);
         } catch (Exception e) {
             exceptionHandler(jedisPool, jedis, e);
-            jedis = null;
-            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-        } finally {
-            if (jedis != null && jedisPool != null) {
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zadd fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+        
+    }
+    public Long zadd(String key,double score,String member){
+            return zadd(0, key,score, member);        
+    }
+    /**
+     * @param dbIndex  
+     *              redis db index
+     * @param key   
+     *              zadd的key值
+     * @param scoreMembers String类型的member,double类型的score
+     * @return
+     */
+    public Long zadd(int dbIndex,final String key,Map<String, Double> scoreMembers){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zadd(key,scoreMembers);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zadd fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
                 jedis.close();
             }
         }
     }
-    /**
-     * 批量增加 已经存在的 members 其值会被覆盖为插入的值
-     * @param key
-     * @param scoreMembers
-     * @return
-     */
-    public Long zadd(String key,Map<String, Double> scoreMembers) {
-        return zadd(0,  key, scoreMembers);
-    }
-    public Long zadd(int dbIndex, String key,double score,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zadd(key, score, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+    
+    public Long zadd(String key,Map<String, Double> scoreMembers){
+     
+        return zadd(0,key, scoreMembers);
     }
     
-    public Long zadd(String key,double score,String member) {
-    	return zadd(0,  key, score, member);
-    }
-    public Double zincrby(int dbIndex, String key,double score,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zincrby(key, score, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
-    }
-    /**
-     * 会返回增加后的 score 值
+     /**
+      * 移除成员
+     * @param dbIndex
+     *               redis db index 
      * @param key
-     * @param score
-     * @param member
+     *               要移除的key值
+     * @param members
+     *               成员
      * @return
      */
-    public Double zincrby(String key,double score,String member) {
-    	return zincrby(0,  key, score, member);
+    public Long zrem(int dbIndex,String key,String...members){
+         Jedis jedis=null;
+         JedisPool jedisPool=null;        
+         try {
+             jedisPool=getJedisMasterPool();
+             jedis=jedisPool.getResource();
+             if(dbIndex !=0){
+                 jedis.select(dbIndex);
+             }
+             return jedis.zrem(key, members);
+         } catch (Exception e) {
+             exceptionHandler(jedisPool, jedis, e);
+             jedis=null;
+             throw new CsRedisRuntimeException("jedis zrem fail",e);
+         }finally{
+             if(jedis !=null && jedisPool !=null){
+                 jedis.close();
+             }
+         }
+     }
+    /**
+     * 移除成员
+    * @param key
+    *               要移除的key值
+    * @param members
+    *               成员
+    * @return
+    */
+    public Long zrem(String key,String...members){
+         return zrem(0, key, members);
     }
     
-    public Set<Tuple> zrangeWithScores(int dbIndex, String key,long start,long end) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrangeWithScores(key, start, end);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
-    }
+    
     /**
-     * 按分数从小到大排序
-     * @param key
-     * @param score
-     * @param member
+     * 指位置范围删除成员
+     * @param dbIndex 
+     *               redis db index 
+     * @param key    
+     *               要被移除的key
+     * @param start  
+     *               开始位置
+     * @param end    
+     *               结束位置
      * @return
      */
-    public Set<Tuple> zrangeWithScores(String key,long start,long end) {
-    	return zrangeWithScores(0,  key, start, end);
+    public Long zremrangeByRank(int dbIndex,final String key,long start,long end){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zremrangeByRank(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zremrangeByRank fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
     }
-    public Set<Tuple> zrevrangeWithScores(int dbIndex, String key,long start,long end) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrevrangeWithScores(key, start, end);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+    public Long zremrangeByRank(String key,long start,long end){
+        return zremrangeByRank(0, key, start, end);
     }
     /**
-     * 按分数逆排 从大到小 
-     * @param key
-     * @param score
-     * @param member
+     * 指score范围删除成员
+     * @param dbIndex 
+     *               redis db index 
+     * @param key    
+     *               要被移除的key
+     * @param start  
+     *               开始位置
+     * @param end    
+     *               结束位置
      * @return
      */
-    public Set<Tuple> zrevrangeWithScores(String key,long start,long end) {
-    	return zrevrangeWithScores(0,  key, start, end);
+    public Long zremrangeByScore(int dbIndex,final String key,double start,double end){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zremrangeByScore(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zremrangeByScore fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Long zremrangeByScore(String key,double start,double end){
+        return zremrangeByScore(0, key, start, end);
+    }
+    /**
+     * 指score范围删除成员
+     * @param dbIndex 
+     *               redis db index 
+     * @param key    
+     *               要被移除的key
+     * @param start  
+     *               开始位置
+     * @param end    
+     *               结束位置
+     * @return
+     */
+    public Long zremrangeByLex(int dbIndex,final String key,String min,String max){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zremrangeByLex(key, min, max);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zremrangeByLex fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Long zremrangeByLex(String key,String min,String max){
+        return zremrangeByLex(0, key, min, max);
     }
     
-    public Double zscore(int dbIndex, String key,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zscore(key, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
-    }
+    
+    
+    
+    
     /**
-     * 获取指定成员的分数
-     * @param key
-     * @param score
-     * @param member
+     * 取得指定范围的成员,递增(从小到大)来排序
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param start
+     *             开始位置
+     * @param end  
+     *             结束位置
      * @return
      */
-    public Double zscore(String key,String member) {
-    	return zscore(0,  key, member);
+    public Set<String>  zrange(int dbIndex,final String key,long start,long end){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrange(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrange fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
     }
-    public Long zrank(int dbIndex, String key,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrank(key, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
-    }
-    /**
-     * 返回指定成员的排名 从小到大排序 
-     * @param key
-     * @param score
-     * @param member
-     * @return
-     */
-    public Long zrank(String key,String member) {
-    	return zrank(0,  key, member);
-    }
-    public Long zrevrank(int dbIndex, String key,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrevrank(key, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
-    }
-    /**
-     * 返回指定成员的排名 从大到小排序 
-     * @param key
-     * @param score
-     * @param member
-     * @return
-     */
-    public Long zrevrank(String key,String member) {
-    	return zrevrank(0,  key, member);
-    }
-    public Long zrem(int dbIndex, String key,String...members ) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrem(key, members);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
-    }
-    /**
-     * 批量移除成员
-     * @param key
-     * @param score
-     * @param member
-     * @return
-     */
-    public Long zrem(String key,String...members) {
-    	return zrem(0,  key, members);
+    public Set<String>  zrange( String key,long start,long end){
+        return zrange(0,key, start, end);
     }
     
+    /**
+     * 取得指定范围的成员,递增(从大到小)来排序
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param start
+     *             开始位置
+     * @param end  
+     *             结束位置
+     * @return
+     */
+    public Set<String>  zrevrange(int dbIndex,final String key,long start,long end){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrevrange(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrevrange fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrevrange( String key,long start,long end){
+        return zrevrange(0,key, start, end);
+    }
+    /**
+     * 取得指定范围的成员和score,递增(从小到大)来排序
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param start
+     *             开始位置
+     * @param end  
+     *             结束位置
+     * @return
+     */
+    public Set<Tuple>  zrangeWithScores(int dbIndex,final String key,long start,long end){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrangeWithScores(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrangeWithScores fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<Tuple>  zrangeWithScores( String key,long start,long end){
+        return zrangeWithScores(0,key, start, end);
+    }
+    
+    /**
+     * 取得指定范围的成员和score,递增(从大到小)来排序
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param start
+     *             开始位置
+     * @param end  
+     *             结束位置
+     * @return
+     */
+    public Set<Tuple>  zrevrangeWithScores(int dbIndex,final String key,long start,long end){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrevrangeWithScores(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrevrangeWithScores fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<Tuple>  zrevrangeWithScores( String key,long start,long end){
+        return zrevrangeWithScores(0,key, start, end);
+    }
+    /**
+     * 通过指定score范围,递增(从小到大)来排序
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param min
+     *             开始score
+     * @param max  
+     *             结束score
+     * @return
+     */
+    public Set<String>  zrangeByScore(int dbIndex,final String key,double min,double max){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zrangeByScore(key, min, max);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrangeByScore fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrangeByScore( String key,double min,double max){
+        return zrangeByScore(0,key, min, max);
+    }
+    
+    /**
+     * 通过指定score范围,递增(从大到小)来排序
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param min
+     *             开始score
+     * @param max  
+     *             结束score
+     * @return
+     */
+    public Set<String>  zrevrangeByScore(int dbIndex,final String key,double min,double max){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zrevrangeByScore(key, min, max);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrevrangeByScore fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrevrangeByScore( String key,double min,double max){
+        
+        return zrevrangeByScore(0,key, min, max);
+    }
+    
+    /**
+     * 通过指定score范围,递增(从小到大)来排序,同时也设置limit
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param min
+     *             开始score
+     * @param max  
+     *             结束score
+     * @return
+     */
+    public Set<String>  zrangeByScore(int dbIndex,final String key,double min,double max,int offset,int count){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zrangeByScore(key, min, max, offset, count);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrangeByScore fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrangeByScore( String key,double min,double max,int offset,int count){
+        return zrangeByScore(0, key, min, max, offset, count);
+    }
+    
+    /**
+     * 通过指定member范围,递增(从小到大)来排序,同时也设置limit
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param min
+     *             开始score
+     * @param max  
+     *             结束score
+     * @return
+     */
+    public Set<String>  zrangeByLex(int dbIndex,final String key,String min,String max,int offset,int count){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrangeByLex(key, min, max, offset, count);                
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrangeByLex fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrangeByLex( String key,String min,String max,int offset,int count){
+        return zrangeByLex(0, key, min, max, offset, count);
+    }
+    
+    public Set<String>  zrangeByLex(int dbIndex,final String key,String min,String max){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrangeByLex(key, min, max);                
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrangeByLex fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrangeByLex( String key,String min,String max){
+        return zrangeByLex(0, key, min, max);
+    }
+    
+    /**
+     * 通过指定member范围,递增(从大到小)来排序,同时也设置limit
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param min
+     *             开始score
+     * @param max  
+     *             结束score
+     * @return
+     */
+    public Set<String>  zrevrangeByLex(int dbIndex,final String key,String min,String max,int offset,int count){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrevrangeByLex(key, min, max, offset, count);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrevrangeByLex fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrevrangeByLex( String key,String min,String max,int offset,int count){
+        return zrevrangeByLex(0, key, min, max, offset, count);
+    }
+    
+    public Set<String>  zrevrangeByLex(int dbIndex,final String key,String min,String max){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            return jedis.zrevrangeByLex(key, min, max);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrevrangeByLex fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrevrangeByLex( String key,String min,String max){
+        return zrevrangeByLex(0, key, min, max);
+    }
+    
+    /**
+     * 通过指定score范围,递增(从大到小)来排序,同时也设置limit
+     * @param dbIndex
+     *             redis db index 
+     * @param key  
+     *             要被移除的key
+     * @param min
+     *             开始score
+     * @param max  
+     *             结束score
+     * @return
+     */
+    public Set<String>  zrevrangeByScore(int dbIndex,final String key,double min,double max,int offset,int count){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zrevrangeByScore(key, max, min, offset, count);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zrevrangeByScore fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Set<String>  zrevrangeByScore( String key,double min,double max,int offset,int count){
+        
+        return zrevrangeByScore(0,key, min, max,offset,count);
+    }
 
-    public Long zremrangeByRank(int dbIndex, String key,long start, long end ) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zremrangeByRank(key, start, end);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
-    }
     /**
-     * 移除指定排名内的成员 排名按分数值从小到大排
+     * 取得Sort set的成员个数
+     * @param dbIndex
      * @param key
-     * @param score
-     * @param member
      * @return
      */
-    public Long zremrangeByRank(String key,long start, long end) {
-    	return zremrangeByRank(0,  key, start,end);
+    public Long  zcard(int dbIndex,final String key){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zcard(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zcard fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
     }
+    public Long  zcard( String key){
+        
+        return zcard(0,key);
+    }
+
+    /**
+     * 指定范围内元素的个数
+     * @param dbIndex
+     * @param key
+     * @param min  score的开始值 
+     * @param max  score的结束值
+     * @return
+     */
+    public Long  zcount(int dbIndex,final String key, String min, String max){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zcount(key, min, max);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zcount fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Long  zcount( String key,String min, String max){
+        
+        return zcount(0,key, min, max);
+    }
+    /**
+     * 指定范围内元素的个数
+     * @param dbIndex
+     * @param key
+     * @param min  score的开始值 
+     * @param max  score的结束值
+     * @return
+     */
+    public Long  zlexcount(int dbIndex,final String key, String min, String max){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zlexcount(key, min, max);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zlexcount fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Long  zlexcount( String key,String min, String max){
+        
+        return zlexcount(0,key, min, max);
+    }
+
+    /**
+     * 给员增加加score
+     * @param dbIndex
+     * @param key
+     * @param score     
+     *             增量
+     * @param member
+     *             成员
+     * @return
+     */
+    public Double  zincrby(int dbIndex,final String key, double score, String member){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            
+            return jedis.zincrby(key, score, member);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zincrby fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Double  zincrby( String key,double score, String member){        
+        return zincrby(0, key, score, member);
+    }
+
+    /**
+     * 多个key的交集
+     * @param dbIndex
+     * @param dstkey destination的key
+     * @param params 对应weights种aggregate的参数
+     * @param sets  多个key
+     * @return
+     */
+    public Long  zinterstore(int dbIndex, String dstkey, ZParams params, String... sets){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            if(params!=null){                
+                return jedis.zinterstore(dstkey, params, sets);
+            }else{                
+                return jedis.zinterstore(dstkey, sets);
+            }
+            
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zinterstore fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Long  zinterstore( String dstkey, ZParams params, String... sets){        
+        return zinterstore(0, dstkey, params, sets);
+    }
+    public Long zinterstore(String dstkey,String...sets){
+        return zinterstore(0, dstkey, null, sets);
+    }
+    /**
+     * 多个key的并集
+     * @param dbIndex
+     * @param dstkey destination的key
+     * @param params 对应weights种aggregate的参数
+     * @param sets  多个key
+     * @return
+     */
+    public Long  zunionstore(int dbIndex, String dstkey, ZParams params, String... sets){
+        Jedis jedis=null;
+        JedisPool jedisPool=null;        
+        try {
+            jedisPool=getJedisMasterPool();
+            jedis=jedisPool.getResource();
+            if(dbIndex !=0){
+                jedis.select(dbIndex);
+            }
+            if(params!=null){     
+                return jedis.zunionstore(dstkey, params, sets);
+            }else{                
+                return jedis.zunionstore(dstkey, sets);
+            }
+            
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis=null;
+            throw new CsRedisRuntimeException("jedis zunionstore fail",e);
+        }finally{
+            if(jedis !=null && jedisPool !=null){
+                jedis.close();
+            }
+        }
+    }
+    public Long  zunionstore( String dstkey, ZParams params, String... sets){        
+        return zunionstore(0, dstkey, params, sets);
+    }
+    public Long zunionstore(String dstkey,String...sets){
+        return zunionstore(0, dstkey, null, sets);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /****************************************** 消息分发 ***************************************************/
     public Long publish(int dbIndex, String channel,String message ) {
     	Jedis jedis = null;
