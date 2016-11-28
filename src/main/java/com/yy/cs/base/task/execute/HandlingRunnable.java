@@ -1,5 +1,19 @@
 package com.yy.cs.base.task.execute;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.status.StatusCode;
 import com.yy.cs.base.task.Task;
@@ -10,15 +24,6 @@ import com.yy.cs.base.task.log.TaskLog;
 import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.log.TaskManagerInfo;
 import com.yy.cs.base.task.trigger.Trigger;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 任务处理的Handling 抽象类，实现了{@link Runnable},{@link ScheduledFuture}接口
@@ -60,6 +65,8 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	protected ScheduledFuture<?> currentFuture;
 	
 	private TaskLogHandler taskLogHandle;
+	
+	private TaskExceptionHandler taskExceptionHandler;
 
 	/**
 	 * TaskManagerInfo
@@ -95,8 +102,16 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 	public void setTaskLogHandle(TaskLogHandler taskLogHandle) {
 		this.taskLogHandle = taskLogHandle;
 	}
+	
+    public TaskExceptionHandler getTaskExceptionHandler() {
+        return taskExceptionHandler;
+    }
 
-	/**
+    public void setTaskExceptionHandler(TaskExceptionHandler taskExceptionHandler) {
+        this.taskExceptionHandler = taskExceptionHandler;
+    }
+
+    /**
 	 * 获取任务上下文对象
 	 * @return
 	 * 		当前执行任务的任务上下文对象 {@link TaskContext}
@@ -127,6 +142,12 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 		}catch (Throwable ex) {
 			logger.error(this.task.getId() + "  "+ ex.getMessage(), ex);
 			this.context.updateException(new Date(),ex);
+			
+            if (taskExceptionHandler != null) {
+                try {
+                    taskExceptionHandler.handle(task,ex);
+                } catch (Exception e) {}
+            }
 		}finally{
 			this.context.updateExecuteTime(startTime, new Date());
 			synchronized (this.triggerContextMonitor) {

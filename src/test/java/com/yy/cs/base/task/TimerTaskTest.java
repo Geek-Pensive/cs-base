@@ -21,6 +21,8 @@ public class TimerTaskTest extends TimerTask {
 		System.out.println(new Date()
 				+ "-----------execute()---TimerTaskTest--------");
 //		date.compareTo(date);
+		
+		throw new RuntimeException("error....");
 	}
 
 	

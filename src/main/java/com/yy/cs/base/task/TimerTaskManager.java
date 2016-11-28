@@ -2,6 +2,7 @@ package com.yy.cs.base.task;
 
 import com.yy.cs.base.status.CsStatus;
 import com.yy.cs.base.task.context.Constants.MonitorType;
+import com.yy.cs.base.task.execute.TaskExceptionHandler;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.log.TaskLogHandler;
@@ -9,6 +10,7 @@ import com.yy.cs.base.task.log.TaskManagerInfo;
 import com.yy.cs.base.task.thread.TaskScheduler;
 import com.yy.cs.base.task.thread.ThreadPoolTaskScheduler;
 import com.yy.cs.base.task.trigger.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,8 @@ public class TimerTaskManager {
     private TaskScheduler taskScheduler;
 
     private TaskLogHandler taskLogHandle;
+    
+    private TaskExceptionHandler taskExceptionHandler;
 
     private TaskManagerInfo taskManagerInfo;
 
@@ -79,6 +83,14 @@ public class TimerTaskManager {
 
     public void setTaskLogHandle(TaskLogHandler taskLogHandle) {
         this.taskLogHandle = taskLogHandle;
+    }
+    
+    public TaskExceptionHandler getTaskExceptionHandler() {
+        return taskExceptionHandler;
+    }
+
+    public void setTaskExceptionHandler(TaskExceptionHandler taskExceptionHandler) {
+        this.taskExceptionHandler = taskExceptionHandler;
     }
 
     public MonitorType getMonitorType() {
@@ -124,6 +136,7 @@ public class TimerTaskManager {
             taskScheduler = tempThreadPoolTaskScheduler;
             taskScheduler.setTaskRegister(registrar);
             taskScheduler.setTaskLogHandler(taskLogHandle);
+            taskScheduler.setTaskExceptionHandler(taskExceptionHandler);
             registrar.start(taskScheduler);
             registrar.addMonitorTask(monitorfile, monitorType);
         } else {

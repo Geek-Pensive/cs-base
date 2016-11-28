@@ -1,5 +1,15 @@
 package com.yy.cs.base.task.thread;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.TimerTask;
@@ -7,18 +17,10 @@ import com.yy.cs.base.task.TimerTaskManager;
 import com.yy.cs.base.task.execute.ClusterTriggerRunnable;
 import com.yy.cs.base.task.execute.HandlingRunnable;
 import com.yy.cs.base.task.execute.LocalTriggerRunnable;
+import com.yy.cs.base.task.execute.TaskExceptionHandler;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.trigger.Trigger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 基于线程池的任务调度器
@@ -33,6 +35,8 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 	private final ScheduledExecutorService scheduledExecutor;
 
 	private TaskLogHandler taskLogHandle;
+	
+	private TaskExceptionHandler taskExceptionHandler;
 	
 	private Lock lock = new ReentrantLock();
 	/**
@@ -76,6 +80,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 			lock.lock();
 			LocalTriggerRunnable triggerRunnable = new LocalTriggerRunnable(task,trigger,scheduledExecutor);
 			triggerRunnable.setTaskLogHandle(taskLogHandle);
+			triggerRunnable.setTaskExceptionHandler(taskExceptionHandler);
 			triggerRunnable.setTaskManagerInfo(getTimerTaskManager().getTaskManagerInfo());
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
 			if( r != null ){
@@ -111,6 +116,7 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 			ClusterTriggerRunnable triggerRunnable = new ClusterTriggerRunnable(
 					task, trigger, scheduledExecutor, config);
 			triggerRunnable.setTaskLogHandle(taskLogHandle);
+	        triggerRunnable.setTaskExceptionHandler(taskExceptionHandler);
 			triggerRunnable.setTaskManagerInfo(getTimerTaskManager().getTaskManagerInfo());
 			HandlingRunnable r = this.register.getHandlings().get(task.getId());
 			if (r != null) {
@@ -165,6 +171,11 @@ public class ThreadPoolTaskScheduler implements TaskScheduler  {
 	public void setTaskLogHandler(TaskLogHandler taskLogHandler) {
 		this.taskLogHandle = taskLogHandler;
 	}
+
+    @Override
+    public void setTaskExceptionHandler(TaskExceptionHandler taskExceptionHandler) {
+        this.taskExceptionHandler = taskExceptionHandler;
+    }
 
 
 }

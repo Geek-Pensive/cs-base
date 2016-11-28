@@ -5,6 +5,7 @@ import com.yy.cs.base.task.ClusterConfig;
 import com.yy.cs.base.task.Task;
 import com.yy.cs.base.task.TimerTaskManager;
 import com.yy.cs.base.task.execute.HandlingRunnable;
+import com.yy.cs.base.task.execute.TaskExceptionHandler;
 import com.yy.cs.base.task.execute.TimerTaskRegistrar;
 import com.yy.cs.base.task.log.TaskLogHandler;
 import com.yy.cs.base.task.trigger.Trigger;
@@ -62,6 +63,8 @@ public interface TaskScheduler {
 	void setTaskRegister(TimerTaskRegistrar register);
 
 	void setTaskLogHandler(TaskLogHandler taskLogHandler);
+	
+	void setTaskExceptionHandler(TaskExceptionHandler taskExceptionHandler);
 
 	/**
 	 * 获取 TimerTaskManager 的引用

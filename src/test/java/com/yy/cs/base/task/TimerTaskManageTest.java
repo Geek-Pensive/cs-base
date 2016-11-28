@@ -1,14 +1,17 @@
 package com.yy.cs.base.task;
 
+import java.util.Date;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.yy.cs.base.status.CsStatus;
+import com.yy.cs.base.task.execute.TaskExceptionHandler;
 
 public class TimerTaskManageTest {
 	
-	TimerTaskManager timerTaskManage = new TimerTaskManager();
+	public static TimerTaskManager timerTaskManage = new TimerTaskManager();
 	@Before
     public void before() {
 //		ApplicationContext context = new ClassPathXmlApplicationContext("spring-task.xml");
@@ -63,5 +66,32 @@ public class TimerTaskManageTest {
 //    		for(TaskStatus t : timerTaskManage.getAllTaskStatus()){
 //				System.out.println(t.toString());;
 //			}
+    }
+    
+    public static void main(String[] args) {
+        TimerTaskTest time = new TimerTaskTest();
+        time.setCron("*/15 * * * * *");
+        timerTaskManage.addTimerTask(time);
+        
+        TaskExceptionHandler taskExceptionHandler = new TaskExceptionHandler() {
+            
+            @Override
+            public void handle(Task task, Throwable ex) {
+                System.out.println("taskId:" + task.getId() + ", exceptionTime:" + new Date() + ", execute error:" + ex);
+            }
+        };
+        timerTaskManage.setTaskExceptionHandler(taskExceptionHandler);
+        
+        timerTaskManage.start();
+        timerTaskManage.getCsStatus();
+        
+            for(int i=0; i<20;i++){
+                try {
+                    Thread.sleep(8000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
     }
 }
