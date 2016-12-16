@@ -1,14 +1,5 @@
 package com.yy.cs.base.http;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -30,6 +21,11 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.URLDecoder;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 基于Apache的httpclient 4.3.X以上的版本，使用PoolingHttpClientConnectionManager封装了HttpClient常用API。
@@ -116,7 +112,7 @@ public class CSHttpClient {
                 result = inputStream2String(entity.getContent());
             } else {
                 throw new HttpClientException(
-                        "get data from url:" + httpRequestBase.getURI() + " fail, status: " + status);
+                        "get data from url:" + httpRequestBase.getURI() + " fail, status: " + status + ",resp:" +  inputStream2String(entity.getContent()));
             }
         } catch (ClientProtocolException e) {
             log.error("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
