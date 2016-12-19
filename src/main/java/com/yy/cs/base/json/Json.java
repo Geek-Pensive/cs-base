@@ -1,6 +1,7 @@
 package com.yy.cs.base.json;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -9,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * 
+ *
  * 封装了jackson常用的API，默认 disable了FAIL_ON_UNKNOWN_PROPERTIES参数，忽略不存在的属性
  *
  */
@@ -23,7 +24,7 @@ public class Json {
 
 	/**
 	 * 通过JSON字符串生成对象
-	 * 
+	 *
 	 * @param jsonStr
 	 *            JSON字符串
 	 * @param type
@@ -43,7 +44,7 @@ public class Json {
 
 	/**
 	 * 生成对象对应的JSON字符串.
-	 * 
+	 *
 	 * @param obj
 	 *            对象实例
 	 * @exception e
@@ -61,7 +62,7 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
-	
+
 	/**
 	 * 通过JSON字符串生成指定类型的引用对象
 	 * @param jsonStr json串
@@ -77,19 +78,29 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
-	
+
+	/**
+	 * 直接转换为Map<String,Object>返回
+	 * @param jsonStr
+	 * @return Map<String,Object>
+	 */
+	public static Map<String,Object> jsonToMap(String jsonStr){
+	    return strToObj(jsonStr,new TypeReference<Map<String,Object>>() {
+        });
+	}
+
 	private static JsonNode toJsonNode(String jsonStr ,String fieldName) throws JsonProcessingException, IOException{
 		JsonNode jsonNode = mapper.readTree(jsonStr);
 		if (jsonNode == null) {
             return null;
         }
-		JsonNode nameNode = jsonNode.get(fieldName);		
+		JsonNode nameNode = jsonNode.get(fieldName);
 		return nameNode;
 	}
-	
+
 	/**
 	 * 取json传里面的某个属性值。
-	 * 
+	 *
 	 * @param jsonStr
 	 *            JSON字符串
 	 * @param fieldName
@@ -111,11 +122,11 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
-	
-	
+
+
 	/**
 	 * 取json传里面的某个属性值。
-	 * 
+	 *
 	 * @param jsonStr
 	 *            JSON字符串
 	 * @param fieldName
@@ -137,10 +148,10 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
-	
+
 	/**
 	 * 取json传里面的某个属性值。
-	 * 
+	 *
 	 * @param jsonStr
 	 *            JSON字符串
 	 * @param fieldName
@@ -162,10 +173,10 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
-	
+
 	/**
 	 * 取json传里面的某个属性值。
-	 * 
+	 *
 	 * @param jsonStr
 	 *            JSON字符串
 	 * @param fieldName
@@ -187,10 +198,10 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
-	
+
 	/**
 	 * 取json传里面的某个属性值。
-	 * 
+	 *
 	 * @param jsonStr
 	 *            JSON字符串
 	 * @param fieldName
@@ -212,9 +223,9 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * 获取jackon 的原生接口
 	 * @return ObjectMapper
