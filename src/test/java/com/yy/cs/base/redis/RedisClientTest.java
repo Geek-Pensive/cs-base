@@ -40,7 +40,7 @@ public class RedisClientTest {
 //		list.add("172.19.103.105:6330::");
 //		list.add("172.19.103.105:6379:fdfs123:");
 		
-		list.add("127.0.0.1:6380::");
+		list.add("127.0.0.1:6379::");
 		list.add("127.0.0.1:6379::");
 		
 		redisClientFactory.setRedisServers(list);
@@ -55,6 +55,18 @@ public class RedisClientTest {
 		
 		
 		
+	}
+
+	@Test
+	public void testSetnxpx() {
+		boolean status = redisClient.setnxpx(0, "test:key", "1", 20 * 1000);
+		if (status) {
+			System.out.println("success");
+		}
+		status = redisClient.setnxpx(0, "test:key", "1", 20 * 1000);
+		if (!status) {
+			System.out.println("no success");
+		}
 	}
 
 	/**

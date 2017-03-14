@@ -169,6 +169,44 @@ public class RedisClient {
     }
 
     /**
+     * 使用set NX PX
+     * PX milliseconds -- Set the specified expire time, in milliseconds.
+     * NX -- Only set the key if it does not already exist.
+     *
+     * @param dbIndex
+     * @param key
+     * @param value
+     * @param millonSecondExpire 过期毫秒数
+     * @return Long, 1-设置成功，0-key已存在
+     */
+    public boolean setnxpx(int dbIndex, String key, String value, long millonSecondExpire) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+
+            // 如果为0,则不需通信表明select db0
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            Object result = jedis.set(key, value, "NX", "PX", millonSecondExpire);
+            if (!"OK".equalsIgnoreCase(result + "")) {
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis set nx px fail", e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
+    }
+
+    /**
      * 返回对应key的ttl（Time To Live），
      * 
      * @param dbIndex
