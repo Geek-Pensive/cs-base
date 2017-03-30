@@ -1890,7 +1890,7 @@ public class RedisClient {
      * @return 成功返回: 1. 设置失败 ｜ KEY不存在返回：0.
      */
     public Long expire(final String key, final int seconds) {
-        return expire(key, seconds);
+        return expire(0, key, seconds);
     }
 
     /**
