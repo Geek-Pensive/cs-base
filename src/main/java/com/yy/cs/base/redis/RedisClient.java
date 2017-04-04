@@ -1,11 +1,8 @@
 package com.yy.cs.base.redis;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPubSub;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Transaction;
-import redis.clients.jedis.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.*;
 
 import java.util.*;
 
@@ -14,7 +11,7 @@ import java.util.*;
  *
  */
 public class RedisClient {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisClient.class);
     private RedisClientFactory factory;
 
     public RedisClientFactory getFactory() {
@@ -41,8 +38,13 @@ public class RedisClient {
     }
 
     private void exceptionHandler(JedisPool jedisPool, Jedis jedis, Exception e) {
-        if (null != jedisPool) {
-            jedis.close();
+        // 增加一层 try catch ，防止 io 异常，导致初始化失败
+        try {
+            if (jedis != null) {
+                jedis.close();
+            }
+        } catch (Exception e1){
+           LOGGER.warn("jedis.close failed",e1);
         }
         factory.init();
     }
@@ -2092,8 +2094,6 @@ public class RedisClient {
     /**
      * 按分数逆排 从大到小 
      * @param key
-     * @param score
-     * @param member
      * @return
      */
     public Set<Tuple> zrevrangeWithScores(String key,long start,long end) {
