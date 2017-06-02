@@ -42,7 +42,7 @@ public class CSHttpClient {
 
     /**
      * 带参数的构造函数，通过工厂类{@link CSHttpClientFactory}生成指定的CSHttpClient,设置post请求方式是否自动跳转302地址
-     * 
+     *
      * @param
      *            factory 生成CSHttpClient的工厂类
      */
@@ -64,7 +64,7 @@ public class CSHttpClient {
 
     /**
      * 带参数的构造函数，通过工厂类{@link CSHttpClientFactory}生成指定的CSHttpClient,
-     * 
+     *
      * @param
      *            factory 生成CSHttpClient的工厂类
      */
@@ -81,7 +81,7 @@ public class CSHttpClient {
 
     /**
      * 获取池化的原生httpClient
-     * 
+     *
      * @return
      *         httpClient
      */
@@ -91,7 +91,7 @@ public class CSHttpClient {
 
     /**
      * 执行一个http方法
-     * 
+     *
      * @param httpRequestBase 执行方法的类型
      * @return response正确返回后的字符串
      * @throws HttpClientException
@@ -115,11 +115,11 @@ public class CSHttpClient {
                         "get data from url:" + httpRequestBase.getURI() + " fail, status: " + status + ",resp:" +  inputStream2String(entity.getContent()));
             }
         } catch (ClientProtocolException e) {
-            log.error("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } catch (IOException e) {
-            log.error("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } finally {
@@ -127,7 +127,7 @@ public class CSHttpClient {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.error("response close IOException:" + httpRequestBase.getURI(), e);
+                    log.warn("response close IOException:" + httpRequestBase.getURI(), e);
                 }
             }
             if (httpRequestBase != null) {
@@ -139,7 +139,7 @@ public class CSHttpClient {
 
     /**
      * 执行一个http方法
-     * 
+     *
      * @param httpRequestBase 执行方法的类型
      * @return response正确返回后的byte[]
      * @throws HttpClientException
@@ -161,11 +161,11 @@ public class CSHttpClient {
                         "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status);
             }
         } catch (ClientProtocolException e) {
-            log.error("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            log.warn("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException(
                     "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
         } catch (IOException e) {
-            log.error("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            log.warn("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException(
                     "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
         } finally {
@@ -173,7 +173,7 @@ public class CSHttpClient {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.error("response close IOException:" + httpRequestBase.getURI(), e);
+                    log.warn("response close IOException:" + httpRequestBase.getURI(), e);
                 }
             }
             if (httpRequestBase != null) {
@@ -184,7 +184,7 @@ public class CSHttpClient {
 
     /**
      * 执行一个HttpGet方法
-     * 
+     *
      * @param url 请求地址
      * @return response正确返回后的字符串
      * @throws HttpClientException
@@ -197,7 +197,7 @@ public class CSHttpClient {
 
     /**
      * 执行一个HttpGet方法,返回response返回的流
-     * 
+     *
      * @param
      *            url ,请求地址
      * @param statusArray 指点正确返回的状态码
@@ -222,11 +222,11 @@ public class CSHttpClient {
             }
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status);
         } catch (ClientProtocolException e) {
-            log.error("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } catch (IOException e) {
-            log.error("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } finally {
@@ -234,7 +234,7 @@ public class CSHttpClient {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.error("response close IOException:" + httpRequestBase.getURI(), e);
+                    log.warn("response close IOException:" + httpRequestBase.getURI(), e);
                 }
             }
             if (httpRequestBase != null) {
@@ -245,7 +245,7 @@ public class CSHttpClient {
 
     /**
      * 发送一个HttpGet请求，检查地址是否正常
-     * 
+     *
      * @param url
      *            地址
      * @return
@@ -266,15 +266,15 @@ public class CSHttpClient {
             }
             return false;
         } catch (ClientProtocolException e) {
-            log.error("get data from url:" + get.getURI() + " fail, status: " + status, e);
+            log.warn("get data from url:" + get.getURI() + " fail, status: " + status, e);
         } catch (Exception e) {
-            log.error("get data from url:" + get.getURI() + " fail, status: " + status, e);
+            log.warn("get data from url:" + get.getURI() + " fail, status: " + status, e);
         } finally {
             if (response != null) {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.error("response close IOException:" + get.getURI(), e);
+                    log.warn("response close IOException:" + get.getURI(), e);
                 }
             }
             if (get != null) {
@@ -286,7 +286,7 @@ public class CSHttpClient {
 
     /**
      * 执行一个HttPost请求
-     * 
+     *
      * @param url 请求地址
      * @param parameters 自动参数按utf-8编码
      * @return response正确返回后的字符串
@@ -308,7 +308,7 @@ public class CSHttpClient {
 
     /**
      * 执行一个HttPost请求
-     * 
+     *
      * @param url 请求地址
      * @param jsonStr json字符串, 按utf-8编码
      * @return response正确返回后的字符串
@@ -388,7 +388,7 @@ public class CSHttpClient {
 
     /**
      * 关闭httpClient,关闭流并释放相关的系统资源
-     * 
+     *
      * @throws IOException
      */
     public void shutdown() throws IOException {
@@ -397,7 +397,7 @@ public class CSHttpClient {
 
     /**
      * 以 utf-8 编码 url，完善日志的输出
-     * 
+     *
      * @param url
      * @return
      */
@@ -405,7 +405,7 @@ public class CSHttpClient {
         try {
             return URLDecoder.decode(url, "utf-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("cannot use urf-8 to decode url : {}", url);
+            log.warn("cannot use urf-8 to decode url : {}", url);
             return url;
         }
     }
