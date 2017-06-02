@@ -22,6 +22,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.yy.cs.base.status.LogLevel;
+
 import java.io.*;
 import java.net.URLDecoder;
 import java.util.Map;
@@ -39,6 +41,8 @@ public class CSHttpClient {
     private final RequestConfig defaultRequestConfig;
 
     private final CloseableHttpClient httpClient;
+
+    private LogLevel logLevel = LogLevel.ERROR;
 
     /**
      * 带参数的构造函数，通过工厂类{@link CSHttpClientFactory}生成指定的CSHttpClient,设置post请求方式是否自动跳转302地址
@@ -58,8 +62,30 @@ public class CSHttpClient {
         if (isPostRedirect != null && isPostRedirect.booleanValue()) {
             builder.setRedirectStrategy(new LaxRedirectStrategy());
         }
+        if (null != factory.getLogLevel()) {
+            this.logLevel = factory.getLogLevel();
+        }
         this.httpClient = builder.setConnectionManager(cm).build();
+    }
 
+    private void logErrorInfo(String msg, Object... args) {
+        switch (this.logLevel) {
+        case TRACE:
+            log.trace(msg, args);
+            break;
+        case INFO:
+            log.info(msg, args);
+            break;
+        case WARN:
+            log.warn(msg, args);
+            break;
+        case ERROR:
+            log.error(msg, args);
+            break;
+        default:
+            log.error(msg, args);
+            break;
+        }
     }
 
     /**
@@ -111,15 +137,15 @@ public class CSHttpClient {
             if (status.getStatusCode() == HttpStatus.SC_OK) {
                 result = inputStream2String(entity.getContent());
             } else {
-                throw new HttpClientException(
-                        "get data from url:" + httpRequestBase.getURI() + " fail, status: " + status + ",resp:" +  inputStream2String(entity.getContent()));
+                throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: "
+                        + status + ",resp:" + inputStream2String(entity.getContent()));
             }
         } catch (ClientProtocolException e) {
-            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } catch (IOException e) {
-            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } finally {
@@ -127,7 +153,7 @@ public class CSHttpClient {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.warn("response close IOException:" + httpRequestBase.getURI(), e);
+                    logErrorInfo("response close IOException:" + httpRequestBase.getURI(), e);
                 }
             }
             if (httpRequestBase != null) {
@@ -161,11 +187,11 @@ public class CSHttpClient {
                         "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status);
             }
         } catch (ClientProtocolException e) {
-            log.warn("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException(
                     "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
         } catch (IOException e) {
-            log.warn("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException(
                     "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
         } finally {
@@ -173,7 +199,7 @@ public class CSHttpClient {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.warn("response close IOException:" + httpRequestBase.getURI(), e);
+                    logErrorInfo("response close IOException:" + httpRequestBase.getURI(), e);
                 }
             }
             if (httpRequestBase != null) {
@@ -222,11 +248,11 @@ public class CSHttpClient {
             }
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status);
         } catch (ClientProtocolException e) {
-            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } catch (IOException e) {
-            log.warn("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } finally {
@@ -234,7 +260,7 @@ public class CSHttpClient {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.warn("response close IOException:" + httpRequestBase.getURI(), e);
+                    logErrorInfo("response close IOException:" + httpRequestBase.getURI(), e);
                 }
             }
             if (httpRequestBase != null) {
@@ -266,15 +292,15 @@ public class CSHttpClient {
             }
             return false;
         } catch (ClientProtocolException e) {
-            log.warn("get data from url:" + get.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get data from url:" + get.getURI() + " fail, status: " + status, e);
         } catch (Exception e) {
-            log.warn("get data from url:" + get.getURI() + " fail, status: " + status, e);
+            logErrorInfo("get data from url:" + get.getURI() + " fail, status: " + status, e);
         } finally {
             if (response != null) {
                 try {
                     response.close();
                 } catch (IOException e) {
-                    log.warn("response close IOException:" + get.getURI(), e);
+                    logErrorInfo("response close IOException:" + get.getURI(), e);
                 }
             }
             if (get != null) {
@@ -405,7 +431,7 @@ public class CSHttpClient {
         try {
             return URLDecoder.decode(url, "utf-8");
         } catch (UnsupportedEncodingException e) {
-            log.warn("cannot use urf-8 to decode url : {}", url);
+            logErrorInfo("cannot use urf-8 to decode url : {}", url);
             return url;
         }
     }
