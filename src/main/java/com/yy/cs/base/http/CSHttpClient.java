@@ -73,6 +73,9 @@ public class CSHttpClient {
         case TRACE:
             log.trace(msg, args);
             break;
+        case DEBUG:
+            log.debug(msg, args);
+            break;
         case INFO:
             log.info(msg, args);
             break;
