@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.yy.cs</groupId>
 	<artifactId>cs-base</artifactId>
-	<version>1.1.32</version>
+	<version>1.1.33-SNAPSHOT</version>
 	<name>cs-base</name>
 	<url>http://maven.apache.org</url>
 
 	<distributionManagement>
-		<snapshotRepository> 
+		<snapshotRepository>
 			<id>jrepo2-public</id>
 			<url>http://jrepo2.yypm.com/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
@@ -92,7 +92,7 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
 		</dependency>
-		 
+
 		<!-- redis -->
 		<dependency>
 			<groupId>redis.clients</groupId>
