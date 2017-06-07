@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2012 duowan.com. 
+ * Copyright (c) 2012 duowan.com.
  * All Rights Reserved.
- * This program is the confidential and proprietary information of 
+ * This program is the confidential and proprietary information of
  * duowan. ("Confidential Information").  You shall not disclose such
  * Confidential Information and shall use it only in accordance with
  * the terms of the license agreement you entered into with duowan.com.
@@ -40,7 +40,8 @@ public class KeyWordUtil {
 
     private static CensorWords censorWords;
 
-    private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("KeyWordUtil", true));
+    private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,
+            new NamedThreadFactory("KeyWordUtil", true));
 
     private static Long lastUpdate = 0L;
 
@@ -50,29 +51,42 @@ public class KeyWordUtil {
 
     private String censorUrl = "http://do.yy.duowan.com/dynamic-shunt-data/type2/102/censor.txt";
 
-    private static KeyWordUtil keywordUtil = new  KeyWordUtil();
+    private static KeyWordUtil keywordUtil = new KeyWordUtil();
 
     private long interval = 5 * 1000 * 60;
+
+    private volatile boolean start = true;
 
     public static KeyWordUtil getInstance() {
         return keywordUtil;
     }
 
-	public void setCensorUrl(String censorUrl){
-		getInstance().censorUrl = censorUrl;
-	}
-	
-    private  KeyWordUtil() {
-        scheduledExecutor.scheduleAtFixedRate(new Task(), 1000, interval, TimeUnit.MILLISECONDS) ;
+    public void setCensorUrl(String censorUrl) {
+        getInstance().censorUrl = censorUrl;
+    }
+
+    private KeyWordUtil() {
+        scheduledExecutor.scheduleAtFixedRate(new Task(), 1000, interval, TimeUnit.MILLISECONDS);
         httpClient = new CSHttpClient();
+    }
+
+    public boolean isStart() {
+        return start;
+    }
+
+    public void setStart(boolean start) {
+        this.start = start;
     }
 
     /**
      * 执行获取过滤关键字的任务
      *
      */
-    private class Task implements Runnable{
+    private class Task implements Runnable {
         public void run() {
+            if (!start) {
+                return;
+            }
             try {
                 updateCensorWords();
             } catch (Exception e) {
@@ -83,7 +97,7 @@ public class KeyWordUtil {
     }
 
     public Boolean isCensor(String text) {
-        if(censorWords==null){
+        if (censorWords == null) {
             return false;
         }
         return censorWords.isCensor(text);
@@ -121,7 +135,7 @@ public class KeyWordUtil {
             byte[] lb = Base64.decodeBase64(str);
             String ls = new String(lb, "utf-8");
             String[] ws = ls.split("\n");
-            for (String t: ws) {
+            for (String t : ws) {
                 list.add(t.trim());
             }
         } catch (Exception e) {
