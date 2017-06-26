@@ -36,34 +36,25 @@ public class OfficeIpLoader {
     private Set<String> ips = new HashSet<>();
     private IpMatcherManager matchManager;
 
-    public static class LoaderHolder {
-        private static final OfficeIpLoader instance = new OfficeIpLoader();
-    }
+    private static final OfficeIpLoader instance = new OfficeIpLoader();
 
     private OfficeIpLoader() {
         scheduledExecutor.scheduleWithFixedDelay(new Runnable() {
 
             @Override
             public void run() {
-                while (true) {
-                    try {
-                        build();
-                    } catch (Exception e) {
-                        logger.error("build content ", e);
-                    }
-                    try {
-                        TimeUnit.MINUTES.sleep(10);
-                    } catch (Exception e) {
-                        logger.error("build content ", e);
-                    }
+                try {
+                    build();
+                } catch (Exception e) {
+                    logger.error("build content ", e);
                 }
             }
 
-        }, 0, 10, TimeUnit.MINUTES);
+        }, 0, 600, TimeUnit.SECONDS);
     }
 
     public static OfficeIpLoader getInstance() {
-        return LoaderHolder.instance;
+        return instance;
     }
 
     public Set<String> getCompanyIps() {
@@ -194,4 +185,8 @@ public class OfficeIpLoader {
         return lines;
     }
 
+    public static void main(String[] args) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println(OfficeIpLoader.getInstance().isCompanyIp("58.248.229.148"));
+    }
 }
