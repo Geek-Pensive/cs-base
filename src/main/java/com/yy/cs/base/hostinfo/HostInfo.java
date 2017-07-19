@@ -7,6 +7,15 @@ public class HostInfo {
     private String areaId;
     private String cityId;
     private Map<NetType, IpInfo> ipList;
+    private String groupId;
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
     public String getAreaId() {
         return areaId;
@@ -39,6 +48,7 @@ public class HostInfo {
         HostInfo hi = new HostInfo();
         hi.setAreaId(orig.getArea_id());
         hi.setCityId(orig.getCity_id());
+        hi.setGroupId(orig.getPri_group_id());
         String ipInfos = orig.getIp_isp_list();
         try {
             hi.setIpList(new HashMap<NetType, IpInfo>());
