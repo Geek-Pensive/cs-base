@@ -72,11 +72,28 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="redisClient" class="com.yy.cs.base.redis.RedisClient">
 		<property name="factory" ref="redisClientFactory"></property>
 	</bean>
-	
+ 
+        //sentinel
+        <bean id="redisClientFactory" class="com.yy.cs.base.redis.sentinel.RedisSentinelFactory" init-method="init" destroy-method="destroy">
+                <property name="maxActive" value="300" /><!-- 可选 -->
+                <property name="maxIdle" value="100" /><!-- 可选 -->
+                <property name="maxWait" value="50" /><!-- 可选 -->
+		<property name="masterName" value="${redis.config.mastername}" />
+		<property name="servers">
+			<set>
+				<value>${redis.config.sentinel1}</value>
+				<value>${redis.config.sentinel2}</value>
+			</set>
+		</property>
+        </bean>
+
+        <bean id="redisClient" class="com.yy.cs.base.redis.RedisClient">
+		<property name="factory" ref="redisClientFactory"></property>
+	</bean>	
 	
 ####	api调用
 	
