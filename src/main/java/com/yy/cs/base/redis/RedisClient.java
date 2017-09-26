@@ -12,13 +12,13 @@ import java.util.*;
  */
 public class RedisClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisClient.class);
-    private RedisClientFactory factory;
+    private AbstractClientFactory factory;
 
-    public RedisClientFactory getFactory() {
+    public AbstractClientFactory getFactory() {
         return factory;
     }
 
-    public void setFactory(RedisClientFactory factory) {
+    public void setFactory(AbstractClientFactory factory) {
         this.factory = factory;
     }
 
@@ -28,7 +28,7 @@ public class RedisClient {
      * @param factory
      *            redis工厂类 {@link RedisClientFactory}
      */
-    public RedisClient(RedisClientFactory factory) {
+    public RedisClient(AbstractClientFactory factory) {
         super();
         this.factory = factory;
     }

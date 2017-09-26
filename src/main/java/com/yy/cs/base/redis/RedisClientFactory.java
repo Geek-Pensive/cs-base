@@ -31,7 +31,7 @@ import redis.clients.jedis.JedisPool;
  * 管理redis的连接池工厂类，redis连接的参数设置
  * 
  */
-public class RedisClientFactory extends JedisPoolConfigAdapter {
+public class RedisClientFactory extends AbstractClientFactory {
 
     private static final Logger log = LoggerFactory.getLogger(RedisClientFactory.class);
 

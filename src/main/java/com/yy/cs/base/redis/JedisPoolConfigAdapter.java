@@ -4,9 +4,10 @@ import java.lang.reflect.Field;
 
 import com.yy.cs.base.jdk.ReflectUtils;
 
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class JedisPoolConfigAdapter {
+public abstract class JedisPoolConfigAdapter {
     protected JedisPoolConfig config = new JedisPoolConfig();
 
     public int getMaxIdle() {
@@ -267,5 +268,4 @@ public class JedisPoolConfigAdapter {
             throw new RuntimeException(e);
         }
     }
-
 }

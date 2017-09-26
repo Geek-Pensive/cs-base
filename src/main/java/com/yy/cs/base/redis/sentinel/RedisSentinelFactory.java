@@ -2,6 +2,7 @@ package com.yy.cs.base.redis.sentinel;
 
 import java.util.Set;
 
+import com.yy.cs.base.redis.AbstractClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,53 +14,63 @@ import com.yy.cs.base.redis.JedisPoolConfigAdapter;
 
 /**
  * Redis Sentinel工厂类
- * 
+ *
  */
-public class RedisSentinelFactory extends JedisPoolConfigAdapter {
+public class RedisSentinelFactory extends AbstractClientFactory {
 
 	private static final Logger logger = LoggerFactory.getLogger(RedisSentinelFactory.class);
-	
+
 	private CustomJedisSentinelPool masterPool;
-    private int retries = 3;
-    
-    // 属性变量
-    private String masterName;
-    private Set<String> servers;
-    private String password = null;
-    private int timeout = 8000;
-    
-	
-    public RedisSentinelFactory() {
-        // 初始值
-        this.config.setMaxWaitMillis(6000L);
-        this.config.setTestOnBorrow(true);
-    }
+	private int retries = 3;
+
+	// 属性变量
+	private String masterName;
+	private Set<String> servers;
+	private String password = null;
+	private int timeout = 8000;
+
+
+	public RedisSentinelFactory() {
+		// 初始值
+		this.config.setMaxWaitMillis(6000L);
+		this.config.setTestOnBorrow(true);
+	}
 
 	/**
 	 * 初始化
 	 */
 	public void init() {
-	    
-	    checkArguments();
-	    
-        password = "".equals(password) ? null : password;
-	    masterPool = new CustomJedisSentinelPool(masterName, servers, this.config,timeout,password);
+
+		checkArguments();
+
+		password = "".equals(password) ? null : password;
+		masterPool = new CustomJedisSentinelPool(masterName, servers, this.config,timeout,password);
 	}
-	
+
+	@Override
+	public JedisPool getMasterPool() {
+		return masterPool;
+	}
+
+	@Override
+	public JedisPool getSlavePool() {
+		return getReaderPool();
+	}
+
 	private void checkArguments(){
-	    if(servers == null || servers.size() < 0){
-            throw new IllegalArgumentException("sentinel server configs "
-                    + "sentinelServers:{"+servers+"} should not be null");
-        }
-	    
-	    if(masterName == null || "".equals(masterName.trim())){
-	        throw new IllegalArgumentException("masterName config should not be null");
-	    }
+		if(servers == null || servers.size() < 0){
+			throw new IllegalArgumentException("sentinel server configs "
+					+ "sentinelServers:{"+servers+"} should not be null");
+		}
+
+		if(masterName == null || "".equals(masterName.trim())){
+			throw new IllegalArgumentException("masterName config should not be null");
+		}
 	}
-	
+
 	/**
 	 * 获取Master实例
-	 * 
+	 *
 	 * @return
 	 */
 	public Jedis getMaster() {
@@ -78,10 +89,10 @@ public class RedisSentinelFactory extends JedisPoolConfigAdapter {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 从Jedis池中获取1个Pool
-	 * 
+	 *
 	 * @return
 	 */
 	public JedisPool getReaderPool() {
@@ -94,103 +105,103 @@ public class RedisSentinelFactory extends JedisPoolConfigAdapter {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 获取只读Jedis实例
-	 * 
+	 *
 	 * @return
 	 */
 	public Jedis getReader() {
-			JedisPool readPool=null;
-			Jedis jedis = null;
-			try {
-				//从不同的实例拿
-				for(int i = 0 ; i < retries ; i++ ){
-					try{
-						readPool = getReaderPool();
-						if(readPool != null ){
-							jedis = readPool.getResource();
-						}
-						if(jedis != null ){
-							break;
-						}
-					}catch(JedisConnectionException e){
-						if(readPool != null ){
-							readPool.returnBrokenResource(jedis);
-							logger.warn("get jedis instance timeout from pool failure,try next slave,error:{}",e.getCause());
-						}
+		JedisPool readPool=null;
+		Jedis jedis = null;
+		try {
+			//从不同的实例拿
+			for(int i = 0 ; i < retries ; i++ ){
+				try{
+					readPool = getReaderPool();
+					if(readPool != null ){
+						jedis = readPool.getResource();
+					}
+					if(jedis != null ){
+						break;
+					}
+				}catch(JedisConnectionException e){
+					if(readPool != null ){
+						readPool.returnBrokenResource(jedis);
+						logger.warn("get jedis instance timeout from pool failure,try next slave,error:{}",e.getCause());
 					}
 				}
-				//从 master 拿
-				if(jedis == null ){
-					jedis = masterPool.getResource();
-				}
-				if(jedis == null){
-					logger.error(" neither master pool nor slave pool can get jedis instance");
-				}else{
-					return jedis;
-				}
-			} catch (JedisConnectionException jce) {
-				logger.error("[getReader] jedisPool.getResource() error:{}", jce.getCause());
-				if (jedis != null) {
-					jedis.close();
-				}
 			}
-			return null;
-		
+			//从 master 拿
+			if(jedis == null ){
+				jedis = masterPool.getResource();
+			}
+			if(jedis == null){
+				logger.error(" neither master pool nor slave pool can get jedis instance");
+			}else{
+				return jedis;
+			}
+		} catch (JedisConnectionException jce) {
+			logger.error("[getReader] jedisPool.getResource() error:{}", jce.getCause());
+			if (jedis != null) {
+				jedis.close();
+			}
+		}
+		return null;
+
 	}
-	
+
 	public void returnSentinelResource(Jedis jedis) {
 		masterPool.returnResource(jedis);
 	}
-	
+
 	public void returnBrokenResource(Jedis jedis) {
 		masterPool.returnBrokenResource(jedis);
 	}
-	
+
 	public void returnJedisResource(Jedis jedis) {
 		if(jedis != null )
 			jedis.close();
 	}
-	
+
 	public void destroy() {
 		if (masterPool != null) {
 			masterPool.destroy();
 		}
 	}
 
-	
-    public String getMasterName() {
-        return masterName;
-    }
 
-    public void setMasterName(String masterName) {
-        this.masterName = masterName;
-    }
+	public String getMasterName() {
+		return masterName;
+	}
 
-    public Set<String> getServers() {
-        return servers;
-    }
+	public void setMasterName(String masterName) {
+		this.masterName = masterName;
+	}
 
-    public void setServers(Set<String> servers) {
-        this.servers = servers;
-    }
+	public Set<String> getServers() {
+		return servers;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setServers(Set<String> servers) {
+		this.servers = servers;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public int getTimeout() {
-        return timeout;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
+	public int getTimeout() {
+		return timeout;
+	}
 
-	
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+
 }
