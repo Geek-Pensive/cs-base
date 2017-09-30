@@ -36,7 +36,9 @@ public class OfficeIpLoader {
     private Set<String> ips = new HashSet<>();
     private IpMatcherManager matchManager;
 
-    private static final OfficeIpLoader instance = new OfficeIpLoader();
+    private static class OfficeIpLoaderHolder {
+        private static final OfficeIpLoader instance = new OfficeIpLoader();
+    }
 
     private OfficeIpLoader() {
         scheduledExecutor.scheduleWithFixedDelay(new Runnable() {
@@ -54,7 +56,7 @@ public class OfficeIpLoader {
     }
 
     public static OfficeIpLoader getInstance() {
-        return instance;
+        return OfficeIpLoaderHolder.instance;
     }
 
     public Set<String> getCompanyIps() {
