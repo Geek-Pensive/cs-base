@@ -43,13 +43,11 @@ public class RedisSentinelFactory extends AbstractClientFactory {
      * 初始化
      */
     public void init() {
-
         checkArguments();
         if (!lock.tryLock()) { // RedisClient 异常情况下调用init方法存在并发的问题
             return;
         }
         try {
-            password = "".equals(password) ? null : password;
             CustomJedisSentinelPool old = masterPool;
             masterPool = new CustomJedisSentinelPool(masterName, servers, this.config, timeout, password);
             if (old != null) {
@@ -79,6 +77,8 @@ public class RedisSentinelFactory extends AbstractClientFactory {
         if (masterName == null || "".equals(masterName.trim())) {
             throw new IllegalArgumentException("masterName config should not be null");
         }
+        
+        password = "".equals(password) ? null : password;
     }
 
     /**
