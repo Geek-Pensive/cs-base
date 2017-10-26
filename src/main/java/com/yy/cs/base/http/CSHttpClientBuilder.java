@@ -14,16 +14,17 @@ import com.yy.cs.base.status.LogLevel;
  * @param connectionTimeToLive 连接池的长链接最大存活时间
  *
  */
-public class CSHttpClientFactory {
+public class CSHttpClientBuilder {
 
-    private int maxTotal = 30;
-    private int defaultMaxPerRoute = 4;
-    private int connectionTimeout = 5000;
-    private int socketTimeOut = 5000;
-    private int connectionRequestTimeout = 5000;
-    private int connectionTimeToLive = -1;
-    private LogLevel logLevel = LogLevel.ERROR;
-    private boolean postRedirect = false;
+    private CSHttpClientFactory factory;
+
+    private CSHttpClientBuilder() {
+        this.factory = new CSHttpClientFactory();
+    }
+
+    public static CSHttpClientBuilder newBuilder() {
+        return new CSHttpClientBuilder();
+    }
 
     /**
      * 连接池的长链接最大存活时间
@@ -32,7 +33,7 @@ public class CSHttpClientFactory {
      *         int 单位：毫秒
      */
     public int getConnectionTimeToLive() {
-        return connectionTimeToLive;
+        return factory.getConnectionTimeToLive();
     }
 
     /**
@@ -40,8 +41,9 @@ public class CSHttpClientFactory {
      *
      * @param connectionTimeToLive 单位：毫秒 , -1表示不限制
      */
-    public void setConnectionTimeToLive(int connectionTimeToLive) {
-        this.connectionTimeToLive = connectionTimeToLive;
+    public CSHttpClientBuilder setConnectionTimeToLive(int connectionTimeToLive) {
+        factory.setConnectionTimeToLive(connectionTimeToLive);
+        return this;
     }
 
     /**
@@ -51,7 +53,7 @@ public class CSHttpClientFactory {
      *         int 最大CSHttpClient数
      */
     public int getMaxTotal() {
-        return maxTotal;
+        return factory.getMaxTotal();
     }
 
     /**
@@ -59,8 +61,9 @@ public class CSHttpClientFactory {
      *
      * @param maxTotal
      */
-    public void setMaxTotal(int maxTotal) {
-        this.maxTotal = maxTotal;
+    public CSHttpClientBuilder setMaxTotal(int maxTotal) {
+        factory.setMaxTotal(maxTotal);
+        return this;
     }
 
     /**
@@ -69,7 +72,7 @@ public class CSHttpClientFactory {
      * @return connectionTimeout time
      */
     public int getConnectionTimeout() {
-        return connectionTimeout;
+        return factory.getConnectionTimeout();
     }
 
     /**
@@ -77,8 +80,9 @@ public class CSHttpClientFactory {
      *
      * @param connectionTimeout 连接超时时间
      */
-    public void setConnectionTimeout(int connectionTimeout) {
-        this.connectionTimeout = connectionTimeout;
+    public CSHttpClientBuilder setConnectionTimeout(int connectionTimeout) {
+        factory.setConnectionTimeout(connectionTimeout);
+        return this;
     }
 
     /**
@@ -88,7 +92,7 @@ public class CSHttpClientFactory {
      *         连接超时时间
      */
     public int getSocketTimeOut() {
-        return socketTimeOut;
+        return factory.getSocketTimeOut();
     }
 
     /**
@@ -96,20 +100,22 @@ public class CSHttpClientFactory {
      *
      * @param socketTimeOut 请求超时时间
      */
-    public void setSocketTimeOut(int socketTimeOut) {
-        this.socketTimeOut = socketTimeOut;
+    public CSHttpClientBuilder setSocketTimeOut(int socketTimeOut) {
+        factory.setSocketTimeOut(socketTimeOut);
+        return this;
     }
 
     public int getDefaultMaxPerRoute() {
-        return defaultMaxPerRoute;
+        return factory.getDefaultMaxPerRoute();
     }
 
-    public void setDefaultMaxPerRoute(int defaultMaxPerRoute) {
-        this.defaultMaxPerRoute = defaultMaxPerRoute;
+    public CSHttpClientBuilder setDefaultMaxPerRoute(int defaultMaxPerRoute) {
+        factory.setDefaultMaxPerRoute(defaultMaxPerRoute);
+        return this;
     }
 
     public int getConnectionRequestTimeout() {
-        return connectionRequestTimeout;
+        return factory.getConnectionRequestTimeout();
     }
 
     /**
@@ -117,8 +123,9 @@ public class CSHttpClientFactory {
      *
      * @param connectionRequestTimeout 请求超时时间
      */
-    public void setConnectionRequestTimeout(int connectionRequestTimeout) {
-        this.connectionRequestTimeout = connectionRequestTimeout;
+    public CSHttpClientBuilder setConnectionRequestTimeout(int connectionRequestTimeout) {
+        factory.setConnectionRequestTimeout(connectionRequestTimeout);
+        return this;
     }
 
     /**
@@ -126,7 +133,7 @@ public class CSHttpClientFactory {
      * @return
      */
     public LogLevel getLogLevel() {
-        return logLevel;
+        return factory.getLogLevel();
     }
 
     /**
@@ -134,8 +141,13 @@ public class CSHttpClientFactory {
      *
      * @param LogLevel 错误级别
      */
-    public void setLogLevel(LogLevel logLevel) {
-        this.logLevel = logLevel;
+    public CSHttpClientBuilder setLogLevel(LogLevel logLevel) {
+        factory.setLogLevel(logLevel);
+        return this;
+    }
+
+    public boolean isPostRedirect() {
+        return factory.isPostRedirect();
     }
 
     /**
@@ -143,12 +155,13 @@ public class CSHttpClientFactory {
      *
      * @param postRedirect 是否重定向
      */
-    public void setPostRedirect(boolean postRedirect) {
-        this.postRedirect = postRedirect;
+    public CSHttpClientBuilder setPostRedirect(boolean postRedirect) {
+        factory.setPostRedirect(postRedirect);
+        return this;
     }
 
-    public boolean isPostRedirect() {
-        return postRedirect;
+    public CSHttpClient build() {
+        return new CSHttpClient(factory, factory.isPostRedirect());
     }
 
 }
