@@ -24,6 +24,10 @@ public class CSHttpClientFactory {
     private int connectionTimeToLive = -1;
     private LogLevel logLevel = LogLevel.ERROR;
 
+    public static CSHttpClientFactory newFactory() {
+        return new CSHttpClientFactory();
+    }
+
     /**
      * 连接池的长链接最大存活时间
      *
@@ -39,8 +43,9 @@ public class CSHttpClientFactory {
      *
      * @param connectionTimeToLive 单位：毫秒 , -1表示不限制
      */
-    public void setConnectionTimeToLive(int connectionTimeToLive) {
+    public CSHttpClientFactory setConnectionTimeToLive(int connectionTimeToLive) {
         this.connectionTimeToLive = connectionTimeToLive;
+        return this;
     }
 
     /**
@@ -58,8 +63,9 @@ public class CSHttpClientFactory {
      *
      * @param maxTotal
      */
-    public void setMaxTotal(int maxTotal) {
+    public CSHttpClientFactory setMaxTotal(int maxTotal) {
         this.maxTotal = maxTotal;
+        return this;
     }
 
     /**
@@ -76,8 +82,9 @@ public class CSHttpClientFactory {
      *
      * @param connectionTimeout 连接超时时间
      */
-    public void setConnectionTimeout(int connectionTimeout) {
+    public CSHttpClientFactory setConnectionTimeout(int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
+        return this;
     }
 
     /**
@@ -95,16 +102,18 @@ public class CSHttpClientFactory {
      *
      * @param socketTimeOut 请求超时时间
      */
-    public void setSocketTimeOut(int socketTimeOut) {
+    public CSHttpClientFactory setSocketTimeOut(int socketTimeOut) {
         this.socketTimeOut = socketTimeOut;
+        return this;
     }
 
     public int getDefaultMaxPerRoute() {
         return defaultMaxPerRoute;
     }
 
-    public void setDefaultMaxPerRoute(int defaultMaxPerRoute) {
+    public CSHttpClientFactory setDefaultMaxPerRoute(int defaultMaxPerRoute) {
         this.defaultMaxPerRoute = defaultMaxPerRoute;
+        return this;
     }
 
     public int getConnectionRequestTimeout() {
@@ -116,8 +125,9 @@ public class CSHttpClientFactory {
      *
      * @param connectionRequestTimeout 请求超时时间
      */
-    public void setConnectionRequestTimeout(int connectionRequestTimeout) {
+    public CSHttpClientFactory setConnectionRequestTimeout(int connectionRequestTimeout) {
         this.connectionRequestTimeout = connectionRequestTimeout;
+        return this;
     }
 
     /**
@@ -133,8 +143,9 @@ public class CSHttpClientFactory {
      *
      * @param LogLevel 错误级别
      */
-    public void setLogLevel(LogLevel logLevel) {
+    public CSHttpClientFactory setLogLevel(LogLevel logLevel) {
         this.logLevel = logLevel;
+        return this;
     }
 
 }
