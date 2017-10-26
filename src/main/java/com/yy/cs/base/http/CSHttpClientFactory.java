@@ -23,6 +23,7 @@ public class CSHttpClientFactory {
     private int connectionRequestTimeout = 5000;
     private int connectionTimeToLive = -1;
     private LogLevel logLevel = LogLevel.ERROR;
+    private boolean postRedirect = false;
 
     public static CSHttpClientFactory newFactory() {
         return new CSHttpClientFactory();
@@ -146,6 +147,24 @@ public class CSHttpClientFactory {
     public CSHttpClientFactory setLogLevel(LogLevel logLevel) {
         this.logLevel = logLevel;
         return this;
+    }
+
+    public boolean isPostRedirect() {
+        return postRedirect;
+    }
+
+    /**
+     * 是否根据302重定向，默认false
+     *
+     * @param postRedirect 是否重定向
+     */
+    public CSHttpClientFactory setPostRedirect(boolean postRedirect) {
+        this.postRedirect = postRedirect;
+        return this;
+    }
+
+    public CSHttpClient build() {
+        return new CSHttpClient(this, this.postRedirect);
     }
 
 }
