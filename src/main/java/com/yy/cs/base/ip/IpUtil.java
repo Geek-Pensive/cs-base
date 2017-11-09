@@ -15,7 +15,7 @@ public class IpUtil {
         byte[] b = new byte[] { 0, 0, 0, 0 };
         for (int i = 0; i < 4; i++) {
             int bit = getBit(i, reverse);
-            int m = Integer.valueOf(t[i]) << bit;
+            long m = Long.valueOf(t[i]) << bit;
             m = m >> (24 - (8 * i));
             b[i] = (byte) (m & 0xff);
         }
@@ -27,7 +27,7 @@ public class IpUtil {
         long ipNumbers = 0;
         for (int i = 0; i < 4; i++) {
             int bit = getBit(i,reverse);
-            ipNumbers += Integer.valueOf(t[i]) << bit;
+            ipNumbers += Long.valueOf(t[i]) << bit;
         }
         return ipNumbers;
     }
