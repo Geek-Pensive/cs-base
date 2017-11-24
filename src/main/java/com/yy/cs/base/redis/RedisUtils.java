@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -14,6 +15,24 @@ import redis.clients.jedis.JedisPoolConfig;
  *
  */
 public class RedisUtils {
+
+    /**
+     * 测试redis是否可以连接
+     * 
+     * @param host
+     * @param port
+     * @param timeout
+     * @return
+     */
+    public static boolean isAvailable(String host, int port, int timeout) {
+        try {
+            Jedis jedis = new Jedis(host, port, timeout);
+            jedis.connect();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     /**
      * 从jedis返回的info信息中获取connected client 数量
@@ -92,19 +111,19 @@ public class RedisUtils {
         }
         return result;
     }
-    
+
     /**
      * ip支持用 "|" 分割多个。对于多IDC接入的服务器，填写不同网络类型的IP，按顺序去尝试可用的网络
      * 
      * @param ip
      * @return
      */
-    public static String[] parseServerIp(String ip){
+    public static String[] parseServerIp(String ip) {
         String[] str = null;
-        if(ip.contains("|")){
-            str =ip.split("\\|");
-        }else{
-            str= new String[]{ip};
+        if (ip.contains("|")) {
+            str = ip.split("\\|");
+        } else {
+            str = new String[] { ip };
         }
         return str;
     }

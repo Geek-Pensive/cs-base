@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.json.Json;
+import com.yy.cs.base.redis.RedisUtils;
 
 import redis.clients.jedis.HostAndPort;
 //import redis.clients.jedis.HostAndPort;
@@ -164,8 +165,12 @@ public class CustomJedisSentinelPool extends JedisPool {
 				jedisPools.clear();
 			}
 			for (HostAndPort hap : slaves) {
-				jedisPools.add(new JedisPool(poolConfig, hap.getHost(), hap.getPort(), timeout));
-				log.info("reload new jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
+			    if(RedisUtils.isAvailable(hap.getHost(), hap.getPort(), timeout)) {
+			        jedisPools.add(new JedisPool(poolConfig, hap.getHost(), hap.getPort(), timeout));
+			        log.info("reload new jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
+			    }else {
+			        log.warn("relaod failed jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
+			    }
 			}
 		} finally {
 			lock.writeLock().unlock();
