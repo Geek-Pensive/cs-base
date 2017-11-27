@@ -2,17 +2,15 @@ package com.yy.cs.base.redis.sentinel;
 
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.yy.cs.base.redis.AbstractClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.yy.cs.base.redis.AbstractClientFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisConnectionException;
-
-import com.yy.cs.base.redis.JedisPoolConfigAdapter;
 
 /**
  * Redis Sentinel工厂类
