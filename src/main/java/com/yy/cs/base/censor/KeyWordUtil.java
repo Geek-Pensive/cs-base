@@ -8,12 +8,16 @@
  */
 package com.yy.cs.base.censor;
 
-import com.yy.cs.base.censor.impl.CensorWordsImpl;
-import com.yy.cs.base.censor.impl.StandardWordsFilterImpl;
-import com.yy.cs.base.http.CSHttpClient;
-import com.yy.cs.base.http.HttpClientException;
-import com.yy.cs.base.task.thread.NamedThreadFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -22,13 +26,10 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.yy.cs.base.censor.impl.CensorWordsImpl;
+import com.yy.cs.base.censor.impl.StandardWordsFilterImpl;
+import com.yy.cs.base.http.CSHttpClient;
+import com.yy.cs.base.task.thread.NamedThreadFactory;
 
 /**
  * @author xiaoweiteng
@@ -43,8 +44,6 @@ public class KeyWordUtil {
     private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,
             new NamedThreadFactory("KeyWordUtil", true));
 
-    private static Long lastUpdate = 0L;
-
     private String eTag = "\"\"";
 
     private final CSHttpClient httpClient;
@@ -54,6 +53,8 @@ public class KeyWordUtil {
     private static KeyWordUtil keywordUtil = new KeyWordUtil();
 
     private long interval = 5 * 1000 * 60;
+
+    private String lastModified = "";
 
     private volatile boolean start = true;
 
@@ -104,14 +105,20 @@ public class KeyWordUtil {
     }
 
     private CensorWords updateCensorWords() {
+        String oldLastModified = lastModified;
         List<String> list = new LinkedList<String>();
         try {
             HttpUriRequest hur = new HttpGet(censorUrl);
             hur.addHeader("If-None-Match", eTag);
 
+            if (StringUtils.isNotBlank(lastModified)) {
+                hur.addHeader("If-Modified-Since", lastModified);
+            }
+
             HttpClient hc = httpClient.getHttpClient();
             HttpResponse hrp = hc.execute(hur);
 
+            System.out.println(hrp.getStatusLine().getStatusCode());
             if (hrp.getStatusLine().getStatusCode() == 304) {
                 return censorWords;
             }
@@ -132,6 +139,12 @@ public class KeyWordUtil {
             if (ha != null && ha.length > 0) {
                 eTag = ha[0].getValue();
             }
+
+            ha = hrp.getHeaders("Last-Modified");
+            if (ha != null && ha.length > 0) {
+                lastModified = ha[0].getValue();
+            }
+            
             byte[] lb = Base64.decodeBase64(str);
             String ls = new String(lb, "utf-8");
             String[] ws = ls.split("\n");
@@ -144,6 +157,11 @@ public class KeyWordUtil {
         if (list == null || list.isEmpty()) {
             LOGGER.warn("[updateCensorWords] list must be not null or empty.");
             throw new RuntimeException("list must be not null or empty.");
+        }
+        if (StringUtils.isNotBlank(oldLastModified)) {
+            if (oldLastModified.equals(lastModified)) {
+                return censorWords;
+            }
         }
         censorWords = CensorWordsImpl.build(list, new StandardWordsFilterImpl());
         return censorWords;
