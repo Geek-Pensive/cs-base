@@ -77,7 +77,7 @@ public class RedisSentinelFactory extends AbstractClientFactory {
         if (masterName == null || "".equals(masterName.trim())) {
             throw new IllegalArgumentException("masterName config should not be null");
         }
-        
+
         password = "".equals(password) ? null : password;
     }
 
