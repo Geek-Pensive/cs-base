@@ -171,4 +171,15 @@ public class RedisUtils {
         pool = constructor.newInstance(config, ip, port, timeout, password);
         return pool;
     }
+
+    public static boolean ping(Jedis jedis) {
+        try {
+            if ("PONG".equals(jedis.ping())) {
+                return true;
+            }
+        } catch (Exception e) {
+
+        }
+        return false;
+    }
 }

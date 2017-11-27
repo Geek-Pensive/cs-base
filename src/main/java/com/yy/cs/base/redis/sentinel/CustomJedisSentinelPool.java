@@ -318,8 +318,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                     }
                     for (SlaveJedisPool jp : availableSlaves) {
                         try (Jedis j = jp.getResource();) {
-                            String pong = j.ping();
-                            if (!"PONG".equals(pong)) {
+                            if (!RedisUtils.ping(j)) {
                                 newUnavailable.add(jp);
                             }
                         } catch (Exception e) {
