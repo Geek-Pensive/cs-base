@@ -346,6 +346,9 @@ public class CustomJedisSentinelPool extends JedisPool {
                             for (SlaveJedisPool jp : newUnavailable) {
                                 unavailableSlaves.add(jp.getHostAndPort());
                                 availableSlaves.remove(jp);
+                                if (log.isDebugEnabled()) {
+                                    log.debug(" remove unavailable jedis slave pool " + jp.getHostAndPort());
+                                }
                             }
                         }
 
@@ -353,6 +356,9 @@ public class CustomJedisSentinelPool extends JedisPool {
                             for (HostAndPort hap : newAvailable) {
                                 availableSlaves.add(new SlaveJedisPool(poolConfig, hap, timeout));
                                 unavailableSlaves.remove(hap);
+                                if (log.isDebugEnabled()) {
+                                    log.debug(" add available jedis slave pool " + hap);
+                                }
                             }
                         }
 
