@@ -118,7 +118,6 @@ public class KeyWordUtil {
             HttpClient hc = httpClient.getHttpClient();
             HttpResponse hrp = hc.execute(hur);
 
-            System.out.println(hrp.getStatusLine().getStatusCode());
             if (hrp.getStatusLine().getStatusCode() == 304) {
                 return censorWords;
             }
