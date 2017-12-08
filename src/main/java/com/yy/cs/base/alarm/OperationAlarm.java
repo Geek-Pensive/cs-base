@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public class OperationAlarm {
-    private static final String PYTHON = "python /home/dspeak/yyms/yymp/yymp_report_script/yymp_report_alarm.py ";
+    private static final String PYTHON = "/home/dspeak/yyms/yymp/yymp_report_script/yymp_report_alarm.py";
 
     /**
      * 调用运维的告警脚本进行告警。
@@ -18,10 +18,8 @@ public class OperationAlarm {
         if (null == reportId || null == progressName || null == message) {
             throw new IllegalArgumentException("argument[reportId,progressName,message] cannot be null");
         }
-        message = message.replaceAll(" ", "_").replaceAll("\t", "_");
-        String command = PYTHON + " " + reportId + " " + progressName + " " + " \"" + message + "\" ";
         try {
-            Process p = Runtime.getRuntime().exec(command);
+            Process p = Runtime.getRuntime().exec(new String[] { "python", PYTHON, reportId, progressName, message });
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             StringBuilder sb = new StringBuilder();
             String line = null;
