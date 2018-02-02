@@ -148,6 +148,26 @@ public class Json {
 			throw new RuntimeException(msg, e);
 		}
 	}
+	
+	/**
+	 * 
+	 * @param jsonStr
+	 * @param fieldName
+	 * @return
+	 */
+	public static String  getFieldAsString(String jsonStr, String fieldName) {
+        try {
+            JsonNode nameNode = toJsonNode(jsonStr,fieldName);
+            if (nameNode != null) {
+                String value = nameNode.toString();
+                return value;
+            }
+            return null;
+        } catch (Exception e) {
+            String msg = String.format("Failed to parse json %s", jsonStr);
+            throw new RuntimeException(msg, e);
+        }
+    }
 
 	/**
 	 * 取json传里面的某个属性值。
