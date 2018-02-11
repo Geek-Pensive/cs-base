@@ -114,7 +114,8 @@ public class RedisSentinelFactory extends AbstractClientFactory {
                 return pool;
             }
         }
-        return null;
+        //return master pool when can not get the reader pool
+        return masterPool;
     }
 
     /**
