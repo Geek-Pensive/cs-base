@@ -39,15 +39,19 @@ public class RedisClient {
 
     private void exceptionHandler(JedisPool jedisPool, Jedis jedis, Exception e) {
         // 增加一层 try catch ，防止 io 异常，导致初始化失败
+        jedisClose(jedis);
+        //以前这段代码是为了保证对端redis服务器重启而需要的重新初始化，这种情况现在大家都是使用sentinel将不会有这个需要，所以去除这段代码。
+        //factory.init();
+    }
+
+    private void jedisClose(Jedis jedis) {
         try {
             if (jedis != null) {
                 jedis.close();
             }
         } catch (Exception e1){
-           LOGGER.warn("jedis.close failed",e1);
+            LOGGER.warn("jedis.close failed",e1);
         }
-        //以前这段代码是为了保证对端redis服务器重启而需要的重新初始化，这种情况现在大家都是使用sentinel将不会有这个需要，所以去除这段代码。
-        //factory.init();
     }
 
     /**
@@ -111,9 +115,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -165,9 +167,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis setnx fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -203,9 +203,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set nx px fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -234,9 +232,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis ttl fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -272,9 +268,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis eval fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -313,9 +307,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -373,9 +365,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -418,9 +408,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis info fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -454,9 +442,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -508,9 +494,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -562,9 +546,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -613,9 +595,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException(e.getMessage(), e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -665,9 +645,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis mget fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -717,9 +695,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis mset fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -769,9 +745,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis mget fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -830,9 +804,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -876,9 +848,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -922,9 +892,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -968,9 +936,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1018,9 +984,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1074,9 +1038,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1124,9 +1086,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1170,9 +1130,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1204,9 +1162,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get hgetAll " + key, e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1254,9 +1210,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1296,9 +1250,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1345,9 +1297,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1387,9 +1337,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1412,9 +1360,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis get fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1451,9 +1397,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1480,9 +1424,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1507,9 +1449,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1535,9 +1475,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis set fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1584,9 +1522,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis keys fail", e);
         } finally {
-            if (jedis != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
         return result;
     }
@@ -1626,9 +1562,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis lpush fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
         return result;
     }
@@ -1668,9 +1602,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis lpush fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
         return result;
     }
@@ -1744,9 +1676,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis lrange fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
         return result;
     }
@@ -1803,9 +1733,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis lpush fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
         return result;
     }
@@ -1871,9 +1799,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis ltrim fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
         return result;
     }
@@ -1926,9 +1852,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis expire fail", e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
         return result;
     }
@@ -1948,9 +1872,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
 
@@ -1973,9 +1895,7 @@ public class RedisClient {
             jedis = null;
             throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
         } finally {
-            if (jedis != null && jedisPool != null) {
-                jedis.close();
-            }
+            jedisClose(jedis);
         }
     }
     /**
@@ -2026,9 +1946,7 @@ public class RedisClient {
     		jedis = null;
     		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
     	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
+            jedisClose(jedis);
     	}
     }
     /**
@@ -2087,9 +2005,7 @@ public class RedisClient {
     		jedis = null;
     		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
     	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
+            jedisClose(jedis);
     	}
     }
     /**
@@ -2146,9 +2062,7 @@ public class RedisClient {
     		jedis = null;
     		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
     	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
+            jedisClose(jedis);
     	}
     }
     /**
@@ -2206,9 +2120,7 @@ public class RedisClient {
     		jedis = null;
     		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
     	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
+            jedisClose(jedis);
     	}
     }
     /**
@@ -2269,9 +2181,7 @@ public class RedisClient {
     		jedis = null;
     		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] channel:" + channel, e);
     	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
+            jedisClose(jedis);
     	}
     }
     /**
