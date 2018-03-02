@@ -46,6 +46,7 @@ public class RedisClient {
         } catch (Exception e1){
            LOGGER.warn("jedis.close failed",e1);
         }
+        //以前这段代码是为了保证对端redis服务器重启而需要的重新初始化，这种情况现在大家都是使用sentinel将不会有这个需要，所以去除这段代码。
         //factory.init();
     }
 
