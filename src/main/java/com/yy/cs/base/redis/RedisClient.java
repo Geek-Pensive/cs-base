@@ -46,7 +46,7 @@ public class RedisClient {
         } catch (Exception e1){
            LOGGER.warn("jedis.close failed",e1);
         }
-        factory.init();
+        //factory.init();
     }
 
     /**
