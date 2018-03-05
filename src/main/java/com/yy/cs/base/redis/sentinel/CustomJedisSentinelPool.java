@@ -243,7 +243,8 @@ public class CustomJedisSentinelPool extends JedisPool {
                         // 初始化slavePool
                         initSalvePools(slaves);
                         lastLoadTimestamp.set(System.currentTimeMillis());
-                        jedis.close();
+
+                        jedisClose(jedis);
                         break outer;
                     }
                 } catch (JedisConnectionException e) {
@@ -283,7 +284,8 @@ public class CustomJedisSentinelPool extends JedisPool {
         }
         sentinelsMap.put(SLAVE_PREFIX, slaves);
         initSalvePools(slaves);
-        jedis.close();
+
+        jedisClose(jedis);
     }
 
     private HostAndPort toHostAndPort(List<String> getMasterAddrByNameResult) {
@@ -445,6 +447,8 @@ public class CustomJedisSentinelPool extends JedisPool {
                     } else {
                         log.info("Unsubscribing from Sentinel at " + host + ":" + port);
                     }
+                } finally {
+                    jedisClose(j);
                 }
             }
         }
@@ -461,4 +465,14 @@ public class CustomJedisSentinelPool extends JedisPool {
         }
     }
 
+
+    private void jedisClose(Jedis jedis) {
+        try {
+            if (jedis != null) {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            log.error("jedis close fail", e);
+        }
+    }
 }
