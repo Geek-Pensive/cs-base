@@ -127,7 +127,7 @@ public class CustomJedisSentinelPool extends JedisPool {
         if (null != slaveChecker) {
             slaveChecker.shutdown();
         }
-        super.destroy();
+
         if (availableSlaves != null && availableSlaves.size() > 0) {
             for (JedisPool pool : availableSlaves) {
                 pool.close();
@@ -139,7 +139,7 @@ public class CustomJedisSentinelPool extends JedisPool {
         }
         log.info("CustomJedisSentinelPool destroy...");
 
-        close(); // close myself
+        super.destroy(); // close myself
     }
 
     public HostAndPort getCurrentHostMaster() {
