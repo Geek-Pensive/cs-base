@@ -1,5 +1,7 @@
 package com.yy.cs.base.task.log;
 
+import org.slf4j.Logger;
+
 public class TaskBizLog {
 
     private TaskBizLogLevel taskBizLogLevel;
@@ -33,6 +35,24 @@ public class TaskBizLog {
                 "taskBizLogLevel=" + taskBizLogLevel +
                 ", logMsg='" + logMsg + '\'' +
                 '}';
+    }
+
+    public void log(Logger logger){
+    		if(logger == null) {
+    			return;
+    		}
+    		if(TaskBizLogLevel.DEBUG == getTaskBizLogLevel()) {
+    			logger.debug("task biz log:{}", getLogMsg());
+    		}
+    		if(TaskBizLogLevel.INFO  == getTaskBizLogLevel()) {
+    			logger.info("task biz log:{}", getLogMsg());
+    		}
+    		if(TaskBizLogLevel.WARN  == getTaskBizLogLevel()) {
+    			logger.warn("task biz log:{}", getLogMsg());
+    		}
+    		if(TaskBizLogLevel.ERROR == getTaskBizLogLevel()) {
+    			logger.error("task biz log:{}", getLogMsg());
+    		}
     }
 
     public enum  TaskBizLogLevel {

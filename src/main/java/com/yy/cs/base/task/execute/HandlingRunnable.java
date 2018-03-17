@@ -150,6 +150,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
             }
 		}finally{
 			this.context.updateExecuteTime(startTime, new Date());
+			boolean istimeout = this.isTimeout();//需要前置获取，否则startTime就被赋值为null，超时时间不正确
 			synchronized (this.triggerContextMonitor) {
 				startTime = null;
 			}
@@ -163,7 +164,6 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
             status.additionInfo(Constants.EXECUTE_ADDRESS, context.executeAddress());
             status.additionInfo(Constants.LAST_EXCEPTION_TIME, context.getExceptionTime());
             status.additionInfo(Constants.THROWABLE, context.getT());
-            boolean istimeout =this.isTimeout();
             status.additionInfo(Constants.TIMEOUT, istimeout);
             if(istimeout){
                 status.setCode(StatusCode.WRONG);
@@ -173,7 +173,7 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
             }
 			// 自定义日志处理
 			if (getTaskLogHandle() != null) {
-				TaskLog taskLog = createTaskLog();
+				TaskLog taskLog = createTaskLog(status.getCode(), istimeout);
 				List<TaskBizLog> taskBizLogs = new ArrayList<>(task.getBizLogger().getLogs());
 				if(context.getT() != null){
 					taskBizLogs.add(new TaskBizLog(TaskBizLog.TaskBizLogLevel.ERROR, ExceptionUtils.getStackTrace(context.getT())));
@@ -185,21 +185,15 @@ public abstract class HandlingRunnable implements Runnable,ScheduledFuture<Objec
 		}
 	}
 
-	protected TaskLog createTaskLog() {
+	protected TaskLog createTaskLog(StatusCode statusCode, boolean isTimeout) {
 		TaskLog taskLog = TaskLog.newBuilder()
 				.taskKey(task.getId())
-				.statusCode(StatusCode.SUCCCESS)
+				.statusCode(statusCode)
 				.scheduledExecutionTime(context.nextScheduledExecutionTime())
 				.startTime(context.lastStartTime())
 				.completionTime(context.lastCompletionTime())
-				.isTimeOut(this.isTimeout())
+				.isTimeOut(isTimeout)
 				.build();
-		if (this.isTimeout()) {
-			taskLog.setStatusCode(StatusCode.WRONG);
-		}
-		if (context.getT() != null) {
-			taskLog.setStatusCode(StatusCode.FAIL);
-		}
 		return taskLog;
 	}
 
