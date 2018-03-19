@@ -24,6 +24,7 @@ public class CSHttpClientFactory {
     private int connectionTimeToLive = -1;
     private LogLevel logLevel = LogLevel.ERROR;
     private boolean postRedirect = false;
+    private boolean trustAllCertificates = false;
 
     /**
      * 连接池的长链接最大存活时间
@@ -149,6 +150,14 @@ public class CSHttpClientFactory {
 
     public boolean isPostRedirect() {
         return postRedirect;
+    }
+
+    public boolean isTrustAllCertificates() {
+        return trustAllCertificates;
+    }
+
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        this.trustAllCertificates = trustAllCertificates;
     }
 
 }

@@ -16,6 +16,7 @@ public class HttpClientManagerUtilTest {
 	@Before
     public void before() {
 		CSHttpClientFactory f = new CSHttpClientFactory();
+		f.setTrustAllCertificates(true);
 		http = new CSHttpClient(f);
     }
 
@@ -44,6 +45,13 @@ public class HttpClientManagerUtilTest {
     	String s = http.doGet("http://www.baidu.com/");
     	System.out.println(s);
     	org.junit.Assert.assertNotNull(s); 
+    }
+    
+    @Test
+    public void testDoGetHttps() throws  HttpClientException {
+        String s = http.doGet("https://rcv.aiclk.com/trace");
+        System.out.println(s);
+        org.junit.Assert.assertNotNull(s); 
     }
     
     @Test

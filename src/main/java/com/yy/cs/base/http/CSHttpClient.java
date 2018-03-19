@@ -1,5 +1,22 @@
 package com.yy.cs.base.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -12,6 +29,13 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -23,11 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.status.LogLevel;
-
-import java.io.*;
-import java.net.URLDecoder;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 基于Apache的httpclient 4.3.X以上的版本，使用PoolingHttpClientConnectionManager封装了HttpClient常用API。
@@ -51,8 +70,36 @@ public class CSHttpClient {
      *            factory 生成CSHttpClient的工厂类
      */
     public CSHttpClient(CSHttpClientFactory factory, Boolean isPostRedirect) {
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(
-                factory.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
+        PoolingHttpClientConnectionManager cm = null;
+        if (factory.isTrustAllCertificates()) {
+            RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder.<ConnectionSocketFactory> create()
+                    .register("http", PlainConnectionSocketFactory.getSocketFactory());
+
+            try {
+                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(trustStore, new TrustStrategy() {
+
+                    @Override
+                    public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                        return true;
+                    }
+
+                }).build();
+                LayeredConnectionSocketFactory sslSF = new SSLConnectionSocketFactory(sslContext, 
+                        SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+                registryBuilder.register("https", sslSF);
+            } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+            
+            cm = new PoolingHttpClientConnectionManager(registryBuilder.build(), null, null, null, 
+                    factory.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
+        } else {
+            cm = new PoolingHttpClientConnectionManager(factory.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
+        }
+        
+        
         this.defaultRequestConfig = RequestConfig.custom().setConnectTimeout(factory.getConnectionTimeout())
                 .setConnectionRequestTimeout(factory.getConnectionRequestTimeout())
                 .setSocketTimeout(factory.getSocketTimeOut()).build();
