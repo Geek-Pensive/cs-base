@@ -300,9 +300,9 @@
 </bean>
 
 <bean name="metricsAndLogHandler" class="com.yy.cs.base.task.log.MetricsAndLogHandler">
-	<property name="activeMetrics" value="true"/>
-	<property name="activeLog" value="true"/>
-	<property name="metricsAppName" value="yysv"/>
+	<property name="activeMetrics" value="true"/>	<!--是否启用鹰眼上报耗时和异常等信息-->
+	<property name="activeLog" value="true"/>		<!--是否在本地日志打印耗时和异常等信息-->
+	<property name="metricsAppName" value="xxxx"/>  <!--鹰眼上所属业务名(yysv代表小视频业务)，会自动获取到潜龙配置的域名作为服务名进行上报-->
 </bean>
 ```
 
