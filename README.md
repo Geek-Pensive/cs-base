@@ -279,8 +279,36 @@
 		任务id;任务状态;异常时间:xxxxxx;异常信息:xxxxxx;(是否超时:xxxxxx;)
 
 
+#### 任务状态加入鹰眼上报
+```
++ 请选用cs-base最新版本1.3.4或以上
+
+加入MetricsAndLogHandler的配置
+如：
+
+<bean name="taskManager" class="com.yy.cs.base.task.TimerTaskManager" init-method="start">
+	<property name="timerTasks">
+		<map>
+			<entry key="com.yy.yypdemo.task.TestTask" value-ref="testTask"/>
+			<entry key="com.yy.yypdemo.task.TestErrorTask" value-ref="testErrorTask"/>
+			<entry key="com.yy.yypdemo.task.TestTimeroutTask" value-ref="testTimeroutTask"/>
+		</map>
+	</property>
+	<property name="monitorType" value="LOG"/>
+	<property name="monitorfile" value="/data/weblog/business/yyp-demo.yy.com/timerTaskManager.log"/>
+	<property name="taskLogHandle" ref="metricsAndLogHandler"/>
+</bean>
+
+<bean name="metricsAndLogHandler" class="com.yy.cs.base.task.log.MetricsAndLogHandler">
+	<property name="activeMetrics" value="true"/>
+	<property name="activeLog" value="true"/>
+	<property name="metricsAppName" value="yysv"/>
+</bean>
+```
+
+
 ### 联系人
-	如果有问题或者建议，可联系李方杰，真诚为你服务
+如果有问题或者建议，可联系李方杰，真诚为你服务
 
 
 
