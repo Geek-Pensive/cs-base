@@ -413,7 +413,7 @@ public class RedisClient {
     }
 
     /**
-     * 执行get操作，然后释放client连接
+     * 在从库执行get操作，然后释放client连接
      * </br>
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
@@ -427,10 +427,36 @@ public class RedisClient {
      *         返回key对应的value值
      */
     public String getAndReturn(int dbIndex, final String key) {
+        return getAndReturnHandler(Boolean.FALSE, dbIndex, key);
+    }
+
+    /**
+     * 在主库执行get操作，然后释放client连接
+     * </br>
+     * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
+     * </br>
+     * 并在调用完成后，需调用pool的returnResource方法释放该连接
+     *
+     * @param dbIndex
+     *            db的索引值
+     * @param key
+     *            set的key值
+     * @return
+     *         返回key对应的value值
+     */
+    public String getAndReturnFromMaster(int dbIndex, final String key) {
+        return getAndReturnHandler(Boolean.TRUE, dbIndex, key);
+    }
+
+    private String getAndReturnHandler(boolean fromMaster, int dbIndex, final String key) {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-            jedisPool = getJedisSlavePool();
+            if (fromMaster) {
+                jedisPool = getJedisMasterPool();
+            } else {
+                jedisPool = getJedisSlavePool();
+            }
             jedis = jedisPool.getResource();
 
             if (dbIndex != 0) {
@@ -447,12 +473,28 @@ public class RedisClient {
     }
 
     /**
-     * 执行get操作，然后释放client连接
+     * 在主库执行get操作，然后释放client连接
      * </br>
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
      * 
+     * @param key
+     *            set的key值
+     * @return
+     *         返回key对应的value值
+     */
+    public String getAndReturnFromMaster(final String key) {
+        return getAndReturnFromMaster(0, key);
+    }
+
+    /**
+     * 在从库执行get操作，然后释放client连接
+     * </br>
+     * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
+     * </br>
+     * 并在调用完成后，需调用pool的returnResource方法释放该连接
+     *
      * @param key
      *            set的key值
      * @return
