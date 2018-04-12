@@ -114,7 +114,7 @@ public class RedisSentinelFactory extends AbstractClientFactory {
                 return pool;
             }
         }
-        //return master pool when can not get the reader pool
+        // return master pool when can not get the reader pool
         return masterPool;
     }
 
@@ -138,8 +138,9 @@ public class RedisSentinelFactory extends AbstractClientFactory {
                         break;
                     }
                 } catch (JedisConnectionException e) {
-                    if (readPool != null) {
-                        readPool.returnBrokenResource(jedis);
+                    if (readPool != null && null != jedis) {
+                        jedis.close();
+                        jedis = null;
                         logger.warn("get jedis instance timeout from pool failure,try next slave,error:{}",
                                 e.getCause());
                     }
