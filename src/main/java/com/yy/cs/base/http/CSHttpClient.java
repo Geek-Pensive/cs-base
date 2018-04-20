@@ -1,22 +1,6 @@
 package com.yy.cs.base.http;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.SSLContext;
-
+import com.yy.cs.base.status.LogLevel;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -30,6 +14,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
@@ -46,7 +31,17 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yy.cs.base.status.LogLevel;
+import javax.net.ssl.SSLContext;
+import java.io.*;
+import java.net.URLDecoder;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 基于Apache的httpclient 4.3.X以上的版本，使用PoolingHttpClientConnectionManager封装了HttpClient常用API。
@@ -70,6 +65,10 @@ public class CSHttpClient {
      *            factory 生成CSHttpClient的工厂类
      */
     public CSHttpClient(CSHttpClientFactory factory, Boolean isPostRedirect) {
+        this(factory,isPostRedirect,null);
+    }
+
+    public CSHttpClient(CSHttpClientFactory factory, Boolean isPostRedirect,HttpRoutePlanner httpRoutePlanner) {
         PoolingHttpClientConnectionManager cm = null;
         if (factory.isTrustAllCertificates()) {
             RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder.<ConnectionSocketFactory> create()
@@ -85,21 +84,21 @@ public class CSHttpClient {
                     }
 
                 }).build();
-                LayeredConnectionSocketFactory sslSF = new SSLConnectionSocketFactory(sslContext, 
+                LayeredConnectionSocketFactory sslSF = new SSLConnectionSocketFactory(sslContext,
                         SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
                 registryBuilder.register("https", sslSF);
             } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
-            
-            cm = new PoolingHttpClientConnectionManager(registryBuilder.build(), null, null, null, 
+
+            cm = new PoolingHttpClientConnectionManager(registryBuilder.build(), null, null, null,
                     factory.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
         } else {
             cm = new PoolingHttpClientConnectionManager(factory.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
         }
-        
-        
+
+
         this.defaultRequestConfig = RequestConfig.custom().setConnectTimeout(factory.getConnectionTimeout())
                 .setConnectionRequestTimeout(factory.getConnectionRequestTimeout())
                 .setSocketTimeout(factory.getSocketTimeOut()).build();
@@ -112,7 +111,9 @@ public class CSHttpClient {
         if (null != factory.getLogLevel()) {
             this.logLevel = factory.getLogLevel();
         }
-        this.httpClient = builder.setConnectionManager(cm).build();
+        builder.setConnectionManager(cm);
+        builder.setRoutePlanner(httpRoutePlanner);
+        this.httpClient = builder.build();
     }
 
     private void logErrorInfo(String msg, Object... args) {
@@ -153,6 +154,10 @@ public class CSHttpClient {
      */
     public CSHttpClient() {
         this(new CSHttpClientFactory());
+    }
+
+    public CSHttpClient(HttpRoutePlanner httpRoutePlanner) {
+        this(new CSHttpClientFactory(),false,httpRoutePlanner);
     }
 
     /**
