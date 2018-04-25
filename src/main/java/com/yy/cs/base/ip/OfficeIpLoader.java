@@ -27,7 +27,7 @@ public class OfficeIpLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(OfficeIpLoader.class);
 
-    private static final String HOST = "http://webapi.sysop.duowan.com:62175/office/ip_desc.txt";
+    private static final String HOST = "http://webapi.sysop.duowan.com:62175/office/ip.txt";
     private static final Pattern pattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
     private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,
             new NamedThreadFactory("OfficeIpLoader", true));
@@ -187,8 +187,9 @@ public class OfficeIpLoader {
         return lines;
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
+        OfficeIpLoader.getInstance();
         TimeUnit.SECONDS.sleep(1);
-        System.out.println(OfficeIpLoader.getInstance().isCompanyIp("58.248.229.148"));
+        System.out.println(OfficeIpLoader.getInstance().isCompanyIp("59.38.34.130"));
     }
 }
