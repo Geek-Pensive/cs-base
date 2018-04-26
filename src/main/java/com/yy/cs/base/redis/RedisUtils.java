@@ -28,6 +28,7 @@ public class RedisUtils {
         try {
             Jedis jedis = new Jedis(host, port, timeout);
             jedis.connect();
+            jedis.close();
             return true;
         } catch (Exception e) {
             return false;
