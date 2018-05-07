@@ -1,6 +1,7 @@
 package com.yy.cs.base.http;
 
 import com.yy.cs.base.status.LogLevel;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -9,10 +10,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -33,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.*;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -216,6 +215,63 @@ public class CSHttpClient {
             }
         }
         return result;
+    }
+
+    /**
+     * 执行一个http方法
+     *
+     * @param httpRequestBase 执行方法的类型
+     * @return Header[] http返回的response头信息
+     * @throws HttpClientException
+     */
+    public Header[] executeMethodReturnHeaders(HttpRequestBase httpRequestBase) throws HttpClientException {
+        CloseableHttpResponse response = null;
+        StatusLine status = null;
+        Header[] headers;
+        try {
+            setDefaultRequestConfig(httpRequestBase);
+            log.debug("executing request " + decodeUrl(httpRequestBase.getURI().toString()));
+            response = httpClient.execute(httpRequestBase);
+            status = response.getStatusLine();
+            headers = response.getAllHeaders();
+        } catch (IOException e) {
+            logErrorInfo("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
+                    e);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logErrorInfo("response close IOException:" + httpRequestBase.getURI(), e);
+                }
+            }
+            if (httpRequestBase != null) {
+                httpRequestBase.releaseConnection();
+            }
+        }
+        return headers;
+    }
+
+    public int getFileSize(String url) {
+        HttpRequestBase httpRequestBase = new HttpHead(url);
+        Header[] headers;
+        try {
+            headers = executeMethodReturnHeaders(httpRequestBase);
+            if (headers == null || headers.length == 0) {
+                log.error("get file size fail, header is null or empty!");
+                return 0;
+            }
+            for (Header header : headers) {
+                if (header.getName().equalsIgnoreCase("content-length")) {
+                    return Integer.valueOf(header.getValue());
+                }
+            }
+            log.error("get file size fail! no content-length element in headers");
+        } catch (Exception e) {
+            log.error("get file size fail!", e);
+        }
+        return 0;
     }
 
     /**
