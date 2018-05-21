@@ -57,6 +57,8 @@ public class CSHttpClient {
 
     private LogLevel logLevel = LogLevel.ERROR;
 
+    private HttpRequestStatisticsInterceptor httpRequestStatisticsInterceptor;
+
     /**
      * 带参数的构造函数，通过工厂类{@link CSHttpClientFactory}生成指定的CSHttpClient,设置post请求方式是否自动跳转302地址
      *
@@ -113,6 +115,11 @@ public class CSHttpClient {
         builder.setConnectionManager(cm);
         builder.setRoutePlanner(httpRoutePlanner);
         this.httpClient = builder.build();
+    }
+
+
+    public void setHttpRequestStatisticsInterceptor(HttpRequestStatisticsInterceptor httpRequestStatisticsInterceptor) {
+        this.httpRequestStatisticsInterceptor = httpRequestStatisticsInterceptor;
     }
 
     private void logErrorInfo(String msg, Object... args) {
@@ -180,14 +187,18 @@ public class CSHttpClient {
         CloseableHttpResponse response = null;
         StatusLine status = null;
         String result = "";
-
+        HttpRequestStatistics statistics = new HttpRequestStatistics();
+        long _s = System.currentTimeMillis();
         try {
             setDefaultRequestConfig(httpRequestBase);
+            statistics.setUri(httpRequestBase.getURI());
             log.debug("executing request " + decodeUrl(httpRequestBase.getURI().toString()));
             response = httpClient.execute(httpRequestBase);
             status = response.getStatusLine();
+            statistics.setStatusLine(status);
             log.debug("response status " + status);
             HttpEntity entity = response.getEntity();
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
             if (status.getStatusCode() == HttpStatus.SC_OK) {
                 result = inputStream2String(entity.getContent());
             } else {
@@ -195,10 +206,14 @@ public class CSHttpClient {
                         + status + ",resp:" + inputStream2String(entity.getContent()));
             }
         } catch (ClientProtocolException e) {
+            statistics.setException(e);
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
             logErrorInfo("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
         } catch (IOException e) {
+            statistics.setException(e);
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
             logErrorInfo("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException("get data from url:" + httpRequestBase.getURI() + " fail, status: " + status,
                     e);
@@ -212,6 +227,14 @@ public class CSHttpClient {
             }
             if (httpRequestBase != null) {
                 httpRequestBase.releaseConnection();
+            }
+            if (httpRequestStatisticsInterceptor != null) {
+                // http 请求的一些监控，同步调用，过于依赖实现方。异步调用，需要提供对线程池的支持
+                try {
+                    httpRequestStatisticsInterceptor.handle(statistics);
+                } catch (Exception e) {
+                    logErrorInfo("httpRequestStatisticsInterceptor Exception:" + httpRequestBase.getURI(), e);
+                }
             }
         }
         return result;
@@ -284,13 +307,18 @@ public class CSHttpClient {
     public byte[] executeMethodAndReturnByteArray(HttpRequestBase httpRequestBase) throws HttpClientException {
         CloseableHttpResponse response = null;
         StatusLine status = null;
+        HttpRequestStatistics statistics = new HttpRequestStatistics();
+        long _s = System.currentTimeMillis();
         try {
             setDefaultRequestConfig(httpRequestBase);
+            statistics.setUri(httpRequestBase.getURI());
             log.debug("executing request " + decodeUrl(httpRequestBase.getURI().toString()));
             response = httpClient.execute(httpRequestBase);
             status = response.getStatusLine();
+            statistics.setStatusLine(status);
             log.debug("response status " + status);
             HttpEntity entity = response.getEntity();
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
             if (status.getStatusCode() == HttpStatus.SC_OK) {
                 return inputStream2ByteArray(entity.getContent());
             } else {
@@ -298,10 +326,14 @@ public class CSHttpClient {
                         "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status);
             }
         } catch (ClientProtocolException e) {
+            statistics.setException(e);
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
             logErrorInfo("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException(
                     "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
         } catch (IOException e) {
+            statistics.setException(e);
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
             logErrorInfo("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
             throw new HttpClientException(
                     "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
@@ -315,6 +347,15 @@ public class CSHttpClient {
             }
             if (httpRequestBase != null) {
                 httpRequestBase.releaseConnection();
+            }
+
+            if (httpRequestStatisticsInterceptor != null) {
+                // http 请求的一些监控，同步调用，过于依赖实现方。异步调用，需要提供对线程池的支持
+                try {
+                    httpRequestStatisticsInterceptor.handle(statistics);
+                } catch (Exception e) {
+                    logErrorInfo("httpRequestStatisticsInterceptor Exception:" + httpRequestBase.getURI(), e);
+                }
             }
         }
     }
