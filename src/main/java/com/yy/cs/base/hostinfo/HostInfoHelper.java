@@ -80,6 +80,10 @@ public class HostInfoHelper {
         return HostInfo.parse(origInfo);
     }
 
+    public static OriginHostInfo getOrigInfo() {
+        return origInfo;
+    }
+
     public static void main(String[] args) {
         System.out.println(HostInfoHelper.getHostInfo());
     }
