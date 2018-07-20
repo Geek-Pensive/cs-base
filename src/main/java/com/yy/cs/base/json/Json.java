@@ -6,6 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -73,6 +74,22 @@ public class Json {
 	public static <T> T strToObj(String jsonStr, TypeReference<T> type){
 		try {
 			return  mapper.readValue(jsonStr, type);
+		} catch (Exception e) {
+			String msg = String.format("Failed to parse json %s", jsonStr);
+			throw new RuntimeException(msg, e);
+		}
+	}
+
+	/**
+	 * 通过JSON字符串生成指定类型的引用对象
+	 * @param jsonStr json串
+	 * @param javaType Java类型
+	 * @return
+	 * 		对应的javatype类型的对象实例
+	 */
+	public static <T> T strToObj(String jsonStr, JavaType javaType){
+		try {
+			return  mapper.readValue(jsonStr, javaType);
 		} catch (Exception e) {
 			String msg = String.format("Failed to parse json %s", jsonStr);
 			throw new RuntimeException(msg, e);
