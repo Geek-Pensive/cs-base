@@ -23,7 +23,6 @@ import com.yy.cs.base.json.Json;
 import com.yy.cs.base.redis.RedisUtils;
 
 import redis.clients.jedis.HostAndPort;
-//import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -32,7 +31,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class CustomJedisSentinelPool extends JedisPool {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CustomJedisSentinelPool.class);
+    protected static final org.slf4j.Logger log = LoggerFactory.getLogger(CustomJedisSentinelPool.class);
 
     protected JedisPoolConfig poolConfig;
 
@@ -52,15 +51,15 @@ public class CustomJedisSentinelPool extends JedisPool {
 
     protected Map<String, ArrayList<HostAndPort>> sentinelsMap = new ConcurrentHashMap<>();
 
-    private Executor executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    protected Executor executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private volatile HostAndPort currentHostMaster;
 
-    private CopyOnWriteArrayList<SlaveJedisPool> availableSlaves = new CopyOnWriteArrayList<>();
+    protected CopyOnWriteArrayList<SlaveJedisPool> availableSlaves = new CopyOnWriteArrayList<>();
 
-    private CopyOnWriteArrayList<HostAndPort> unavailableSlaves = new CopyOnWriteArrayList<>();
+    protected CopyOnWriteArrayList<HostAndPort> unavailableSlaves = new CopyOnWriteArrayList<>();
 
     private AtomicLong lastLoadTimestamp = new AtomicLong();
 
@@ -184,7 +183,7 @@ public class CustomJedisSentinelPool extends JedisPool {
             }
             for (HostAndPort hap : slaves) {
                 if (RedisUtils.isAvailable(hap.getHost(), hap.getPort(), timeout)) {
-                    availableSlaves.add(new SlaveJedisPool(poolConfig, hap, timeout));
+                    availableSlaves.add(createSlaveJedisPool(hap));
                     log.info("reload new jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
                 } else {
                     unavailableSlaves.add(hap);
@@ -196,12 +195,16 @@ public class CustomJedisSentinelPool extends JedisPool {
         }
     }
 
+    protected SlaveJedisPool createSlaveJedisPool(HostAndPort hap) {
+        return new SlaveJedisPool(poolConfig, hap, timeout);
+    }
+
     public JedisPool getReaderPool() {
         try {
             lock.readLock().lock();
             int size = availableSlaves.size();
             if (size > 0) {
-                return availableSlaves.get(ThreadLocalRandom.current().nextInt(size));
+                return availableSlaves.get(nextBalanceIndex(size));
             } else {
                 log.info("error: none slave pool can be aquired");
                 return null;
@@ -211,7 +214,14 @@ public class CustomJedisSentinelPool extends JedisPool {
         }
     }
 
-    private Map<String, ArrayList<HostAndPort>> initSentinels(Set<String> sentinels, final String masterName,
+    /**
+     * 返回一个下次要访问的slave索引序号
+     */
+    protected int nextBalanceIndex(int size) {
+        return ThreadLocalRandom.current().nextInt(size);
+    }
+
+    protected Map<String, ArrayList<HostAndPort>> initSentinels(Set<String> sentinels, final String masterName,
             int timeout) {
         Map<String, ArrayList<HostAndPort>> map = new HashMap<String, ArrayList<HostAndPort>>();
         HostAndPort master = null;
@@ -236,7 +246,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                         // 获取从服务器列表
                         ArrayList<HostAndPort> slaves = new ArrayList<>();
                         for (Map<String, String> slave : jedis.sentinelSlaves(masterName)) {
-                            HostAndPort _slave = toHostAndPort(Arrays.asList(slave.get("name").split(":")));
+                            HostAndPort _slave = new HostAndPort(slave.get("ip"), Integer.parseInt(slave.get("port")));
                             slaves.add(_slave);
                             log.info("Found Redis Slave: " + Json.ObjToStr(slave));
                         }
@@ -278,7 +288,7 @@ public class CustomJedisSentinelPool extends JedisPool {
     private void reloadSlavePools(Jedis jedis, String masterName) {
         ArrayList<HostAndPort> slaves = new ArrayList<>();
         for (Map<String, String> slave : jedis.sentinelSlaves(masterName)) {
-            HostAndPort _slave = toHostAndPort(Arrays.asList(slave.get("name").split(":")));
+            HostAndPort _slave = new HostAndPort(slave.get("ip"), Integer.parseInt(slave.get("port")));
             slaves.add(_slave);
             log.info("reloadSlavePools: found Redis Slave: " + Json.ObjToStr(slave));
         }
@@ -355,7 +365,7 @@ public class CustomJedisSentinelPool extends JedisPool {
 
                         if (!newAvailable.isEmpty()) {
                             for (HostAndPort hap : newAvailable) {
-                                availableSlaves.add(new SlaveJedisPool(poolConfig, hap, timeout));
+                                availableSlaves.add(createSlaveJedisPool(hap));
                                 unavailableSlaves.remove(hap);
                                 if (log.isDebugEnabled()) {
                                     log.debug(" add available jedis slave pool " + hap);

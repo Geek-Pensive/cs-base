@@ -10,6 +10,12 @@ public class LocalIpHelper {
     public static String getLocalHostIP() {
         String ip;
         try {
+
+            ip = System.getProperty("dragon.ip");
+            if (ip != null && ip.length() > 0) {
+                return ip;
+            }
+
             /**返回本地主机。*/
             InetAddress addr = InetAddress.getLocalHost();
             /**返回 IP 地址字符串（以文本表现形式）*/

@@ -10,9 +10,14 @@ import redis.clients.jedis.Protocol;
  * @author tanghengde
  *
  */
-public class SlaveJedisPool extends JedisPool {
+public class SlaveJedisPool extends JedisPool implements Comparable<SlaveJedisPool> {
 
     private final HostAndPort hostAndPort;
+
+    /**
+     * 优先级，数字越大优先级越高，默认为0，相同机房的优先级为1
+     */
+    private int priority = 0;
 
     public SlaveJedisPool(final JedisPoolConfig poolConfig, final HostAndPort hostAndPort, final int timeout) {
         super(poolConfig, hostAndPort.getHost(), hostAndPort.getPort(), timeout, null, Protocol.DEFAULT_DATABASE, null);
@@ -24,4 +29,16 @@ public class SlaveJedisPool extends JedisPool {
         return hostAndPort;
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int compareTo(SlaveJedisPool o) {
+        return o.getPriority() - this.getPriority();
+    }
 }

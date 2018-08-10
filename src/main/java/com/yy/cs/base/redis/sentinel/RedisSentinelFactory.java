@@ -21,6 +21,12 @@ public class RedisSentinelFactory extends AbstractClientFactory {
     private static final Logger logger = LoggerFactory.getLogger(RedisSentinelFactory.class);
 
     private CustomJedisSentinelPool masterPool;
+
+    /**
+     * 是否就近读reids从，如果为true，将优先读同机房的reids从库
+     */
+    private boolean useNearbySlave = false;
+
     private int retries = 3;
 
     // 属性变量
@@ -47,7 +53,12 @@ public class RedisSentinelFactory extends AbstractClientFactory {
         }
         try {
             CustomJedisSentinelPool old = masterPool;
-            masterPool = new CustomJedisSentinelPool(masterName, servers, this.config, timeout, password);
+            if (useNearbySlave) {
+                masterPool = new NearbyJedisSentinelPool(masterName, servers, this.config, timeout, password);
+            } else {
+                masterPool = new CustomJedisSentinelPool(masterName, servers, this.config, timeout, password);
+            }
+            logger.info("[init] Instance {} for sentinel master : {}", masterPool.getClass().getName(), masterName);
             if (old != null) {
                 old.destroy(); // 不destroy会导致重复创建后台线程
             }
@@ -216,4 +227,11 @@ public class RedisSentinelFactory extends AbstractClientFactory {
         this.timeout = timeout;
     }
 
+    public boolean isUseNearbySlave() {
+        return useNearbySlave;
+    }
+
+    public void setUseNearbySlave(boolean useNearbySlave) {
+        this.useNearbySlave = useNearbySlave;
+    }
 }
