@@ -40,8 +40,16 @@ public class ClusterConfig {
 	public void setExpireLockTime(int expireLockTime) {
 		this.expireLockTime = expireLockTime;
 	}
-	
-//	public RedisPoolManager getRedisPoolManager() {
+
+	@Override
+	public String toString() {
+		return "ClusterConfig{" +
+				"redisClient=" + redisClient +
+				", expireLockTime=" + expireLockTime +
+				'}';
+	}
+
+	//	public RedisPoolManager getRedisPoolManager() {
 //		return redisPoolManager;
 //	}
 //
