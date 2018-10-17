@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Json {
 
-	private final static ObjectMapper mapper = new ObjectMapper();
+	private static ObjectMapper mapper = new ObjectMapper();
 
 	static {
 		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); // 忽略不存在的属性
@@ -270,4 +270,8 @@ public class Json {
 	public static ObjectMapper getObjectMapper(){
 		return mapper;
 	}
+
+    public static void setMapper(ObjectMapper mapper) {
+        Json.mapper = mapper;
+    }
 }
