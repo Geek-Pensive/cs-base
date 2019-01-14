@@ -24,7 +24,7 @@ public class RedisClient {
 
     /**
      * redis客户端构造器
-     * 
+     *
      * @param factory
      *            redis工厂类 {@link RedisClientFactory}
      */
@@ -56,7 +56,7 @@ public class RedisClient {
 
     /**
      * 从redisMasterPool中随机获取pool
-     * 
+     *
      * @return
      *         Salve的jedis资源池
      */
@@ -70,7 +70,7 @@ public class RedisClient {
 
     /**
      * 从redisSlavePool中随机获取pool
-     * 
+     *
      * @return
      *         Master的jedis资源池
      */
@@ -88,7 +88,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            redis db index
      * @param key
@@ -125,7 +125,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @param value
@@ -139,7 +139,7 @@ public class RedisClient {
 
     /**
      * 使用setnx命令探测
-     * 
+     *
      * @param dbIndex
      * @param key
      * @param value
@@ -209,7 +209,7 @@ public class RedisClient {
 
     /**
      * 返回对应key的ttl（Time To Live），
-     * 
+     *
      * @param dbIndex
      * @param key
      * @return Long，-2：key不存在，-1：key不会过期，>0剩余过期秒数
@@ -238,7 +238,7 @@ public class RedisClient {
 
     /**
      * 在redis上执行相应的lua脚本
-     * 
+     *
      * @param dbIndex
      * @param readonly 如果为true并且存在从库设置的情况下，在从库上执行
      * @param script lua脚本
@@ -278,7 +278,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @param value
@@ -317,7 +317,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @param value
@@ -337,7 +337,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @param value
@@ -375,7 +375,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @param value
@@ -391,7 +391,7 @@ public class RedisClient {
 
     /**
      * 获取info信息
-     * 
+     *
      * @return
      *         String类型，当前连接服务器的服务器信息
      */
@@ -418,7 +418,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            db的索引值
      * @param key
@@ -478,7 +478,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @return
@@ -510,7 +510,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            redis db index
      * @param key
@@ -546,7 +546,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @param value
@@ -564,7 +564,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            db的索引值
      * @param key
@@ -598,7 +598,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param key
      *            set的key值
      * @return
@@ -614,7 +614,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            db的索引值
      * @param keysvalues
@@ -647,7 +647,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param keysvalues
      *            set的key值
      * @return
@@ -663,7 +663,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            db的索引值
      * @param keys
@@ -697,7 +697,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param keys
      *            set的keys,可以获取多个key的value值
      * @return
@@ -713,7 +713,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            db的索引值
      * @param keysvalues
@@ -747,7 +747,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param keysvalues
      *            set的keys,可以获取多个key的value值
      * @return
@@ -763,7 +763,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param dbIndex
      *            db的索引值
      * @param keys
@@ -797,7 +797,7 @@ public class RedisClient {
      * 如果要多次操作，请使用原生的Jedis, 可以使用 getJedisMasterPool getJedisSlavePool 获取pool后，再获取redis连接
      * </br>
      * 并在调用完成后，需调用pool的returnResource方法释放该连接
-     * 
+     *
      * @param keys
      *            set的keys,可以获取多个key的value值
      * @return
@@ -810,7 +810,7 @@ public class RedisClient {
     /**
      * 执行smembers操作，然后释放client连接
      * 返回集合 key 中的所有成员。不存在的 key 被视为空集合
-     * 
+     *
      * @param key
      *            set的key值
      * @return
@@ -823,11 +823,11 @@ public class RedisClient {
     /**
      * 执行smembers操作，然后释放client连接
      * 返回集合 key 中的所有成员。不存在的 key 被视为空集合
-     * 
+     *
      * @param dbIndex
      * @param key
      *            set的key值
-     * 
+     *
      * @return
      *         默认db下,当前key对应的所有成员
      */
@@ -852,7 +852,7 @@ public class RedisClient {
 
     /**
      * redis SADD 操作，向名为key的set中添加一个或者多个value
-     * 
+     *
      * @param key
      *            假如 key不存在，则创建一个只包含 member 元素作成员的集合。当 key 不是集合类型时，返回一个错误。
      * @param values
@@ -866,7 +866,7 @@ public class RedisClient {
 
     /**
      * redis SADD 操作，向名为key的set中添加一个或者多个value
-     * 
+     *
      * @param dbIndex
      * @param key
      *            假如 key不存在，则创建一个只包含 member 元素作成员的集合。当 key 不是集合类型时，返回一个错误。
@@ -896,7 +896,7 @@ public class RedisClient {
 
     /**
      * redis的 SREM 操作，移除set(名称为key)中的一个或多个value
-     * 
+     *
      * @param key
      *            set的key值
      * @param values
@@ -910,7 +910,7 @@ public class RedisClient {
 
     /**
      * redis的 SREM 操作，移除set(名称为key)中的一个或多个value
-     * 
+     *
      * @param dbIndex
      * @param key
      *            set的key值
@@ -942,7 +942,7 @@ public class RedisClient {
      * Redis 的SCARD 操作，返回当前set中的value个数。
      * 集合的基数。
      * 当 key 不存在时，返回 0
-     * 
+     *
      * @param key
      *            set的key值
      * @return Long
@@ -956,7 +956,7 @@ public class RedisClient {
      * Redis 的SCARD 操作，返回当前set中的value个数。
      * 集合的基数。
      * 当 key 不存在时，返回 0
-     * 
+     *
      * @param dbIndex
      * @param key
      *            set的key值
@@ -986,7 +986,7 @@ public class RedisClient {
      * SISMEMBER key member 判断 member 元素是否集合 key 的成员。
      * 如果 member 元素是集合的成员，返回 1 。
      * 如果 member 元素不是集合的成员，或 key 不存在，返回 0 。
-     * 
+     *
      * @param key
      *            set的key值
      * @param value
@@ -1002,7 +1002,7 @@ public class RedisClient {
      * SISMEMBER key member 判断 member 元素是否集合 key 的成员。
      * 如果 member 元素是集合的成员，返回 1 。
      * 如果 member 元素不是集合的成员，或 key 不存在，返回 0 。
-     * 
+     *
      * @param dbIndex
      * @param key
      *            set的key值
@@ -1035,7 +1035,7 @@ public class RedisClient {
     /**
      * 将哈希表 key 中的域 field 的值设为 value 。如果 key 不存在，一个新的哈希表被创建并进行 HSET 操作。
      * 如果域 field 已经存在于哈希表中，旧值将被覆盖。
-     * 
+     *
      * @param key
      *            hash表的标记key
      * @param field
@@ -1053,7 +1053,7 @@ public class RedisClient {
     /**
      * 将哈希表 key 中的域 field 的值设为 value 。如果 key 不存在，一个新的哈希表被创建并进行 HSET 操作。
      * 如果域 field 已经存在于哈希表中，旧值将被覆盖。
-     * 
+     *
      * @param dbIndex
      * @param key
      *            hash表的标记key
@@ -1087,7 +1087,7 @@ public class RedisClient {
     /**
      * 同时将多个 field-value (域-值)对设置到哈希表 key 中。此命令会覆盖哈希表中已存在的域。
      * 如果 key 不存在，一个空哈希表被创建并执行 HMSET 操作。
-     * 
+     *
      * @param key
      *            hash表的标记key
      * @param value
@@ -1103,7 +1103,7 @@ public class RedisClient {
     /**
      * 同时将多个 field-value (域-值)对设置到哈希表 key 中。此命令会覆盖哈希表中已存在的域。
      * 如果 key 不存在，一个空哈希表被创建并执行 HMSET 操作。
-     * 
+     *
      * @param dbIndex
      * @param key
      *            hash表的标记key
@@ -1134,7 +1134,7 @@ public class RedisClient {
 
     /**
      * 返回哈希表 key 中给定域 field 的值。
-     * 
+     *
      * @param key
      *            hash表的标记key
      * @param field
@@ -1148,7 +1148,7 @@ public class RedisClient {
 
     /**
      * 返回哈希表 key 中给定域 field 的值。
-     * 
+     *
      * @param dbIndex
      * @param key
      *            hash表的标记key
@@ -1212,7 +1212,7 @@ public class RedisClient {
      * 返回哈希表 key 中，一个或多个给定域的值。
      * 如果给定的域不存在于哈希表，那么返回一个 nil 值。
      * 因为不存在的 key 被当作一个空哈希表来处理，所以对一个不存在的 key 进行 HMGET 操作将返回一个只带有 nil 值的表。
-     * 
+     *
      * @param key
      *            hash表的标记key
      * @param fields
@@ -1228,7 +1228,7 @@ public class RedisClient {
      * 返回哈希表 key 中，一个或多个给定域的值。
      * 如果给定的域不存在于哈希表，那么返回一个 nil 值。
      * 因为不存在的 key 被当作一个空哈希表来处理，所以对一个不存在的 key 进行 HMGET 操作将返回一个只带有 nil 值的表。
-     * 
+     *
      * @param dbIndex
      * @param key
      *            hash表的标记key
@@ -1259,7 +1259,7 @@ public class RedisClient {
     /*** common operation ***/
     /**
      * 移除指定key和value,并返回删除个数
-     * 
+     *
      * @param key
      *            set中的key值
      * @return
@@ -1272,7 +1272,7 @@ public class RedisClient {
     /*** common operation ***/
     /**
      * 移除指定key和value,并返回删除个数
-     * 
+     *
      * @param dbIndex
      * @param key
      *            set中的key值
@@ -1299,7 +1299,7 @@ public class RedisClient {
     /**
      * 将 key 改名为 newkey 。当 key 和 newkey 相同，或者 key 不存在时，返回一个错误。
      * 当 newkey 已经存在时， RENAME 命令将覆盖旧值。
-     * 
+     *
      * @param oldkey
      *            原有的key
      * @param newkey
@@ -1314,7 +1314,7 @@ public class RedisClient {
     /**
      * 将 key 改名为 newkey 。当 key 和 newkey 相同，或者 key 不存在时，返回一个错误。
      * 当 newkey 已经存在时， RENAME 命令将覆盖旧值。
-     * 
+     *
      * @param dbIndex
      * @param oldkey
      *            原有的key
@@ -1345,7 +1345,7 @@ public class RedisClient {
 
     /**
      * 判断当前key是否已存在
-     * 
+     *
      * @param key
      *            set中的key值
      * @return
@@ -1357,7 +1357,7 @@ public class RedisClient {
 
     /**
      * 判断当前key是否已存在
-     * 
+     *
      * @param dbIndex
      * @param key
      *            set中的key值
@@ -1385,7 +1385,7 @@ public class RedisClient {
 
     /**
      * 使用客户端向 Redis 服务器发送一个 PING 通常用于测试与服务器的连接是否仍然生效，或者用于测量延迟值。
-     * 
+     *
      * @return
      *         如果服务器运作正常的话，会返回一个 PONG,否则抛出异常
      */
@@ -1409,7 +1409,7 @@ public class RedisClient {
     /*** advanced operation ***/
     /**
      * 监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断。
-     * 
+     *
      * @param key
      *            set中的key值
      */
@@ -1419,7 +1419,7 @@ public class RedisClient {
 
     /**
      * 监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断。
-     * 
+     *
      * @param dbIndex
      * @param key
      *            set中的key值
@@ -1445,7 +1445,7 @@ public class RedisClient {
 
     /**
      * 进行事务处理
-     * 
+     *
      * @param transactionAction
      *            事务对象
      * @return
@@ -1472,7 +1472,7 @@ public class RedisClient {
 
     /**
      * 通过使用管道，执行相关操作
-     * 
+     *
      * @param piplineAction
      *            管道对象
      */
@@ -1496,7 +1496,7 @@ public class RedisClient {
     }
 
     /**
-     * 
+     *
      * @param piplineAction
      *            管道对象
      * @return
@@ -1523,7 +1523,7 @@ public class RedisClient {
 
     /**
      * redis中进行管道相关操作时，实现此接口
-     * 
+     *
      * @author duowan-PC
      *
      */
@@ -1533,7 +1533,7 @@ public class RedisClient {
 
     /**
      * 数据库操作事务对象接口,在redis中进行事务相关的操作时，实现此接口
-     * 
+     *
      * @author duowan-PC
      *
      */
@@ -1571,7 +1571,7 @@ public class RedisClient {
 
     /**
      * 往列表头插入元素
-     * 
+     *
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
      * @return 列表的长度
@@ -1582,7 +1582,7 @@ public class RedisClient {
 
     /**
      * 往列表头插入元素
-     * 
+     *
      * @param dbIndex 一般都是 0
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
@@ -1610,8 +1610,39 @@ public class RedisClient {
     }
 
     /**
+     * 从列表头pop出元素
+     */
+    public String lpop(final String key) {
+        return lpop(0, key);
+    }
+
+    /**
+     * 从列表头pop出元素
+     */
+    public String lpop(final int dbIndex, final String key) {
+        String result;
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.lpop(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis lpop fail", e);
+        } finally {
+            jedisClose(jedis);
+        }
+        return result;
+    }
+
+    /**
      * 往列表尾插入元素
-     * 
+     *
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
      * @return 列表的长度
@@ -1622,7 +1653,7 @@ public class RedisClient {
 
     /**
      * 往列表尾插入元素
-     * 
+     *
      * @param dbIndex 一般都是 0
      * @param key 列表的KEY值 创建一个KEY(如果不存在) / 向KEY的列表中添加值
      * @param values 添加到列表中的值 一个或多个
@@ -1650,6 +1681,37 @@ public class RedisClient {
     }
 
     /**
+     * 往列表尾pop出元素
+     */
+    public String rpop(final String key) {
+        return rpop(0, key);
+    }
+
+    /**
+     * 往列表尾pop出元素
+     */
+    public String rpop(final int dbIndex, final String key) {
+        String result;
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.rpop(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis rpop fail", e);
+        } finally {
+            jedisClose(jedis);
+        }
+        return result;
+    }
+
+    /**
      * 返回存储在 KEY 中的列表元素，开始和结束索引都是从 0 开始的。 索引为0 代表列表的第一个元素，1 代表第二个元素 以此类推。
      * <p>
      * 例如：LRANGE foobar 0 2 就会返回列表名为：foobar的前3个元素。
@@ -1667,7 +1729,7 @@ public class RedisClient {
      * Redis会把它当做列表的最后一个元素的索引来对待。
      * <p>
      * 时间复杂度：O(start+n) n为要查询的范围 即 end - start。
-     * 
+     *
      * @param key 列表名称
      * @param start 查询起始索引
      * @param end 查询结束索引
@@ -1695,7 +1757,7 @@ public class RedisClient {
      * Redis会把它当做列表的最后一个元素的索引来对待。
      * <p>
      * 时间复杂度：O(start+n) n为要查询的范围 即 end - start。
-     * 
+     *
      * @param dbIndex
      * @param key 列表名称
      * @param start 查询起始索引
@@ -1733,7 +1795,7 @@ public class RedisClient {
      * <b>时间复杂度:</b>
      * <p>
      * O(N) (N为列表的长度), 设置表头或表尾元素的时间复杂度为：O(1).
-     * 
+     *
      * @param key 列表的KEY值
      * @param index 列表索引
      * @param value 要设置的新值
@@ -1753,7 +1815,7 @@ public class RedisClient {
      * <b>时间复杂度:</b>
      * <p>
      * O(N) (N为列表的长度), 设置表头或表尾元素的时间复杂度为：O(1).
-     * 
+     *
      * @param key 列表的KEY值
      * @param index 列表索引
      * @param value 要设置的新值
@@ -1794,7 +1856,7 @@ public class RedisClient {
      * <p>
      * <p>
      * Time complexity: O(n) (列表长度 - 修剪范围)
-     * 
+     *
      * @param key 列表的KEY值
      * @param start 开始索引
      * @param end 结束索引
@@ -1818,7 +1880,7 @@ public class RedisClient {
      * <p>
      * <p>
      * Time complexity: O(n) (列表长度 - 修剪范围)
-     * 
+     *
      * @param dbIndex 默认为 0
      * @param key 列表的KEY值
      * @param start 开始索引
@@ -1853,9 +1915,9 @@ public class RedisClient {
      * 变成一个正常的KEY，取消生存时间限制。
      * <p>
      * 时间复杂度: O(1)
-     * 
+     *
      * @see <ahref="http://code.google.com/p/redis/wiki/ExpireCommand">ExpireCommand</a>
-     * 
+     *
      * @param key
      * @param seconds
      * @return 成功返回: 1. 设置失败 ｜ KEY不存在返回：0.
@@ -1871,9 +1933,9 @@ public class RedisClient {
      * 变成一个正常的KEY，取消生存时间限制。
      * <p>
      * 时间复杂度: O(1)
-     * 
+     *
      * @see <ahref="http://code.google.com/p/redis/wiki/ExpireCommand">ExpireCommand</a>
-     * 
+     *
      * @param key
      * @param seconds
      * @return 成功返回: 1. 设置失败 ｜ KEY不存在返回：0.
@@ -1950,46 +2012,46 @@ public class RedisClient {
         return zadd(0,  key, scoreMembers);
     }
     public Long zadd(int dbIndex, String key,double score,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zadd(key, score, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zadd(key, score, member);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
     }
-    
+
     public Long zadd(String key,double score,String member) {
-    	return zadd(0,  key, score, member);
+        return zadd(0,  key, score, member);
     }
     public Double zincrby(int dbIndex, String key,double score,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zincrby(key, score, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zincrby(key, score, member);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
             jedisClose(jedis);
-    	}
+        }
     }
     /**
      * 会返回增加后的 score 值
@@ -1999,28 +2061,28 @@ public class RedisClient {
      * @return
      */
     public Double zincrby(String key,double score,String member) {
-    	return zincrby(0,  key, score, member);
+        return zincrby(0,  key, score, member);
     }
-    
+
     public Set<Tuple> zrangeWithScores(int dbIndex, String key,long start,long end) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrangeWithScores(key, start, end);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zrangeWithScores(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
     }
     /**
      * 按分数从小到大排序
@@ -2030,25 +2092,25 @@ public class RedisClient {
      * @return
      */
     public Set<Tuple> zrangeWithScores(String key,long start,long end) {
-    	return zrangeWithScores(0,  key, start, end);
+        return zrangeWithScores(0,  key, start, end);
     }
     public Set<Tuple> zrevrangeWithScores(int dbIndex, String key,long start,long end) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrevrangeWithScores(key, start, end);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zrevrangeWithScores(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
             jedisClose(jedis);
-    	}
+        }
     }
     /**
      * 按分数逆排 从大到小 
@@ -2056,28 +2118,28 @@ public class RedisClient {
      * @return
      */
     public Set<Tuple> zrevrangeWithScores(String key,long start,long end) {
-    	return zrevrangeWithScores(0,  key, start, end);
+        return zrevrangeWithScores(0,  key, start, end);
     }
-    
+
     public Double zscore(int dbIndex, String key,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zscore(key, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zscore(key, member);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
     }
     /**
      * 获取指定成员的分数
@@ -2087,25 +2149,25 @@ public class RedisClient {
      * @return
      */
     public Double zscore(String key,String member) {
-    	return zscore(0,  key, member);
+        return zscore(0,  key, member);
     }
     public Long zrank(int dbIndex, String key,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrank(key, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zrank(key, member);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
             jedisClose(jedis);
-    	}
+        }
     }
     /**
      * 返回指定成员的排名 从小到大排序 
@@ -2115,27 +2177,27 @@ public class RedisClient {
      * @return
      */
     public Long zrank(String key,String member) {
-    	return zrank(0,  key, member);
+        return zrank(0,  key, member);
     }
     public Long zrevrank(int dbIndex, String key,String member) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisSlavePool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrevrank(key, member);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zrevrank(key, member);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
     }
     /**
      * 返回指定成员的排名 从大到小排序 
@@ -2145,25 +2207,25 @@ public class RedisClient {
      * @return
      */
     public Long zrevrank(String key,String member) {
-    	return zrevrank(0,  key, member);
+        return zrevrank(0,  key, member);
     }
     public Long zrem(int dbIndex, String key,String...members ) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zrem(key, members);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zrem(key, members);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
             jedisClose(jedis);
-    	}
+        }
     }
     /**
      * 批量移除成员
@@ -2173,29 +2235,29 @@ public class RedisClient {
      * @return
      */
     public Long zrem(String key,String...members) {
-    	return zrem(0,  key, members);
+        return zrem(0,  key, members);
     }
-    
+
 
     public Long zremrangeByRank(int dbIndex, String key,long start, long end ) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.zremrangeByRank(key, start, end);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zremrangeByRank(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
     }
     /**
      * 移除指定排名内的成员 排名按分数值从小到大排
@@ -2205,26 +2267,26 @@ public class RedisClient {
      * @return
      */
     public Long zremrangeByRank(String key,long start, long end) {
-    	return zremrangeByRank(0,  key, start,end);
+        return zremrangeByRank(0,  key, start,end);
     }
     /****************************************** 消息分发 ***************************************************/
     public Long publish(int dbIndex, String channel,String message ) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		return jedis.publish(channel, message);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] channel:" + channel, e);
-    	} finally {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.publish(channel, message);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] channel:" + channel, e);
+        } finally {
             jedisClose(jedis);
-    	}
+        }
     }
     /**
      * 发送消息 message 到指定的 channel 
@@ -2234,37 +2296,37 @@ public class RedisClient {
      * @return
      */
     public Long publish(String channel,String message) {
-    	return publish(0,  channel, message);
+        return publish(0,  channel, message);
     }
     public void subscribe(int dbIndex, JedisPubSub jedisPubSub, String... channels ) {
-    	Jedis jedis = null;
-    	JedisPool jedisPool = null;
-    	try {
-    		jedisPool = getJedisMasterPool();
-    		jedis = jedisPool.getResource();
-    		if (dbIndex != 0) {
-    			jedis.select(dbIndex);
-    		}
-    		jedis.subscribe(jedisPubSub, channels);
-    	} catch (Exception e) {
-    		exceptionHandler(jedisPool, jedis, e);
-    		jedis = null;
-    		throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] channels:" + channels, e);
-    	} finally {
-    		if (jedis != null && jedisPool != null) {
-    			jedis.close();
-    		}
-    	}
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            jedis.subscribe(jedisPubSub, channels);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] channels:" + channels, e);
+        } finally {
+            if (jedis != null && jedisPool != null) {
+                jedis.close();
+            }
+        }
     }
     /**
      * 订阅频道
      * @param key
      * @param score
      * @param member
-     * @return 
+     * @return
      */
     public void subscribe(JedisPubSub jedisPubSub, String... channels) {
-    	subscribe(0,  jedisPubSub, channels);
+        subscribe(0,  jedisPubSub, channels);
     }
-    
+
 }
