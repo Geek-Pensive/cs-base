@@ -2087,13 +2087,46 @@ public class RedisClient {
     /**
      * 按分数从小到大排序
      * @param key
-     * @param score
-     * @param member
+     * @param start 开始下标
+     * @param end 结束下标
      * @return
      */
     public Set<Tuple> zrangeWithScores(String key,long start,long end) {
         return zrangeWithScores(0,  key, start, end);
     }
+
+
+    /**
+     * 获取指定分数范围内的元素
+     * @param key
+     * @param start 开始分数
+     * @param end 结束分数
+     * @return
+     */
+    public Set<Tuple> zrangeByScoreWithScores(String key,double start,double end) {
+        return zrangeByScoreWithScores(0,  key, start, end);
+    }
+
+    public Set<Tuple> zrangeByScoreWithScores(int dbIndex,String key,double start,double end) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zrangeByScoreWithScores(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            jedisClose(jedis);
+        }
+    }
+
+
     public Set<Tuple> zrevrangeWithScores(int dbIndex, String key,long start,long end) {
         Jedis jedis = null;
         JedisPool jedisPool = null;
@@ -2113,12 +2146,44 @@ public class RedisClient {
         }
     }
     /**
-     * 按分数逆排 从大到小 
+     * 按分数逆排 从大到小
      * @param key
+     * @param start 开始下标
+     * @param end 结束下标
      * @return
      */
     public Set<Tuple> zrevrangeWithScores(String key,long start,long end) {
         return zrevrangeWithScores(0,  key, start, end);
+    }
+
+    public Long zremrangeByScores(int dbIndex,String key,double start,double end){
+
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisSlavePool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.zremrangeByScore(key, start, end);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis del db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            jedisClose(jedis);
+        }
+    }
+    /**
+     * 删除分数区间内的元素
+     * @param key
+     * @param start
+     * @param end
+     * @return
+     */
+    public Long zremrangeByScores(String key,double start,double end){
+        return zremrangeByScores(0,  key, start, end);
     }
 
     public Double zscore(int dbIndex, String key,String member) {
@@ -2170,7 +2235,7 @@ public class RedisClient {
         }
     }
     /**
-     * 返回指定成员的排名 从小到大排序 
+     * 返回指定成员的排名 从小到大排序
      * @param key
      * @param score
      * @param member
@@ -2200,7 +2265,7 @@ public class RedisClient {
         }
     }
     /**
-     * 返回指定成员的排名 从大到小排序 
+     * 返回指定成员的排名 从大到小排序
      * @param key
      * @param score
      * @param member
@@ -2289,7 +2354,7 @@ public class RedisClient {
         }
     }
     /**
-     * 发送消息 message 到指定的 channel 
+     * 发送消息 message 到指定的 channel
      * @param key
      * @param score
      * @param member

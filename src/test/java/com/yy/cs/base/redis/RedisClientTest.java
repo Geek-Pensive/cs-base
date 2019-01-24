@@ -14,14 +14,11 @@ import org.junit.Test;
 
 import com.yy.cs.base.redis.RedisClient.TransactionAction;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.Transaction;
+import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
- * 
+ *
  * @author haoqing
  * RedisClientTest 的覆盖测试用例
  *
@@ -29,33 +26,68 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 public class RedisClientTest {
 
 	RedisClient redisClient;
-	
+
 	@Before
 	public void init(){
-		
+
 		RedisClientFactory redisClientFactory = new RedisClientFactory();
 		List<String> list = new ArrayList<String>();
 		//这里是业务要连接的redis
 //		list.add("172.19.103.105:6331::");
 //		list.add("172.19.103.105:6330::");
 //		list.add("172.19.103.105:6379:fdfs123:");
-		
+
 		list.add("127.0.0.1:6379::");
 		list.add("127.0.0.1:6379::");
-		
+
 		redisClientFactory.setRedisServers(list);
-		
+
 		redisClientFactory.setHealthCheck(true);
 		redisClientFactory.setCheckPeriod(1000);
 		redisClientFactory.setFullCheckPeriod(1000);
-		
+
 		redisClientFactory.init();
 		redisClient = new RedisClient(redisClientFactory);
 		//redisClient.setFactory(redisClientFactory);
-		
-		
-		
+
+
+
 	}
+
+	@Test
+	public void testZremrangeByScores(){
+		String key="RECENTLY_LIVE_UID";
+		long start=System.currentTimeMillis();
+		long end=System.currentTimeMillis();
+		for(int i=0;i<5;i++){
+			end+=3000;
+			Long size=redisClient.zadd(key,end,String.valueOf(3500015098l+i));
+			System.out.println(i+":" +size);
+		}
+
+		Set<Tuple> set1=redisClient.zrangeByScoreWithScores(key,start,end);
+		for(Tuple tuple:set1){
+			System.out.println(tuple.getElement() +"--" +tuple.getScore());
+		}
+
+		redisClient.zadd(key,System.currentTimeMillis(),"hello");
+
+		Set<Tuple> set3=redisClient.zrangeByScoreWithScores(key,start,System.currentTimeMillis());
+		for(Tuple tuple:set3){
+			System.out.println(tuple.getElement() +"--" +tuple.getScore());
+		}
+
+		Long size=redisClient.zremrangeByScores(key,end,end+5000);
+		System.out.println(size);
+		Set<Tuple> set5=redisClient.zrangeByScoreWithScores(key,start,end+5000);
+		// System.out.println(set5);
+
+		for(Tuple tuple:set5){
+			System.out.println(tuple.getElement() +"--" +tuple.getScore());
+		}
+
+	}
+
 
 	@Test
 	public void testSetnxpx() {
@@ -91,9 +123,9 @@ public class RedisClientTest {
 		}
 		System.out.println("测试轮询从 jedisPool中获取jedis实例  通过");
 	}
-	
-	
-	
+
+
+
 	/**
 	 * 测试returnJedis 和 连接数
 	 */
@@ -108,7 +140,7 @@ public class RedisClientTest {
 		}
 		System.out.println("测试returnJedis 和 连接数 通过");
 	}
-	
+
 	/**
 	 * 对比RedisClient与Jedis的数据
 	 * </br>
@@ -143,7 +175,7 @@ public class RedisClientTest {
 				borrowOrOprSuccess = false;
 				if (jedis != null)
 					pool.returnBrokenResource(jedis);
-	 
+
 			} finally {
 				if (borrowOrOprSuccess)
 					pool.returnResource(jedis);
@@ -151,7 +183,7 @@ public class RedisClientTest {
 		}
 		long endTime = System.currentTimeMillis();
 		System.out.println("test 1000 time cost "+ (endTime -  beginTime) + " in Jedis");
-		
+
 		beginTime = System.currentTimeMillis();
 		for(int i = 0; i < 1000; i++){
 			redisClient.setAndReturn(String.valueOf(i), String.valueOf(i));
@@ -160,11 +192,11 @@ public class RedisClientTest {
 		System.out.println("test 1000 time cost "+ (endTime -  beginTime) + " in RedisClient");
 		System.out.println("对比RedisClient与Jedis的数据  结束");
 	}
-	
+
 	/**
 	 * 对比RedisClient每次操作不returnResource的数据
 	 * </br>
-	 * 每次操作不returnResource test 100000 time cost 113906 in Jedis 
+	 * 每次操作不returnResource test 100000 time cost 113906 in Jedis
 	 * </br>
 	 * 每次操作returnResource test 100000 time cost 116360 in RedisClient
 	 */
@@ -186,7 +218,7 @@ public class RedisClientTest {
 		//pool.returnResource(jedis);
 		long endTime = System.currentTimeMillis();
 		System.out.println("test 100000 time cost "+ (endTime -  beginTime) + " in Jedis without returnResouce once operate");
-		
+
 		beginTime = System.currentTimeMillis();
 		for(int i = 0; i < 100000; i++){
 			redisClient.setAndReturn(String.valueOf(i), String.valueOf(i));
@@ -195,134 +227,134 @@ public class RedisClientTest {
 		System.out.println("test 100000 time cost "+ (endTime -  beginTime) + " in RedisClient with returnResouce once operate");
 		System.out.println("对比RedisClient每次操作不returnResource的数据  结束");
 	}
-	
-	
-	@Test 
+
+
+	@Test
 	public void msetAndReturnTest(){
-		String keys = redisClient.msetAndReturn("k1","v1","k2","v2") ; 
+		String keys = redisClient.msetAndReturn("k1","v1","k2","v2") ;
 		System.out.println(keys);
 		List<String> str = redisClient.mgetAndReturn("k1","k2","k3") ;
 		for(String s : str){
 			System.out.println(s);
 		}
 	}
-	
+
 	@Test
 	public void setAndReturnTest(){
-		byte [] key = "key".getBytes() ; 
-		byte [] value = "value".getBytes() ; 
+		byte [] key = "key".getBytes() ;
+		byte [] value = "value".getBytes() ;
 		String keys = redisClient.setAndReturn(key, value) ;
 		System.out.println(keys);
-		System.out.println(new String(redisClient.getAndReturn(key))); 
-		
+		System.out.println(new String(redisClient.getAndReturn(key)));
+
 	}
 	/************SET OPERATION TEST**********/
 	@Test
 	public void saddTest(){
 		//向set中添加值,返回set
-		String key  = "sadd" ; 
-		redisClient.sadd(key, "a","b","c") ; 
+		String key  = "sadd" ;
+		redisClient.sadd(key, "a","b","c") ;
 		Set<String> set = redisClient.smembers(key) ;
-		Iterator<String> it = set.iterator() ; 
+		Iterator<String> it = set.iterator() ;
 		while(it.hasNext()){
-			String s = it.next() ; 
+			String s = it.next() ;
 			System.out.println(s);
 		}
 	}
-	
+
 	@Test
 	public void sremTest(){
 		//remove set中的值
 		//
-		String key  = "sremTest" ; 
-		redisClient.sadd(key, "c","java","c++") ; 
-		System.out.println(redisClient.srem(key, "non-exists-language")) ; 
-		System.out.println(redisClient.srem(key, "c","c++")) ; 
+		String key  = "sremTest" ;
+		redisClient.sadd(key, "c","java","c++") ;
+		System.out.println(redisClient.srem(key, "non-exists-language")) ;
+		System.out.println(redisClient.srem(key, "c","c++")) ;
 	}
-	
+
 	@Test
 	public void scardTest(){
-		String key  = "scardTest" ; 
-		redisClient.sadd(key, "c","java","c++") ; 
-		System.out.println(redisClient.scard(key)); 
+		String key  = "scardTest" ;
+		redisClient.sadd(key, "c","java","c++") ;
+		System.out.println(redisClient.scard(key));
 	}
 	@Test
 	public void sismemberTest(){
-		String key  = "scardTest" ; 
-		System.out.println(redisClient.sismember(key, "c") ); 
+		String key  = "scardTest" ;
+		System.out.println(redisClient.sismember(key, "c") );
 	}
-	
-	
-	
+
+
+
 	/***************HASH OPERATION TEST*****************/
 	@Test
 	public void hsetTest(){
 		String HashName = "hsetTest1" ;
-		String fieldName = "initKey" ; 
-		String fieldValue = "initValue" ; 
-		long t1 = redisClient.hset(HashName, fieldName, fieldValue) ; 
+		String fieldName = "initKey" ;
+		String fieldValue = "initValue" ;
+		long t1 = redisClient.hset(HashName, fieldName, fieldValue) ;
 		Assert.assertEquals(1, t1) ;
 		String fieldValue2 = "secondSetValue" ;
-		redisClient.hset(HashName, fieldName, fieldValue2); 
+		redisClient.hset(HashName, fieldName, fieldValue2);
 		long t2 = redisClient.hset(HashName, fieldName, fieldValue2);
 		Assert.assertEquals(0, t2) ;
-		 
+
 	}
-	
+
 	@Test
 	public void hmsetTest(){
-		String hashName = "hmsetTest1" ; 
+		String hashName = "hmsetTest1" ;
 		Map<String, String> map = new HashMap<String,String>();
-		map.put("lg", "c java c++") ; 
-		map.put("cpy", "yy qq") ; 
-		String str = redisClient.hmset(hashName, map) ; 
-		Assert.assertEquals("OK", str) ; 
-		String s = redisClient.hget(hashName, "lg") ; 
-		Assert.assertEquals("c java c++", s) ; 
-		
+		map.put("lg", "c java c++") ;
+		map.put("cpy", "yy qq") ;
+		String str = redisClient.hmset(hashName, map) ;
+		Assert.assertEquals("OK", str) ;
+		String s = redisClient.hget(hashName, "lg") ;
+		Assert.assertEquals("c java c++", s) ;
+
 	}
-	
+
 	@Test
 	public void hmgetTest(){
-		String hashName="hmgetTest" ; 
+		String hashName="hmgetTest" ;
 		Map<String, String> map = new HashMap<String,String>();
-		map.put("lg", "c java c++") ; 
-		map.put("cpy", "yy qq") ; 
-		String str = redisClient.hmset(hashName, map) ; 
-		Assert.assertEquals("OK", str) ; 
-		List<String> list = redisClient.hmget(hashName, "lg","cpy") ; 
+		map.put("lg", "c java c++") ;
+		map.put("cpy", "yy qq") ;
+		String str = redisClient.hmset(hashName, map) ;
+		Assert.assertEquals("OK", str) ;
+		List<String> list = redisClient.hmget(hashName, "lg","cpy") ;
 		for(String s : list){
 			System.out.println(s);
 		}
 	}
-	
+
 	@Test
 	public void doTransactionTest(){
 		redisClient.doTransaction(new TransactionAction(){
 			@Override
 			public void execute(Transaction transaction) {
-				transaction.set("doTransactionTest", "haha") ; 
+				transaction.set("doTransactionTest", "haha") ;
 			}
-		}) ; 
-		System.out.println(redisClient.getAndReturn("doTransactionTest")); 
+		}) ;
+		System.out.println(redisClient.getAndReturn("doTransactionTest"));
 	}
-	
-	
-	
-	
+
+
+
+
 	public static void main(String []args) throws InterruptedException{
-		
+
 		RedisClientFactory redisClientFactory = new RedisClientFactory();
 		List<String> list = new ArrayList<String>();
 		//这里是业务要连接的redis
 //		list.add("172.19.103.105:6331::");
 //		list.add("172.19.103.105:6330::");
 //		list.add("172.19.103.105:6379:fdfs123:");
-		
+
 		list.add("127.0.0.1:6380::");
 		list.add("127.0.0.1:6381::");
-		
-		
+
+
 		redisClientFactory.setRedisServers(list);
 		redisClientFactory.init();
 		RedisClient redisClient = new RedisClient();
@@ -334,22 +366,22 @@ public class RedisClientTest {
 		Jedis jedis = pool.getResource();
 		System.out.println(RedisUtils.isMaster(jedis.info()));
 		pool.returnResource(jedis);
-		
+
 		pool = redisClientFactory.getSlavePool();
 		jedis = pool.getResource();
 		System.out.println(RedisUtils.isMaster(jedis.info()));
 		pool.returnResource(jedis);*/
-		
+
 	}
 	/**
 	 * 测试当master shutdown后，修改slave conf文件，reload RedisFactory 参数是否可以完成master/slave切换
 	 * @throws InterruptedException
 	 */
-	@Test 
+	@Test
 	public void testCall() throws InterruptedException{
-		int i = 0 ; 
+		int i = 0 ;
 		while(++i<500){
-			String str2 = null ; 
+			String str2 = null ;
 			try {
 				 str2 = redisClient.msetAndReturn("hello","hello1","world","world1");
 				 Thread.currentThread().sleep(1000);
@@ -363,18 +395,18 @@ public class RedisClientTest {
 				System.out.println(redisClient.mgetAndReturn("hello","hello1","world","world1"));
 			} catch (Exception e) {
 				System.out.println(e);
-				continue ; 
+				continue ;
 			}
-			
-			
+
+
 		}
 	}
-	
-	@Test 
+
+	@Test
 	public void testGet() throws InterruptedException{
-		int i = 0 ; 
+		int i = 0 ;
 		while(++i<20000){
-			List<String> str2 = null ; 
+			List<String> str2 = null ;
 			try {
 				 str2 = redisClient.mgetAndReturn("hello","world");
 				 TimeUnit.MILLISECONDS.sleep(500);
@@ -384,10 +416,10 @@ public class RedisClientTest {
 				continue ;
 			}
 			System.out.println(str2);
-			
+
 		}
 	}
-	
-	
-	
+
+
+
 }
