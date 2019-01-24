@@ -68,7 +68,7 @@ public class RedisClientFactoryHealthChecker extends TimerTask {
         }
     }
 
-    private boolean check(List<JedisPool> pools, int size) {
+    private boolean check(List<CustomJedisPool> pools, int size) {
         boolean reInit = false;
         if (null == pools && size == 0) {
             return reInit;

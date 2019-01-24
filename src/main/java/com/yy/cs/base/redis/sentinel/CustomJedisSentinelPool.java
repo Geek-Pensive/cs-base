@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.yy.cs.base.redis.CustomJedisPool;
 import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.json.Json;
@@ -321,14 +322,14 @@ public class CustomJedisSentinelPool extends JedisPool {
 
                 }
                 long lastUpdate = lastLoadTimestamp.get();
-                List<SlaveJedisPool> newUnavailable = new ArrayList<>();
+                List<CustomJedisPool> newUnavailable = new ArrayList<>();
                 List<HostAndPort> newAvailable = new ArrayList<>();
                 lock.readLock().lock();
                 try {
                     if (availableSlaves.isEmpty() && unavailableSlaves.isEmpty()) {
                         continue;
                     }
-                    for (SlaveJedisPool jp : availableSlaves) {
+                    for (CustomJedisPool jp : availableSlaves) {
                         try (Jedis j = jp.getResource();) {
                             if (!RedisUtils.ping(j)) {
                                 newUnavailable.add(jp);
@@ -354,7 +355,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                     }
                     try {
                         if (!newUnavailable.isEmpty()) {
-                            for (SlaveJedisPool jp : newUnavailable) {
+                            for (CustomJedisPool jp : newUnavailable) {
                                 unavailableSlaves.add(jp.getHostAndPort());
                                 availableSlaves.remove(jp);
                                 if (log.isDebugEnabled()) {

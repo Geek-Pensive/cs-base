@@ -35,9 +35,9 @@ public class RedisClientFactory extends AbstractClientFactory {
 
     private static final Logger log = LoggerFactory.getLogger(RedisClientFactory.class);
 
-    private volatile List<JedisPool> redisMasterPool = new ArrayList<JedisPool>();
+    private volatile List<CustomJedisPool> redisMasterPool = new ArrayList<CustomJedisPool>();
 
-    private volatile List<JedisPool> redisSlavePool = new ArrayList<JedisPool>();
+    private volatile List<CustomJedisPool> redisSlavePool = new ArrayList<CustomJedisPool>();
 
     private int totalServersSize;
 
@@ -158,10 +158,10 @@ public class RedisClientFactory extends AbstractClientFactory {
         }
         lock.lock();
         try {
-            JedisPool pool = null;
+            CustomJedisPool pool = null;
             Jedis jedis = null;
-            List<JedisPool> newMasterPool = new ArrayList<JedisPool>();
-            List<JedisPool> newRslavePool = new ArrayList<JedisPool>();
+            List<CustomJedisPool> newMasterPool = new ArrayList<CustomJedisPool>();
+            List<CustomJedisPool> newRslavePool = new ArrayList<CustomJedisPool>();
             StringBuilder sb = new StringBuilder();
 
             Map<String, Integer> initialPools = new HashMap<String, Integer>();
@@ -205,7 +205,7 @@ public class RedisClientFactory extends AbstractClientFactory {
                         } catch (Throwable e) {
                             log.warn("can not support info function.", e);
                         }
-                        pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
+                        pool = RedisUtils.getCustomJedisPool(this.config, ip, port, timeout, password);
                         // 主实例
                         if (isMaster == true) {
                             newMasterPool.add(pool);
@@ -230,8 +230,8 @@ public class RedisClientFactory extends AbstractClientFactory {
                 }
             }
             realServersCount = initialPools.size();
-            List<JedisPool> oldMasterPool = redisMasterPool;
-            List<JedisPool> oldRslavePool = redisSlavePool;
+            List<CustomJedisPool> oldMasterPool = redisMasterPool;
+            List<CustomJedisPool> oldRslavePool = redisSlavePool;
             redisMasterPool = newMasterPool;
             redisSlavePool = newRslavePool;
             // 如果没有slave 避免用户直接获取slave进行操作导致错误
@@ -298,7 +298,7 @@ public class RedisClientFactory extends AbstractClientFactory {
     /**
      * 销毁Jedis资源池
      */
-    public void destroy(List<JedisPool> pool) {
+    public void destroy(List<CustomJedisPool> pool) {
         if (pool != null && pool.size() != 0) {
             for (JedisPool p : pool) {
                 try {
@@ -335,11 +335,11 @@ public class RedisClientFactory extends AbstractClientFactory {
         return redisServers;
     }
 
-    public List<JedisPool> getRedisMasterPool() {
+    public List<CustomJedisPool> getRedisMasterPool() {
         return redisMasterPool;
     }
 
-    public List<JedisPool> getRedisSlavePool() {
+    public List<CustomJedisPool> getRedisSlavePool() {
         return redisSlavePool;
     }
 

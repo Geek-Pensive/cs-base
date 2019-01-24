@@ -2,9 +2,12 @@ package com.yy.cs.base.redis;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -171,6 +174,34 @@ public class RedisUtils {
                 int.class, int.class, String.class);
         pool = constructor.newInstance(config, ip, port, timeout, password);
         return pool;
+    }
+
+    /**
+     * @param config
+     * @param ip
+     * @param port
+     * @param timeout
+     * @param password
+     * @return
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    public static CustomJedisPool getCustomJedisPool(JedisPoolConfig config, String ip, int port, int timeout, String password)
+            throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+
+        HostAndPort hap = toHostAndPort(Arrays.asList(ip, port + ""));
+        return new CustomJedisPool(config, hap, timeout, password);
+    }
+
+    private static HostAndPort toHostAndPort(List<String> getMasterAddrByNameResult) {
+        String host = getMasterAddrByNameResult.get(0);
+        int port = Integer.parseInt(getMasterAddrByNameResult.get(1));
+        return new HostAndPort(host, port);
     }
 
     public static boolean ping(Jedis jedis) {

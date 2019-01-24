@@ -1,8 +1,10 @@
 package com.yy.cs.base.redis.sentinel;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.yy.cs.base.redis.CustomJedisPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +129,10 @@ public class RedisSentinelFactory extends AbstractClientFactory {
         }
         // return master pool when can not get the reader pool
         return masterPool;
+    }
+
+    public List<CustomJedisPool> getAllReaderPools() {
+        return masterPool.getAllReaderPools();
     }
 
     /**
