@@ -29,22 +29,22 @@ import redis.clients.jedis.JedisPool;
 
 /**
  * 管理redis的连接池工厂类，redis连接的参数设置
- * 
+ *
  */
 public class RedisClientFactory extends AbstractClientFactory {
 
     private static final Logger log = LoggerFactory.getLogger(RedisClientFactory.class);
 
-    private volatile List<CustomJedisPool> redisMasterPool = new ArrayList<CustomJedisPool>();
+    private volatile List<JedisPool> redisMasterPool = new ArrayList<JedisPool>();
 
-    private volatile List<CustomJedisPool> redisSlavePool = new ArrayList<CustomJedisPool>();
+    private volatile List<JedisPool> redisSlavePool = new ArrayList<JedisPool>();
 
     private int totalServersSize;
 
     private int masterServerSize;
 
     private int slaveServerSize;
-    
+
     private volatile int realServersCount = 0;
 
     private ReentrantLock lock = new ReentrantLock();
@@ -65,7 +65,7 @@ public class RedisClientFactory extends AbstractClientFactory {
 
     /**
      * 构造器函数
-     * 
+     *
      * @param redisServers
      *            redis服务器地址列表 ip:port:username:password
      */
@@ -85,7 +85,7 @@ public class RedisClientFactory extends AbstractClientFactory {
 
     /**
      * 从redisMasterPool中随机获取pool
-     * 
+     *
      * @return
      *         Master的jedisPool资源池
      */
@@ -107,7 +107,7 @@ public class RedisClientFactory extends AbstractClientFactory {
 
     /**
      * 从redisSlavePool中随机获取pool,当前pool无法获取jedis连接时，切换到其他的Jedispool
-     * 
+     *
      * @return
      *         Slave的jedisPool资源池
      */
@@ -158,10 +158,10 @@ public class RedisClientFactory extends AbstractClientFactory {
         }
         lock.lock();
         try {
-            CustomJedisPool pool = null;
+            JedisPool pool = null;
             Jedis jedis = null;
-            List<CustomJedisPool> newMasterPool = new ArrayList<CustomJedisPool>();
-            List<CustomJedisPool> newRslavePool = new ArrayList<CustomJedisPool>();
+            List<JedisPool> newMasterPool = new ArrayList<JedisPool>();
+            List<JedisPool> newRslavePool = new ArrayList<JedisPool>();
             StringBuilder sb = new StringBuilder();
 
             Map<String, Integer> initialPools = new HashMap<String, Integer>();
@@ -205,7 +205,7 @@ public class RedisClientFactory extends AbstractClientFactory {
                         } catch (Throwable e) {
                             log.warn("can not support info function.", e);
                         }
-                        pool = RedisUtils.getCustomJedisPool(this.config, ip, port, timeout, password);
+                        pool = RedisUtils.getJedisPool(this.config, ip, port, timeout, password);
                         // 主实例
                         if (isMaster == true) {
                             newMasterPool.add(pool);
@@ -230,8 +230,8 @@ public class RedisClientFactory extends AbstractClientFactory {
                 }
             }
             realServersCount = initialPools.size();
-            List<CustomJedisPool> oldMasterPool = redisMasterPool;
-            List<CustomJedisPool> oldRslavePool = redisSlavePool;
+            List<JedisPool> oldMasterPool = redisMasterPool;
+            List<JedisPool> oldRslavePool = redisSlavePool;
             redisMasterPool = newMasterPool;
             redisSlavePool = newRslavePool;
             // 如果没有slave 避免用户直接获取slave进行操作导致错误
@@ -298,7 +298,7 @@ public class RedisClientFactory extends AbstractClientFactory {
     /**
      * 销毁Jedis资源池
      */
-    public void destroy(List<CustomJedisPool> pool) {
+    public void destroy(List<JedisPool> pool) {
         if (pool != null && pool.size() != 0) {
             for (JedisPool p : pool) {
                 try {
@@ -335,11 +335,11 @@ public class RedisClientFactory extends AbstractClientFactory {
         return redisServers;
     }
 
-    public List<CustomJedisPool> getRedisMasterPool() {
+    public List<JedisPool> getRedisMasterPool() {
         return redisMasterPool;
     }
 
-    public List<CustomJedisPool> getRedisSlavePool() {
+    public List<JedisPool> getRedisSlavePool() {
         return redisSlavePool;
     }
 

@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.yy.cs.base.redis.CustomJedisPool;
 import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.json.Json;
@@ -77,22 +76,22 @@ public class CustomJedisSentinelPool extends JedisPool {
     }
 
     public CustomJedisSentinelPool(String masterName, Set<String> sentinels, final JedisPoolConfig poolConfig,
-            int timeout, final String password) {
+                                   int timeout, final String password) {
         this(masterName, sentinels, poolConfig, timeout, password, Protocol.DEFAULT_DATABASE);
     }
 
     public CustomJedisSentinelPool(String masterName, Set<String> sentinels, final JedisPoolConfig poolConfig,
-            final int timeout) {
+                                   final int timeout) {
         this(masterName, sentinels, poolConfig, timeout, null, Protocol.DEFAULT_DATABASE);
     }
 
     public CustomJedisSentinelPool(String masterName, Set<String> sentinels, final JedisPoolConfig poolConfig,
-            final String password) {
+                                   final String password) {
         this(masterName, sentinels, poolConfig, Protocol.DEFAULT_TIMEOUT, password);
     }
 
     public CustomJedisSentinelPool(String masterName, Set<String> sentinels, final JedisPoolConfig poolConfig,
-            int timeout, final String password, final int database) {
+                                   int timeout, final String password, final int database) {
         this.poolConfig = poolConfig;
         this.timeout = timeout;
         this.password = password;
@@ -223,7 +222,7 @@ public class CustomJedisSentinelPool extends JedisPool {
     }
 
     protected Map<String, ArrayList<HostAndPort>> initSentinels(Set<String> sentinels, final String masterName,
-            int timeout) {
+                                                                int timeout) {
         Map<String, ArrayList<HostAndPort>> map = new HashMap<String, ArrayList<HostAndPort>>();
         HostAndPort master = null;
         boolean running = true;
@@ -322,14 +321,14 @@ public class CustomJedisSentinelPool extends JedisPool {
 
                 }
                 long lastUpdate = lastLoadTimestamp.get();
-                List<CustomJedisPool> newUnavailable = new ArrayList<>();
+                List<SlaveJedisPool> newUnavailable = new ArrayList<>();
                 List<HostAndPort> newAvailable = new ArrayList<>();
                 lock.readLock().lock();
                 try {
                     if (availableSlaves.isEmpty() && unavailableSlaves.isEmpty()) {
                         continue;
                     }
-                    for (CustomJedisPool jp : availableSlaves) {
+                    for (SlaveJedisPool jp : availableSlaves) {
                         try (Jedis j = jp.getResource();) {
                             if (!RedisUtils.ping(j)) {
                                 newUnavailable.add(jp);
@@ -355,7 +354,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                     }
                     try {
                         if (!newUnavailable.isEmpty()) {
-                            for (CustomJedisPool jp : newUnavailable) {
+                            for (SlaveJedisPool jp : newUnavailable) {
                                 unavailableSlaves.add(jp.getHostAndPort());
                                 availableSlaves.remove(jp);
                                 if (log.isDebugEnabled()) {
