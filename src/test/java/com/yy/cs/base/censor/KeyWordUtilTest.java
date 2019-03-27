@@ -7,17 +7,17 @@ public class KeyWordUtilTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
-		
+
+
 	}
 
 	@Test
 	public void test() throws InterruptedException {
-		KeyWordUtil util = KeyWordUtil.getInstance();
-		System.out.println(util.isCensor("XXa"));
-		synchronized (KeyWordUtilTest.this) {
-			wait();
-		}
+		// KeyWordUtil util = KeyWordUtil.getInstance();
+		// System.out.println(util.isCensor("XXa"));
+		// synchronized (KeyWordUtilTest.this) {
+		// 	wait();
+		// }
 	}
 
 }

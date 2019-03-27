@@ -894,6 +894,39 @@ public class RedisClient {
         }
     }
 
+    public String spop(String key){ return spop(0,key);}
+
+    /**
+     * redis SPOP 操作，向名为key的set中删除并获取一个value
+     *
+     * @param dbIndex
+     * @param key
+     * @return
+     *         从对应key中获取到的元素，key不存在/无元素时返回null。
+     */
+    public String spop(int dbIndex, String key) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0) {
+                jedis.select(dbIndex);
+            }
+            return jedis.spop(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis spop fail", e);
+        } finally {
+            jedisClose(jedis);
+        }
+    }
+
+
+
+
+
     /**
      * redis的 SREM 操作，移除set(名称为key)中的一个或多个value
      *
