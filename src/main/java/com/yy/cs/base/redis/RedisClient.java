@@ -1673,6 +1673,33 @@ public class RedisClient {
         return result;
     }
 
+    public long llen(final String key){return llen(0,key);}
+
+    /*
+    * 返回列表的元素个数
+    * */
+    public long llen(final int dbIndex, final String key){
+        long result;
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (0 != dbIndex) {
+                jedis.select(dbIndex);
+            }
+            result = jedis.llen(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis llen fail", e);
+        } finally {
+            jedisClose(jedis);
+        }
+        return result;
+    }
+
+
     /**
      * 往列表尾插入元素
      *
