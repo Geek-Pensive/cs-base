@@ -39,6 +39,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -358,6 +359,70 @@ public class CSHttpClient {
                 }
             }
         }
+    }
+
+
+    public CSHttpResponse executeMethodAndReturnCSHttpResponse(HttpRequestBase httpRequestBase) throws HttpClientException {
+        CSHttpResponse csHttpResponse = new CSHttpResponse();
+        CloseableHttpResponse response = null;
+        StatusLine status = null;
+        HttpRequestStatistics statistics = new HttpRequestStatistics();
+        long _s = System.currentTimeMillis();
+        try {
+            setDefaultRequestConfig(httpRequestBase);
+            statistics.setUri(httpRequestBase.getURI());
+            log.debug("executing request " + decodeUrl(httpRequestBase.getURI().toString()));
+            response = httpClient.execute(httpRequestBase);
+            status = response.getStatusLine();
+            statistics.setStatusLine(status);
+            log.debug("response status " + status);
+            Header[] headers = response.getAllHeaders();
+            Map<String,String> headersMap = new HashMap<>();
+            if (headers != null) {
+                for(Header header : headers) {
+                    headersMap.put(header.getName(),header.getValue());
+                }
+            }
+            csHttpResponse.setHeaders(headersMap);
+            HttpEntity entity = response.getEntity();
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
+            csHttpResponse.setStatusLine(status);
+            csHttpResponse.setBytes(inputStream2ByteArray(entity.getContent()));
+            return csHttpResponse;
+        } catch (ClientProtocolException e) {
+            statistics.setException(e);
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
+            logErrorInfo("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            throw new HttpClientException(
+                    "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+        } catch (IOException e) {
+            statistics.setException(e);
+            statistics.setSpendTime(System.currentTimeMillis() - _s);
+            logErrorInfo("get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+            throw new HttpClientException(
+                    "get byte array from url:" + httpRequestBase.getURI() + " fail, status: " + status, e);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    logErrorInfo("response close IOException:" + httpRequestBase.getURI(), e);
+                }
+            }
+            if (httpRequestBase != null) {
+                httpRequestBase.releaseConnection();
+            }
+
+            if (httpRequestStatisticsInterceptor != null) {
+                // http 请求的一些监控，同步调用，过于依赖实现方。异步调用，需要提供对线程池的支持
+                try {
+                    httpRequestStatisticsInterceptor.handle(statistics);
+                } catch (Exception e) {
+                    logErrorInfo("httpRequestStatisticsInterceptor Exception:" + httpRequestBase.getURI(), e);
+                }
+            }
+        }
+
     }
 
     /**
