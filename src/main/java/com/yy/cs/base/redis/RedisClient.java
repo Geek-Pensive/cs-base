@@ -2221,7 +2221,7 @@ public class RedisClient {
         Jedis jedis = null;
         JedisPool jedisPool = null;
         try {
-            jedisPool = getJedisSlavePool();
+            jedisPool = getJedisMasterPool();
             jedis = jedisPool.getResource();
             if (dbIndex != 0) {
                 jedis.select(dbIndex);
