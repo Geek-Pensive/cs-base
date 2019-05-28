@@ -2454,4 +2454,140 @@ public class RedisClient {
         subscribe(0,  jedisPubSub, channels);
     }
 
+    /**
+     * 根据指定值递减
+     * @param dbIndex
+     * @param key
+     * @param value
+     * @return
+     */
+    public Long decrBy(final int dbIndex, final String key, final long value) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0)
+                jedis.select(dbIndex);
+            return jedis.decrBy(key, value);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis decrBy db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            jedisClose(jedis);
+        }
+    }
+
+    /**
+     * 根据指定值递减
+     * @param key
+     * @param value
+     * @return
+     */
+    public Long decrBy(final String key, final long value) {
+        return decrBy(0, key, value);
+    }
+
+    /**
+     * 递减1
+     * @param dbIndex
+     * @param key
+     * @return
+     */
+    public Long decr(final int dbIndex, final String key) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0)
+                jedis.select(dbIndex);
+            return jedis.decr(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis decr db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            jedisClose(jedis);
+        }
+    }
+
+    /**
+     * 递减1
+     * @param key
+     * @return
+     */
+    public Long decr(final String key) {
+        return decr(0, key);
+    }
+
+    /**
+     * 根据指定值递增
+     * @param dbIndex
+     * @param key
+     * @param value
+     * @return
+     */
+    public Long incrBy(final int dbIndex, final String key, final long value) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0)
+                jedis.select(dbIndex);
+            return jedis.incrBy(key, value);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis incrBy db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            jedisClose(jedis);
+        }
+    }
+
+    /**
+     * 根据指定值递增
+     * @param key
+     * @param value
+     * @return
+     */
+    public Long incrBy(final String key, final long value) {
+        return incrBy(0, key, value);
+    }
+
+    /**
+     * 递增1
+     * @param dbIndex
+     * @param key
+     * @return
+     */
+    public Long incr(final int dbIndex, final String key) {
+        Jedis jedis = null;
+        JedisPool jedisPool = null;
+        try {
+            jedisPool = getJedisMasterPool();
+            jedis = jedisPool.getResource();
+            if (dbIndex != 0)
+                jedis.select(dbIndex);
+            return jedis.incr(key);
+        } catch (Exception e) {
+            exceptionHandler(jedisPool, jedis, e);
+            jedis = null;
+            throw new CsRedisRuntimeException("jedis incr db[ " + dbIndex + "] key:" + key, e);
+        } finally {
+            jedisClose(jedis);
+        }
+    }
+
+    /**
+     * 递增1
+     * @param key
+     * @return
+     */
+    public Long incr(final String key) {
+        return incr(0, key);
+    }
+
 }
