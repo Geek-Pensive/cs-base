@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.yy.cs.base.task.trigger.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.json.Json;
@@ -256,6 +257,11 @@ public class CustomJedisSentinelPool extends JedisPool {
                         // 获取从服务器列表
                         ArrayList<HostAndPort> slaves = new ArrayList<>();
                         for (Map<String, String> slave : jedis.sentinelSlaves(masterName)) {
+                            String runid = slave.get("runid");
+                            //可能是伪装的redis replicator, 没有填充该参数
+                            if (StringUtils.isEmpty(runid)) {
+                                continue;
+                            }
                             HostAndPort _slave = new HostAndPort(slave.get("ip"), Integer.parseInt(slave.get("port")));
                             slaves.add(_slave);
                             log.debug("Found Redis Slave: " + Json.ObjToStr(slave));
@@ -298,6 +304,11 @@ public class CustomJedisSentinelPool extends JedisPool {
     private void reloadSlavePools(Jedis jedis, String masterName) {
         ArrayList<HostAndPort> slaves = new ArrayList<>();
         for (Map<String, String> slave : jedis.sentinelSlaves(masterName)) {
+            String runid = slave.get("runid");
+            //可能是伪装的redis replicator, 没有填充该参数
+            if (StringUtils.isEmpty(runid)) {
+                continue;
+            }
             HostAndPort _slave = new HostAndPort(slave.get("ip"), Integer.parseInt(slave.get("port")));
             slaves.add(_slave);
             log.debug("reloadSlavePools: found Redis Slave: " + Json.ObjToStr(slave));
