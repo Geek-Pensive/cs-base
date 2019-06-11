@@ -1,13 +1,21 @@
 package com.yy.cs.base.redis.sentinel;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.LockSupport;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.yy.cs.base.hostgroup.HostAreaCmdbLocator;
+import com.yy.cs.base.hostgroup.HostCityCmdbLocator;
 import com.yy.cs.base.hostgroup.HostGroupCmdbLocator;
 import com.yy.cs.base.hostgroup.HostGroupLocator;
-import org.apache.commons.lang3.StringUtils;
+
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPoolConfig;
-
-import java.util.*;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * 就近读redis从库
@@ -20,12 +28,17 @@ import java.util.concurrent.locks.LockSupport;
  **/
 public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
 
-    protected HostGroupLocator hostGroupLocator;
+    protected List<HostGroupLocator> hostGroupLocators;
 
     /**
      * 本机分组id，优先读相同分组id的redis从
+     * 
+     * 读优先级：同机房>同城市>同区域
+     * 
+     * 只能通过hostGroupLocators列表去获取本机的localGroupIds列表，所以不提供setter方法
+     * 
      */
-    protected String localGroupId;
+    protected List<String> localGroupIds;
 
     /**
      * 是否只从最高优先级的{@link #availableSlaves}拿资源
@@ -34,16 +47,11 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
      * <p>如果为<code>false</code>，则无视优先级，从5个节点中随机挑选
      */
     private boolean pickHighestSlaves;
-
+    
     /**
-     * 同机房优先级
+     * 默认优先级
      */
-    public static final int SAME_GROUP_PRIORITY = 1;
-
-    /**
-     * 不同机房优先级
-     */
-    public static final int NOT_SAME_GROUP_PRIORITY = 0;
+    public static final int DEFAULT_PRIORITY = 0;
 
     @Override
     protected Map<String, ArrayList<HostAndPort>> initSentinels(Set<String> sentinels, String masterName, int timeout) {
@@ -53,7 +61,7 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
 
     @Override
     protected int nextBalanceIndex(int size) {
-        if (pickHighestSlaves && !HostGroupLocator.DEFAULT_GROUP.equals(localGroupId)) {
+        if (pickHighestSlaves && null != localGroupIds && localGroupIds.size() > 0 && !HostGroupLocator.DEFAULT_GROUP.equals(localGroupIds.get(0))) {
             size = getHighestSize(size);
         }
         return super.nextBalanceIndex(size);
@@ -75,11 +83,13 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
 
         pickHighestSlaves = true;
 
-        if (hostGroupLocator == null) {
-            setHostGroupLocator(new HostGroupCmdbLocator());
-        }
-        if (localGroupId == null) {
-            localGroupId = hostGroupLocator.getGroup();
+        if (hostGroupLocators == null) {
+            // 优先级：同机房>同城市>同区域
+            List<HostGroupLocator> hostGroupLocatorsTmp = new ArrayList<>();
+            hostGroupLocatorsTmp.add(HostGroupCmdbLocator.INSTANCE);
+            hostGroupLocatorsTmp.add(HostCityCmdbLocator.INSTANCE);
+            hostGroupLocatorsTmp.add(HostAreaCmdbLocator.INSTANCE);
+            this.setHostGroupLocators(hostGroupLocatorsTmp);
         }
     }
 
@@ -97,12 +107,11 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
 
     private void fillPriority(SlaveJedisPool pool) {
 
-        if (!pickHighestSlaves || HostGroupLocator.DEFAULT_GROUP.equals(localGroupId)) {
+        if (!pickHighestSlaves || null == localGroupIds || localGroupIds.size() == 0 || HostGroupLocator.DEFAULT_GROUP.equals(localGroupIds.get(0))) {
             return;
         }
 
-        String slaveGroup = hostGroupLocator.getGroup(pool.getHostAndPort().getHost());
-        int priority = StringUtils.equals(slaveGroup, localGroupId) ? SAME_GROUP_PRIORITY : NOT_SAME_GROUP_PRIORITY;
+        int priority = this.getPriority(pool.getHostAndPort().getHost());
         if (priority != pool.getPriority()) {
             pool.setPriority(priority);
             //存在极小可能pool还没添加到availableSlaves中
@@ -110,6 +119,25 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
                 sortSlaveJedisPool();
             }
         }
+    }
+    
+    /**
+     * 从第一个hostGroupLocator开始对比远程和本地的group，相同则返回当前优先级
+     * 最高优先级为hostGroupLocators.size()，依次减1
+     * 
+     * @param host
+     * @return
+     */
+    private int getPriority(String host) {
+        if(null != hostGroupLocators){
+            for (int i = 0; i < hostGroupLocators.size(); i++) {
+                String slaveGroup = hostGroupLocators.get(i).getGroup(host);
+                if(StringUtils.equals(slaveGroup, localGroupIds.get(i))){
+                    return hostGroupLocators.size() - i;
+                }
+            }
+        }
+        return DEFAULT_PRIORITY;
     }
 
     /**
@@ -158,22 +186,6 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
         }
     }
 
-    public HostGroupLocator getHostGroupLocator() {
-        return hostGroupLocator;
-    }
-
-    public void setHostGroupLocator(HostGroupLocator hostGroupLocator) {
-        this.hostGroupLocator = hostGroupLocator;
-    }
-
-    public String getLocalGroupId() {
-        return localGroupId;
-    }
-
-    public void setLocalGroupId(String localGroupId) {
-        this.localGroupId = localGroupId;
-    }
-
     public boolean isPickHighestSlaves() {
         return pickHighestSlaves;
     }
@@ -182,13 +194,33 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
         if (pickHighestSlaves && this.pickHighestSlaves == false && !availableSlaves.isEmpty()) {
             //旧值为false且新值为true，排一次序
             for (SlaveJedisPool pool : availableSlaves) {
-                String slaveGroup = hostGroupLocator.getGroup(pool.getHostAndPort().getHost());
-                int priority = StringUtils.equals(slaveGroup, localGroupId) ? SAME_GROUP_PRIORITY : NOT_SAME_GROUP_PRIORITY;
+                int priority = this.getPriority(pool.getHostAndPort().getHost());
                 pool.setPriority(priority);
             }
             sortSlaveJedisPool();
         }
         this.pickHighestSlaves = pickHighestSlaves;
+    }
+    
+    public List<HostGroupLocator> getHostGroupLocators() {
+        return hostGroupLocators;
+    }
+
+    public void setHostGroupLocators(List<HostGroupLocator> hostGroupLocators) {
+        this.hostGroupLocators = hostGroupLocators;
+
+        // 根据hostGroupLocators获取本地localGroupIds
+        if(null != hostGroupLocators){
+            List<String> localGroupIdsTmp = new ArrayList<>();
+            for (HostGroupLocator hostGroupLocator : hostGroupLocators) {
+                localGroupIdsTmp.add(hostGroupLocator.getGroup());
+            }
+            localGroupIds = localGroupIdsTmp;
+        }
+    }
+
+    public List<String> getLocalGroupIds() {
+        return localGroupIds;
     }
 
     public NearbyJedisSentinelPool(String masterName, Set<String> sentinels, JedisPoolConfig poolConfig) {

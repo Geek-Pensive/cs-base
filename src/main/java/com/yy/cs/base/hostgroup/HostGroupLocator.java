@@ -3,7 +3,7 @@ package com.yy.cs.base.hostgroup;
 /**
  * 获取机器服务分组
  * @author Zhangtao3
- * @email zhanghao3@yy.com
+ * @email zhangtao3@yy.com
  */
 public interface HostGroupLocator {
 

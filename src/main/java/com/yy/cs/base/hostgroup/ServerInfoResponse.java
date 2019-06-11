@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * @author Zhangtao3
- * @email zhanghao3@yy.com
+ * @email zhangtao3@yy.com
  */
 public class ServerInfoResponse {
     private Integer code;
