@@ -153,7 +153,7 @@ public class CustomJedisSentinelPool extends JedisPool {
             sentinelsMap.put(MASTER_PREFIX, ls);
             currentHostMaster = master;
             log.info("Created JedisPool to master at " + master);
-            // 创建master pool
+            // 创建master pool(创建之前会先close)
             initPool(poolConfig, new JedisFactory(master.getHost(), master.getPort(), timeout, password, database));
         }
     }
@@ -171,24 +171,34 @@ public class CustomJedisSentinelPool extends JedisPool {
             } else {
                 sentinelsMap.put(SLAVE_PREFIX, slaves);
             }
-            if (availableSlaves != null && availableSlaves.size() > 0) {
-                for (JedisPool pool : availableSlaves) {
-                    log.info("remove and destroy old jedisPool :{}", pool);
-                    pool.close();
-                }
-                availableSlaves.clear();
-            }
-            if (unavailableSlaves != null && unavailableSlaves.size() > 0) {
-                unavailableSlaves.clear();
-            }
+            
+            // 先初始化新的从连接池
+            CopyOnWriteArrayList<SlaveJedisPool> oldAvailableSlaves = availableSlaves;
+            CopyOnWriteArrayList<HostAndPort> oldUnavailableSlaves = unavailableSlaves;
+            CopyOnWriteArrayList<SlaveJedisPool> newAvailableSlaves = new CopyOnWriteArrayList<>();
+            CopyOnWriteArrayList<HostAndPort> newUnavailableSlaves = new CopyOnWriteArrayList<>();
             for (HostAndPort hap : slaves) {
                 if (RedisUtils.isAvailable(hap.getHost(), hap.getPort(), timeout)) {
-                    availableSlaves.add(createSlaveJedisPool(hap));
-                    log.info("reload new jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
+                    newAvailableSlaves.add(createSlaveJedisPool(hap));
+                    log.info("reload new slave jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
                 } else {
-                    unavailableSlaves.add(hap);
-                    log.warn("relaod failed jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
+                    newUnavailableSlaves.add(hap);
+                    log.warn("reload failed slave jedisPool host:{},port:{}", hap.getHost(), hap.getPort());
                 }
+            }
+            availableSlaves = newAvailableSlaves;
+            unavailableSlaves = newUnavailableSlaves;
+            
+            // 再销毁老的从连接池
+            if (oldAvailableSlaves != null && oldAvailableSlaves.size() > 0) {
+                for (JedisPool pool : oldAvailableSlaves) {
+                    log.info("remove and destroy old slave jedisPool :{}", pool);
+                    pool.close();
+                }
+                oldAvailableSlaves.clear();
+            }
+            if (oldUnavailableSlaves != null && oldUnavailableSlaves.size() > 0) {
+                oldUnavailableSlaves.clear();
             }
         } finally {
             lock.writeLock().unlock();
@@ -248,7 +258,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                         for (Map<String, String> slave : jedis.sentinelSlaves(masterName)) {
                             HostAndPort _slave = new HostAndPort(slave.get("ip"), Integer.parseInt(slave.get("port")));
                             slaves.add(_slave);
-                            log.info("Found Redis Slave: " + Json.ObjToStr(slave));
+                            log.debug("Found Redis Slave: " + Json.ObjToStr(slave));
                         }
                         // 初始化slavePool
                         initSalvePools(slaves);
@@ -290,9 +300,8 @@ public class CustomJedisSentinelPool extends JedisPool {
         for (Map<String, String> slave : jedis.sentinelSlaves(masterName)) {
             HostAndPort _slave = new HostAndPort(slave.get("ip"), Integer.parseInt(slave.get("port")));
             slaves.add(_slave);
-            log.info("reloadSlavePools: found Redis Slave: " + Json.ObjToStr(slave));
+            log.debug("reloadSlavePools: found Redis Slave: " + Json.ObjToStr(slave));
         }
-        sentinelsMap.put(SLAVE_PREFIX, slaves);
         initSalvePools(slaves);
 
         jedisClose(jedis);
@@ -377,6 +386,23 @@ public class CustomJedisSentinelPool extends JedisPool {
                         lock.writeLock().unlock();
                     }
                 }
+                
+                if (log.isDebugEnabled()) {
+                    StringBuilder sb = new StringBuilder("availableSlaves: ");
+                    for (SlaveJedisPool pool : availableSlaves) {
+                        sb.append(pool.getHostAndPort())
+                                .append("(Priority=")
+                                .append(pool.getPriority())
+                                .append("), ");
+                    }
+                    log.debug(sb.toString());
+                    
+                    sb = new StringBuilder("unavailableSlaves: ");
+                    for (HostAndPort hostAndPort : unavailableSlaves) {
+                        sb.append(hostAndPort);
+                    }
+                    log.debug(sb.toString());
+                }
             }
         }
 
@@ -414,6 +440,19 @@ public class CustomJedisSentinelPool extends JedisPool {
             this.subscribeRetryWaitTimeMillis = subscribeRetryWaitTimeMillis;
         }
 
+        /**
+         * 消息例子：
+                        主切换：
+            Sentinel 221.228.86.201:26382 published: (channel:+switch-master, message: mymaster 58.215.180.218 6380 58.215.180.219 6381).
+                        主挂：
+            Sentinel 58.215.180.219:26381 published: (channel:+sdown, message: master mymaster 58.215.180.219 6381).
+                        从挂：
+            Sentinel 58.215.180.219:26381 published: (channel:+sdown, message: slave 58.215.180.219:6381 58.215.180.219 6381 @ mymaster 58.215.180.218 6380).
+                        从恢复：
+            Sentinel 58.215.180.219:26381 published: (channel:-sdown, message: slave 58.215.180.219:6381 58.215.180.219 6381 @ mymaster 58.215.180.218 6380).
+                        从增加：
+            Sentinel 221.228.86.201:26382 published: (channel:+slave, message: slave 58.215.180.218:6381 58.215.180.218 6381 @ mymaster 221.228.86.201 6382).
+         */
         public void run() {
             running.set(true);
             while (running.get()) {
@@ -422,29 +461,59 @@ public class CustomJedisSentinelPool extends JedisPool {
                     j.subscribe(new JedisPubSubAdapter() {
                         @Override
                         public void onMessage(String channel, String message) {
-                            log.info("Sentinel " + host + ":" + port + " published: " + message + ".");
-                            String[] switchMasterMsg = message.split(" ");
-                            if (switchMasterMsg.length > 3) {
-                                if (masterName.equals(switchMasterMsg[0])) {
-                                    HostAndPort hostAddress = toHostAndPort(
-                                            Arrays.asList(switchMasterMsg[3], switchMasterMsg[4]));
-                                    log.info("switch master and init pool at :{}", hostAddress);
-                                    initMasterPool(hostAddress);
-                                    executorService.execute(new Runnable() {
-                                        public void run() {
-                                            reloadSlavePools(new Jedis(host, port), masterName);
-                                        };
-                                    });
+                            log.info("Sentinel " + host + ":" + port + " published: (channel:" + channel + ", message: " + message + ").");
+                            if("+switch-master".equals(channel)){   //主切换
+                                String[] messages = message.split(" ");
+                                if (messages.length > 3) {
+                                    if (masterName.equals(messages[0])) {
+                                        String oldMasterIp = messages[1];
+                                        String oldMasterPort = messages[2];
+                                        String newMasterIp = messages[3];
+                                        String newMasterPort = messages[4];
+                                        
+                                        HostAndPort hostAddress = toHostAndPort(
+                                                Arrays.asList(newMasterIp, newMasterPort));
+                                        log.info("switch master {} from [{}] to [{}]", messages[0], toHostAndPort(
+                                                Arrays.asList(oldMasterIp, oldMasterPort)), hostAddress);
+                                        initMasterPool(hostAddress);
+                                        executorService.execute(new Runnable() {
+                                            public void run() {
+                                                reloadSlavePools(new Jedis(host, port), masterName);
+                                            };
+                                        });
+                                    } else {
+                                        log.info("Ignoring message on +switch-master for master name " + messages[0]
+                                                + ", our master name is " + masterName);
+                                    }
                                 } else {
-                                    log.info("Ignoring message on +switch-master for master name " + switchMasterMsg[0]
-                                            + ", our master name is " + masterName);
+                                    log.error("Invalid message received on Sentinel  host:" + port
+                                            + " on channel +switch-master: " + message);
                                 }
-                            } else {
-                                log.error("Invalid message received on Sentinel  host:" + port
-                                        + " on channel +switch-master: " + message);
+                            } else if ("-sdown".equals(channel) || "+sdown".equals(channel)) {
+                                String[] messages = message.split(" ");
+                                if(messages.length == 8){
+                                    if("slave".equals(messages[0])){    // 只处理从挂，主挂会触发切换事件
+                                        if(masterName.equals(messages[5])){
+                                            reloadSlavePools(new Jedis(host, port), masterName);
+                                        }else{
+                                            log.info("Ignoring message on -/+sdown for master name {}, our master name is {}!", messages[5], masterName);
+                                        }
+                                    }
+                                }
+                            } else if ("+slave".equals(channel)) {
+                                String[] messages = message.split(" ");
+                                if(messages.length == 8){
+                                    if("slave".equals(messages[0])){    // 从增加
+                                        if(masterName.equals(messages[5])){
+                                            reloadSlavePools(new Jedis(host, port), masterName);
+                                        }else{
+                                            log.info("Ignoring message on +slave for master name {}, our master name is {}!", messages[5], masterName);
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }, "+switch-master");
+                    }, "+switch-master", "+sdown", "-sdown", "+slave");
                 } catch (JedisConnectionException e) {
                     if (running.get()) {
                         log.error("Lost connection to Sentinel at " + host + ":" + port
