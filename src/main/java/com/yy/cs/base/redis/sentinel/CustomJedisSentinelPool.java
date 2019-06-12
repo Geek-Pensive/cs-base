@@ -237,7 +237,7 @@ public class CustomJedisSentinelPool extends JedisPool {
         Map<String, ArrayList<HostAndPort>> map = new HashMap<String, ArrayList<HostAndPort>>();
         HostAndPort master = null;
         boolean running = true;
-        log.info("start initSentinels...");
+        log.info("start initSentinels masterName:{}, sentinels:{}...", masterName, sentinels);
         outer: while (running) {
             log.info("Trying to find master from available Sentinels...");
             for (String sentinel : sentinels) {

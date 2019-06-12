@@ -4,6 +4,7 @@ import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,28 +30,39 @@ public abstract class AbstractHostGroupCmdbLocator implements HostGroupLocator {
     
     protected String hostGroupLocatorUrl = GROUP_URL;
     
+    private static final int TRY_TIMES = 3;
+    
     protected ServerInfo getServerInfo(String host) {
         SoftReference<ServerInfo> serverInfoRef = serverInfoCacheMap.get(host);
         if (serverInfoRef == null || serverInfoRef.get() == null) {
-            try {
-                String response = httpClient.doGet(toCmdbServerInfoUrl(host));
-                ServerInfoResponse serverInfoResponse = Json.strToObj(response, ServerInfoResponse.class);
-                if (serverInfoResponse != null) {
-                    List<ServerInfo> serverInfoList = serverInfoResponse.getObject();
-                    if (serverInfoList != null && !serverInfoList.isEmpty()) {
-                        ServerInfo serverInfo = serverInfoList.get(0);
-                        if (log.isInfoEnabled()) {
-                            log.info("HostGroupLocatorCmdb update serverInfoMap,host:{},serverInfo:{}", host,
-                                    serverInfo);
-                        }
-                        if (serverInfo != null) {
-                            serverInfoCacheMap.put(host, new SoftReference<>(serverInfo));
-                            return serverInfo;
+            for (int i = 0; i < TRY_TIMES; i++) {
+                try {
+                    String response = httpClient.doGet(toCmdbServerInfoUrl(host));
+                    ServerInfoResponse serverInfoResponse = Json.strToObj(response, ServerInfoResponse.class);
+                    if (serverInfoResponse != null) {
+                        List<ServerInfo> serverInfoList = serverInfoResponse.getObject();
+                        if (serverInfoList != null && !serverInfoList.isEmpty()) {
+                            ServerInfo serverInfo = serverInfoList.get(0);
+                            if (log.isInfoEnabled()) {
+                                log.info(getClass().getSimpleName() + " update serverInfoMap,host:{},serverInfo:{}", host,
+                                        serverInfo);
+                            }
+                            if (serverInfo != null) {
+                                serverInfoCacheMap.put(host, new SoftReference<>(serverInfo));
+                                return serverInfo;
+                            }
                         }
                     }
+                    break;
+                } catch (Exception e) {
+                    log.warn(getClass().getSimpleName()+ " getGroup failed,host:{},cause:", host, e);
+                    
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(200);
+                    } catch (InterruptedException e1) {
+                        break;
+                    }
                 }
-            } catch (Exception e) {
-                log.error("HostGroupLocatorCmdb getGroup failed,host:{},cause:{}", host, e);
             }
         } else {
             return serverInfoRef.get();
@@ -102,7 +114,7 @@ public abstract class AbstractHostGroupCmdbLocator implements HostGroupLocator {
         String priGroupIdStr = getGroupFromRemote(serverInfo);
         priGroupIdStr = priGroupIdStr == null ? defaultGroup : priGroupIdStr;
         if (log.isInfoEnabled()) {
-            log.info("HostGroupLocatorCmdb getGroup priGroupId:{}", priGroupIdStr);
+            log.info(getClass().getSimpleName() + " getGroup priGroupId:{}", priGroupIdStr);
         }
         return priGroupIdStr;
     }
