@@ -1,3 +1,8 @@
+1.3.23
+charnges:
+    1. RedisSentinelFactory 增加redis slave读优先级：同机房>同城市>同区域
+    2. sentinel增加订阅事件
+
 1.3.12
 charnges:
     1. RedisSentinelFactory 增加redis slave就近读，设置useNearbySlave为true开启
