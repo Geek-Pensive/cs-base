@@ -1,6 +1,6 @@
 1.3.26-SNAPSHOT
 charnges:
-    1. redis sentinel slave增加runid判断
+    1. redis sentinel slave增加runid判断，fix：redis sentinel slave pool sort
     2. HostGroupCmdbLocator中的CSHttpClient改为打warn日志
 
 1.3.23
