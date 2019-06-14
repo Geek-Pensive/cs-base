@@ -34,6 +34,10 @@ public class CustomJedisSentinelPool extends JedisPool {
 
     protected static final org.slf4j.Logger log = LoggerFactory.getLogger(CustomJedisSentinelPool.class);
 
+    protected String masterName;
+    
+    protected Set<String> sentinels;
+    
     protected JedisPoolConfig poolConfig;
 
     protected int timeout = Protocol.DEFAULT_TIMEOUT;
@@ -93,6 +97,8 @@ public class CustomJedisSentinelPool extends JedisPool {
 
     public CustomJedisSentinelPool(String masterName, Set<String> sentinels, final JedisPoolConfig poolConfig,
                                    int timeout, final String password, final int database) {
+        this.masterName = masterName;
+        this.sentinels = sentinels;
         this.poolConfig = poolConfig;
         this.timeout = timeout;
         this.password = password;
@@ -190,6 +196,9 @@ public class CustomJedisSentinelPool extends JedisPool {
             availableSlaves = newAvailableSlaves;
             unavailableSlaves = newUnavailableSlaves;
             
+            // availableSlaves的每一次新增、修改（删除除外）都进行一次fillPriority
+            fillPriorityAndSortSlaveJedisPool();
+            
             // 再销毁老的从连接池
             if (oldAvailableSlaves != null && oldAvailableSlaves.size() > 0) {
                 for (JedisPool pool : oldAvailableSlaves) {
@@ -206,8 +215,12 @@ public class CustomJedisSentinelPool extends JedisPool {
         }
     }
 
-    protected SlaveJedisPool createSlaveJedisPool(HostAndPort hap) {
+    private SlaveJedisPool createSlaveJedisPool(HostAndPort hap) {
         return new SlaveJedisPool(poolConfig, hap, timeout);
+    }
+    
+    protected void fillPriorityAndSortSlaveJedisPool() {
+        // TODO empty implementation
     }
 
     public JedisPool getReaderPool() {
@@ -391,6 +404,8 @@ public class CustomJedisSentinelPool extends JedisPool {
                                     log.debug(" add available jedis slave pool " + hap);
                                 }
                             }
+                            // availableSlaves的每一次新增、修改（删除除外）都进行一次fillPriority
+                            fillPriorityAndSortSlaveJedisPool();
                         }
 
                     } finally {
@@ -399,7 +414,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                 }
                 
                 if (log.isDebugEnabled()) {
-                    StringBuilder sb = new StringBuilder("availableSlaves: ");
+                    StringBuilder sb = new StringBuilder("masterName:" + masterName + " availableSlaves: ");
                     for (SlaveJedisPool pool : availableSlaves) {
                         sb.append(pool.getHostAndPort())
                                 .append("(Priority=")
@@ -408,7 +423,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                     }
                     log.debug(sb.toString());
                     
-                    sb = new StringBuilder("unavailableSlaves: ");
+                    sb = new StringBuilder("masterName:" + masterName + " unavailableSlaves: ");
                     for (HostAndPort hostAndPort : unavailableSlaves) {
                         sb.append(hostAndPort);
                     }

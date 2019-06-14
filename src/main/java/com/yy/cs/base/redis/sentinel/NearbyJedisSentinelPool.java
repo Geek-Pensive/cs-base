@@ -94,31 +94,27 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
     }
 
     @Override
-    protected SlaveJedisPool createSlaveJedisPool(HostAndPort hap) {
-        final SlaveJedisPool pool = super.createSlaveJedisPool(hap);
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                fillPriority(pool);
-            }
-        });
-        return pool;
-    }
-
-    private void fillPriority(SlaveJedisPool pool) {
+    protected void fillPriorityAndSortSlaveJedisPool() {
 
         if (!pickHighestSlaves || null == localGroupIds || localGroupIds.size() == 0 || HostGroupLocator.DEFAULT_GROUP.equals(localGroupIds.get(0))) {
             return;
         }
-
-        int priority = this.getPriority(pool.getHostAndPort().getHost());
-        if (priority != pool.getPriority()) {
-            pool.setPriority(priority);
-            //存在极小可能pool还没添加到availableSlaves中
-            if (waitForPoolAdded(pool)) {
-                sortSlaveJedisPool();
+        
+        // 异步处理
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    for (SlaveJedisPool pool : availableSlaves) {
+                        int priority = getPriority(pool.getHostAndPort().getHost());
+                        pool.setPriority(priority);
+                    }
+                    sortSlaveJedisPool();
+                } catch (Exception e) {
+                    log.warn("error:", e);
+                }
             }
-        }
+        });
     }
     
     /**
@@ -144,7 +140,7 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
      * 等待pool被加入到从库列表中
      * @return 线程中断时返回false，否则返回true
      */
-    private boolean waitForPoolAdded(SlaveJedisPool pool) {
+    /*private boolean waitForPoolAdded(SlaveJedisPool pool) {
         if (!containSlavePool(pool)) {
             Thread.yield();
             if (!containSlavePool(pool)) {
@@ -165,14 +161,14 @@ public class NearbyJedisSentinelPool extends CustomJedisSentinelPool {
 
     private boolean containSlavePool(SlaveJedisPool pool) {
         return availableSlaves.contains(pool) || unavailableSlaves.contains(pool);
-    }
+    }*/
 
     private void sortSlaveJedisPool() {
         lock.writeLock().lock();
         try {
             Collections.sort(availableSlaves);
             if (log.isInfoEnabled()) {
-                StringBuilder sb = new StringBuilder("[NearbyJedisSentinelPool] Sorted SlaveJedisPool: ");
+                StringBuilder sb = new StringBuilder("[NearbyJedisSentinelPool] masterName:" + masterName + " Sorted SlaveJedisPool: ");
                 for (SlaveJedisPool pool : availableSlaves) {
                     sb.append(pool.getHostAndPort())
                             .append("(Priority=")
