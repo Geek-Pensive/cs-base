@@ -28,7 +28,7 @@ public abstract class AbstractHostGroupCmdbLocator implements HostGroupLocator {
 
     protected static final Map<String, SoftReference<ServerInfo>> serverInfoCacheMap = new ConcurrentHashMap<>();
 
-    protected static final CSHttpClient httpClient = CSHttpClientBuilder.newBuilder().setConnectionRequestTimeout(20000)
+    protected static final CSHttpClient httpClient = CSHttpClientBuilder.newBuilder().setSocketTimeOut(20000)
             .setLogLevel(LogLevel.WARN).build();
     
     protected String hostGroupLocatorUrl = GROUP_URL;
