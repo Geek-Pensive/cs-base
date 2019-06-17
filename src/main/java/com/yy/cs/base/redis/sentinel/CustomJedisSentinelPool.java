@@ -414,16 +414,18 @@ public class CustomJedisSentinelPool extends JedisPool {
                 }
                 
                 if (log.isDebugEnabled()) {
-                    StringBuilder sb = new StringBuilder("masterName:" + masterName + " availableSlaves: ");
+                    StringBuilder sb = new StringBuilder("SlavesChecker...");
+                    sb.append(System.lineSeparator() + "masterName:" + masterName + " currentHostMaster: " + currentHostMaster);
+                    
+                    sb.append(System.lineSeparator() + "availableSlaves: ");
                     for (SlaveJedisPool pool : availableSlaves) {
                         sb.append(pool.getHostAndPort())
                                 .append("(Priority=")
                                 .append(pool.getPriority())
                                 .append("), ");
                     }
-                    log.debug(sb.toString());
                     
-                    sb = new StringBuilder("masterName:" + masterName + " unavailableSlaves: ");
+                    sb.append(System.lineSeparator() + "unavailableSlaves: ");
                     for (HostAndPort hostAndPort : unavailableSlaves) {
                         sb.append(hostAndPort);
                     }
