@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,11 +18,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.yy.cs.base.task.trigger.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.yy.cs.base.json.Json;
 import com.yy.cs.base.redis.RedisUtils;
+import com.yy.cs.base.task.trigger.StringUtils;
 
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
@@ -152,20 +153,40 @@ public class CustomJedisSentinelPool extends JedisPool {
         return currentHostMaster;
     }
 
-    private void initMasterPool(HostAndPort master) {
-        // 覆写equals，避免重复初始化master pool
-        if (!master.equals(currentHostMaster)) {
-            ArrayList<HostAndPort> ls = new ArrayList<>();
-            ls.add(master);
-            sentinelsMap.put(MASTER_PREFIX, ls);
-            currentHostMaster = master;
-            log.info("Created JedisPool to master at " + master);
-            // 创建master pool(创建之前会先close)
-            initPool(poolConfig, new JedisFactory(master.getHost(), master.getPort(), timeout, password, database));
+    /**
+     * 初始化 或 重建MasterPool
+     * 
+     * @param master
+     * @return 返回MasterPool是否有变化
+     */
+    private boolean initMasterPool(HostAndPort master) {
+        try {
+            lock.writeLock().lock();
+            
+            // 覆写equals，避免重复初始化master pool
+            if (!master.equals(currentHostMaster)) {
+                ArrayList<HostAndPort> ls = new ArrayList<>();
+                ls.add(master);
+                sentinelsMap.put(MASTER_PREFIX, ls);
+                currentHostMaster = master;
+                log.info("Created JedisPool to master at " + master);
+                // 创建master pool(创建之前会先close)
+                initPool(poolConfig, new JedisFactory(master.getHost(), master.getPort(), timeout, password, database));
+                return true;
+            }
+        } finally {
+            lock.writeLock().unlock();
         }
+        return false;
     }
 
-    private void initSalvePools(ArrayList<HostAndPort> slaves) {
+    /**
+     * 初始化 或 重建SalvePools
+     * 
+     * @param slaves
+     * @return 返回SalvePools是否有变化
+     */
+    private boolean initSalvePools(ArrayList<HostAndPort> slaves) {
         try {
             lock.writeLock().lock();
             boolean isSame = false;
@@ -174,7 +195,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                 isSame = true;
             }
             if (isSame) {
-                return;
+                return false;
             } else {
                 sentinelsMap.put(SLAVE_PREFIX, slaves);
             }
@@ -210,6 +231,7 @@ public class CustomJedisSentinelPool extends JedisPool {
             if (oldUnavailableSlaves != null && oldUnavailableSlaves.size() > 0) {
                 oldUnavailableSlaves.clear();
             }
+            return true;
         } finally {
             lock.writeLock().unlock();
         }
@@ -336,6 +358,66 @@ public class CustomJedisSentinelPool extends JedisPool {
         int port = Integer.parseInt(getMasterAddrByNameResult.get(1));
         return new HostAndPort(host, port);
     }
+    
+    /**
+     * 检查当前master是否成为slave(readonly)
+     * 有可能switch-master消息收不到，定时检查master是否正常
+     */
+    private void checkMaster() {
+        try (Jedis j = getResource();) {
+            String info = j.info();
+            if (!RedisUtils.isMaster(info)) {
+                // map<masterAddr, List<sentinelAddr>>
+                Map<HostAndPort, List<HostAndPort>> masterMap = new HashMap<>();
+                for (String sentinel : sentinels) {
+                    final HostAndPort hap = toHostAndPort(Arrays.asList(sentinel.split(":")));
+                    log.debug("Connecting to Sentinel " + hap);
+                    try {
+                        @SuppressWarnings("resource")
+                        Jedis jedis = new Jedis(hap.getHost(), hap.getPort(), timeout);
+                        HostAndPort master = toHostAndPort(jedis.sentinelGetMasterAddrByName(masterName));
+                        List<HostAndPort> hapList = masterMap.get(master);
+                        if (null == hapList) {
+                            hapList = new ArrayList<>();
+                        }
+                        hapList.add(hap);
+                        masterMap.put(master, hapList);
+                    } catch (JedisConnectionException e) {
+                        log.warn("Cannot connect to sentinel running @ " + hap + ". Trying next one.");
+                    }
+                }
+
+                if (null != masterMap && masterMap.size() > 0) {
+                    List<Entry<HostAndPort, List<HostAndPort>>> list = new ArrayList<>(masterMap.entrySet());
+                    HostAndPort master = list.get(0).getKey();
+                    List<HostAndPort> hapList = list.get(0).getValue();
+                    for (int i = 1; i < list.size(); i++) {
+                        HostAndPort key = list.get(i).getKey();
+                        List<HostAndPort> value = list.get(i).getValue();
+                        if (value.size() > hapList.size()) {
+                            master = key;
+                            hapList = value;
+                        }
+                    }
+
+                    final HostAndPort hap = hapList.get(0);
+                    log.info("checkMaster masterMap:{}， found Redis master at {}", masterMap, master);
+                    ArrayList<HostAndPort> ls = new ArrayList<>();
+                    ls.add(master);
+                    // 初始化masterPool
+                    boolean masterChange = initMasterPool(master);
+                    if (masterChange) {
+                        executorService.execute(new Runnable() {
+                            public void run() {
+                                reloadSlavePools(new Jedis(hap.getHost(), hap.getPort()), masterName);
+                            };
+                        });
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
 
     protected class SlavesChecker extends Thread {
 
@@ -382,10 +464,10 @@ public class CustomJedisSentinelPool extends JedisPool {
 
                 if (newUnavailable.size() > 0 || newAvailable.size() > 0) {
                     lock.writeLock().lock();
-                    if (lastUpdate != lastLoadTimestamp.get()) {
-                        continue;
-                    }
                     try {
+                        if (lastUpdate != lastLoadTimestamp.get()) {
+                            continue;
+                        }
                         if (!newUnavailable.isEmpty()) {
                             for (SlaveJedisPool jp : newUnavailable) {
                                 unavailableSlaves.add(jp.getHostAndPort());
@@ -412,6 +494,9 @@ public class CustomJedisSentinelPool extends JedisPool {
                         lock.writeLock().unlock();
                     }
                 }
+                
+                // 定时检查master是否正常
+                checkMaster();
                 
                 if (log.isDebugEnabled()) {
                     StringBuilder sb = new StringBuilder("SlavesChecker...");
@@ -503,12 +588,14 @@ public class CustomJedisSentinelPool extends JedisPool {
                                                 Arrays.asList(newMasterIp, newMasterPort));
                                         log.info("switch master {} from [{}] to [{}]", messages[0], toHostAndPort(
                                                 Arrays.asList(oldMasterIp, oldMasterPort)), hostAddress);
-                                        initMasterPool(hostAddress);
-                                        executorService.execute(new Runnable() {
-                                            public void run() {
-                                                reloadSlavePools(new Jedis(host, port), masterName);
-                                            };
-                                        });
+                                        boolean masterChange = initMasterPool(hostAddress);
+                                        if(masterChange){
+                                            executorService.execute(new Runnable() {
+                                                public void run() {
+                                                    reloadSlavePools(new Jedis(host, port), masterName);
+                                                };
+                                            });
+                                        }
                                     } else {
                                         log.info("Ignoring message on +switch-master for master name " + messages[0]
                                                 + ", our master name is " + masterName);
