@@ -372,9 +372,7 @@ public class CustomJedisSentinelPool extends JedisPool {
                 for (String sentinel : sentinels) {
                     final HostAndPort hap = toHostAndPort(Arrays.asList(sentinel.split(":")));
                     log.debug("Connecting to Sentinel " + hap);
-                    try {
-                        @SuppressWarnings("resource")
-                        Jedis jedis = new Jedis(hap.getHost(), hap.getPort(), timeout);
+                    try (Jedis jedis = new Jedis(hap.getHost(), hap.getPort(), timeout);) {
                         HostAndPort master = toHostAndPort(jedis.sentinelGetMasterAddrByName(masterName));
                         List<HostAndPort> hapList = masterMap.get(master);
                         if (null == hapList) {
