@@ -433,6 +433,29 @@ public class CustomJedisSentinelPool extends JedisPool {
                 } catch (Exception e) {
 
                 }
+                
+                if (log.isDebugEnabled()) {
+                    StringBuilder sb = new StringBuilder("SlavesChecker...");
+                    sb.append(System.lineSeparator() + "masterName:" + masterName + " currentHostMaster: " + currentHostMaster);
+                    
+                    sb.append(System.lineSeparator() + "availableSlaves: ");
+                    for (SlaveJedisPool pool : availableSlaves) {
+                        sb.append(pool.getHostAndPort())
+                                .append("(Priority=")
+                                .append(pool.getPriority())
+                                .append("), ");
+                    }
+                    
+                    sb.append(System.lineSeparator() + "unavailableSlaves: ");
+                    for (HostAndPort hostAndPort : unavailableSlaves) {
+                        sb.append(hostAndPort);
+                    }
+                    log.debug(sb.toString());
+                }
+                
+                // 定时检查master是否正常
+                checkMaster();
+                
                 long lastUpdate = lastLoadTimestamp.get();
                 List<SlaveJedisPool> newUnavailable = new ArrayList<>();
                 List<HostAndPort> newAvailable = new ArrayList<>();
@@ -491,28 +514,6 @@ public class CustomJedisSentinelPool extends JedisPool {
                     } finally {
                         lock.writeLock().unlock();
                     }
-                }
-                
-                // 定时检查master是否正常
-                checkMaster();
-                
-                if (log.isDebugEnabled()) {
-                    StringBuilder sb = new StringBuilder("SlavesChecker...");
-                    sb.append(System.lineSeparator() + "masterName:" + masterName + " currentHostMaster: " + currentHostMaster);
-                    
-                    sb.append(System.lineSeparator() + "availableSlaves: ");
-                    for (SlaveJedisPool pool : availableSlaves) {
-                        sb.append(pool.getHostAndPort())
-                                .append("(Priority=")
-                                .append(pool.getPriority())
-                                .append("), ");
-                    }
-                    
-                    sb.append(System.lineSeparator() + "unavailableSlaves: ");
-                    for (HostAndPort hostAndPort : unavailableSlaves) {
-                        sb.append(hostAndPort);
-                    }
-                    log.debug(sb.toString());
                 }
             }
         }
